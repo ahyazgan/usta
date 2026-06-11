@@ -15,7 +15,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#16181D"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.usta.app",
@@ -30,7 +32,11 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#16181D"
-      }
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -43,10 +49,20 @@
         {
           "cameraPermission": "Usta kamerayı doğru parçayı bulduğunu doğrulamak için kullanır."
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "78ea62dc-1ba8-426b-8c56-0da737951693"
+      }
+    },
+    "owner": "ahyazgan"
   }
 }

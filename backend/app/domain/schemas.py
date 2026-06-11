@@ -13,6 +13,7 @@ from .enums import (
     Guven,
     KayitKosulu,
     Konum,
+    ReminderStatus,
     SesKategori,
     SubscriptionTier,
 )
@@ -158,6 +159,36 @@ class TaskOut(BaseModel):
     title_tr: str
     title_en: str
     risk: Aciliyet
+
+
+# --------------------------------------------------------------------------- #
+# Bakım geçmişi & hatırlatma
+# --------------------------------------------------------------------------- #
+
+
+class MaintenanceLogCreate(BaseModel):
+    task: str = Field(min_length=1, max_length=60)
+    km: int | None = Field(default=None, ge=0)
+    note: str | None = Field(default=None, max_length=500)
+
+
+class MaintenanceLogOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    task: str
+    km: int | None
+    note: str | None
+    created_at: datetime
+
+
+class ReminderOut(BaseModel):
+    task: str
+    interval_km: int
+    last_km: int | None
+    due_km: int | None
+    remaining_km: int | None
+    status: ReminderStatus
 
 
 class HealthResponse(BaseModel):

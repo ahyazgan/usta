@@ -68,3 +68,12 @@ class Aciliyet(str, Enum):
 class AIKind(str, Enum):
     image = "image"
     sound = "sound"
+
+
+class ReminderStatus(str, Enum):
+    """Bakım hatırlatma durumu (km bazlı)."""
+
+    ok = "ok"
+    soon = "soon"
+    due = "due"
+    unknown = "unknown"  # km veya kayıt yoksa

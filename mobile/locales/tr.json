@@ -1,0 +1,43 @@
+{
+  "app": {
+    "name": "Usta",
+    "tagline": "Cebindeki usta"
+  },
+  "garage": {
+    "title": "Garajım",
+    "labels": {
+      "make": "Marka",
+      "model": "Model",
+      "year": "Yıl",
+      "engine": "Motor",
+      "fuel": "Yakıt",
+      "km": "Kilometre"
+    },
+    "chips": {
+      "oil": "Yağ",
+      "filter": "Filtre",
+      "battery": "Akü"
+    },
+    "chipState": {
+      "ok": "Tamam",
+      "due": "Zamanı geldi",
+      "soon": "Yaklaşıyor"
+    },
+    "cta": "Ustaya Göster"
+  },
+  "camera": {
+    "stepBanner": "Adım {{current}}/{{total}}",
+    "stepTitle": "Yağ çubuğunu bul ve seviyeyi kontrol et",
+    "safetyStrip": "Dikkat: Motor sıcak olabilir. Aracı sabit zemine al, krikoyla kaldırdıysan takozla destekle.",
+    "check": "Kontrol Et",
+    "permissionDenied": "Kamera izni verilmedi. Doğru parçayı doğrulamak için ayarlardan izin ver.",
+    "offline": "Çevrimdışısın — bağlantı bekleniyor",
+    "hint": "Parçayı çerçeveye ortala ve Kontrol Et'e bas"
+  },
+  "common": {
+    "loading": "Yükleniyor…",
+    "retry": "Tekrar Dene",
+    "cancel": "Vazgeç",
+    "goToMechanic": "Tamirciye Git"
+  }
+}

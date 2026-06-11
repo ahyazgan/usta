@@ -1,0 +1,43 @@
+{
+  "app": {
+    "name": "Usta",
+    "tagline": "A master mechanic in your pocket"
+  },
+  "garage": {
+    "title": "My Garage",
+    "labels": {
+      "make": "Make",
+      "model": "Model",
+      "year": "Year",
+      "engine": "Engine",
+      "fuel": "Fuel",
+      "km": "Mileage"
+    },
+    "chips": {
+      "oil": "Oil",
+      "filter": "Filter",
+      "battery": "Battery"
+    },
+    "chipState": {
+      "ok": "OK",
+      "due": "Due now",
+      "soon": "Coming up"
+    },
+    "cta": "Show the Master"
+  },
+  "camera": {
+    "stepBanner": "Step {{current}}/{{total}}",
+    "stepTitle": "Find the dipstick and check the level",
+    "safetyStrip": "Warning: The engine may be hot. Park on firm ground; if jacked up, support it with axle stands.",
+    "check": "Check",
+    "permissionDenied": "Camera permission denied. Grant access in settings to verify the correct part.",
+    "offline": "You are offline — waiting for connection",
+    "hint": "Center the part in the frame and tap Check"
+  },
+  "common": {
+    "loading": "Loading…",
+    "retry": "Retry",
+    "cancel": "Cancel",
+    "goToMechanic": "Go to a Mechanic"
+  }
+}

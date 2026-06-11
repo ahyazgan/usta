@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "Usta",
+    "slug": "usta",
+    "scheme": "usta",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#16181D"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.usta.app",
+      "userInterfaceStyle": "dark",
+      "infoPlist": {
+        "UIBackgroundColor": "#16181D"
+      }
+    },
+    "android": {
+      "package": "com.usta.app",
+      "userInterfaceStyle": "dark",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#16181D"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Usta kamerayı doğru parçayı bulduğunu doğrulamak için kullanır."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

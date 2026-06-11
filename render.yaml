@@ -1,0 +1,29 @@
+# Render Blueprint — backend web servisi + ücretsiz Postgres.
+# Kullanım: Render → New → Blueprint → bu repo. Sonra ANTHROPIC anahtarını
+# panelden gir (aşağıda sync:false olan değişken).
+services:
+  - type: web
+    name: usta-backend
+    runtime: docker
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
+    healthCheckPath: /health
+    plan: free
+    envVars:
+      - key: USTA_DEBUG
+        value: "false"
+      # Vision/ses analizi için — değeri Render panelinden GİR (repoda yok).
+      - key: USTA_ANTHROPIC_API_KEY
+        sync: false
+      # JWT imza anahtarı — Render rastgele üretir.
+      - key: USTA_JWT_SECRET
+        generateValue: true
+      # Postgres bağlantısı (aşağıdaki veritabanından otomatik).
+      - key: USTA_DATABASE_URL
+        fromDatabase:
+          name: usta-db
+          property: connectionString
+
+databases:
+  - name: usta-db
+    plan: free

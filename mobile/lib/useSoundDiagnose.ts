@@ -11,7 +11,7 @@ import {
   type KayitKosulu,
   type SoundDiagnoseResult,
 } from '@/lib/api';
-import { useUstaStore } from '@/lib/store';
+import { selectCurrentVehicle, useUstaStore } from '@/lib/store';
 
 export interface UseSoundDiagnose {
   loading: boolean;
@@ -30,12 +30,14 @@ function errorKey(err: unknown): string {
   if (err instanceof ApiError) {
     if (err.status === 0) return 'sound.error.offline';
     if (err.status === 401 || err.status === 403) return 'sound.error.auth';
+    if (err.status === 503 || err.status === 502) return 'sound.error.aiUnavailable';
+    if (err.status === 429) return 'sound.error.busy';
   }
   return 'sound.error.generic';
 }
 
 export function useSoundDiagnose(): UseSoundDiagnose {
-  const vehicle = useUstaStore((s) => s.vehicle);
+  const vehicle = useUstaStore(selectCurrentVehicle);
   const authToken = useUstaStore((s) => s.authToken);
 
   const [loading, setLoading] = useState(false);

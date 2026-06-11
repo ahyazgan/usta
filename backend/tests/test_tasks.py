@@ -2,8 +2,9 @@
 
 import pytest
 
+from app.domain.enums import FuelType
 from app.domain.pricing import TARGET_COST_PER_DIAGNOSIS_USD, cost_usd, within_budget
-from app.domain.tasks import get_task, get_tasks
+from app.domain.tasks import get_task, get_tasks, tasks_for_fuel
 from app.services.ai.prompts import PROMPTS_DIR
 from app.tools.eval_vision import offline_selfcheck
 
@@ -24,6 +25,52 @@ def test_get_task_lookup():
     assert get_task("battery").risk.value == "yuksek"
     assert get_task("cabin_filter").risk.value == "dusuk"
     assert get_task("olmayan") is None
+
+
+def test_tasks_for_fuel_filters_by_applicability():
+    benzin = {t.id for t in tasks_for_fuel(FuelType.benzin)}
+    dizel = {t.id for t in tasks_for_fuel(FuelType.dizel)}
+    elektrik = {t.id for t in tasks_for_fuel(FuelType.elektrik)}
+
+    assert "spark_plug" in benzin  # bujili motor
+    assert "spark_plug" not in dizel  # dizelde buji yok
+    assert "oil_change" in dizel
+    assert "air_filter" in dizel  # motor hava filtresi yanmalı motorlarda var
+    assert "oil_change" not in elektrik  # elektrikte yağ yok
+    assert "spark_plug" not in elektrik
+    assert "air_filter" not in elektrik  # elektrikte motor hava filtresi yok
+    assert {"battery", "cabin_filter", "brake_check"} <= elektrik  # her araçta var
+    assert get_task("brake_check").risk.value == "yuksek"  # güvenlik-kritik
+
+
+@pytest.mark.asyncio
+async def test_vehicle_tasks_endpoint_respects_fuel(client):
+    from .conftest import create_vehicle
+
+    headers = await register_and_login(client, "vtask@usta.app")
+    # conftest demo aracı LPG -> buji dahil tüm görevler
+    lpg = await create_vehicle(client, headers)
+    r = await client.get(f"/v1/vehicles/{lpg['id']}/tasks", headers=headers)
+    assert r.status_code == 200
+    assert "spark_plug" in {t["id"] for t in r.json()}
+
+    # Dizel araç -> buji hariç
+    dz = await client.post(
+        "/v1/vehicles",
+        json={"make": "Renault", "model": "Clio", "year": 2018, "fuel_type": "dizel", "engine_code": "K9K"},
+        headers=headers,
+    )
+    rid = dz.json()["id"]
+    r = await client.get(f"/v1/vehicles/{rid}/tasks", headers=headers)
+    ids = {t["id"] for t in r.json()}
+    assert "spark_plug" not in ids
+    assert "oil_change" in ids
+
+
+@pytest.mark.asyncio
+async def test_vehicle_tasks_requires_auth_401(client):
+    r = await client.get("/v1/vehicles/1/tasks")
+    assert r.status_code == 401
 
 
 # --------------------------------------------------------------------------- #

@@ -5,11 +5,13 @@
   },
   "garage": {
     "title": "Garajım",
+    "loading": "Garajın yükleniyor…",
     "labels": {
       "make": "Marka",
       "model": "Model",
       "year": "Yıl",
       "engine": "Motor",
+      "engineCode": "Motor kodu",
       "fuel": "Yakıt",
       "km": "Kilometre"
     },
@@ -21,16 +23,67 @@
     "chipState": {
       "ok": "Tamam",
       "due": "Zamanı geldi",
-      "soon": "Yaklaşıyor"
+      "soon": "Yaklaşıyor",
+      "unknown": "Bilinmiyor"
     },
     "tasks": {
       "title": "Ne yapacaksın?",
       "selectHint": "Devam etmek için bir görev seç",
       "oil_change": "Yağ Değişimi",
       "battery": "Akü",
-      "cabin_filter": "Polen Filtresi"
+      "cabin_filter": "Polen Filtresi",
+      "spark_plug": "Buji Değişimi"
     },
     "cta": "Ustaya Göster"
+  },
+  "vehicle": {
+    "add": "Araç Ekle",
+    "switch": "Değiştir",
+    "edit": {
+      "title": "Aracı Düzenle",
+      "cta": "Düzenle"
+    },
+    "delete": {
+      "cta": "Sil",
+      "confirmTitle": "Aracı sil",
+      "confirmMessage": "{{make}} {{model}} aracını silmek istediğine emin misin? Bu işlem geri alınamaz.",
+      "confirm": "Sil",
+      "cancel": "Vazgeç"
+    },
+    "empty": {
+      "title": "Henüz araç eklemedin",
+      "desc": "Sana özel rehberlik için önce aracını tanıt."
+    },
+    "fuel": {
+      "benzin": "Benzin",
+      "dizel": "Dizel",
+      "lpg": "LPG",
+      "hibrit": "Hibrit",
+      "elektrik": "Elektrik"
+    },
+    "form": {
+      "title": "Araç Ekle",
+      "make": "Marka",
+      "makePlaceholder": "Örn: Renault",
+      "model": "Model",
+      "modelPlaceholder": "Örn: Clio",
+      "year": "Yıl",
+      "yearPlaceholder": "Örn: 2019",
+      "engineCode": "Motor kodu (isteğe bağlı)",
+      "engineCodePlaceholder": "Örn: K9K",
+      "km": "Kilometre (isteğe bağlı)",
+      "kmPlaceholder": "Örn: 138420",
+      "fuel": "Yakıt",
+      "save": "Kaydet",
+      "specAutoHint": "Bilinen TR araçları için teknik özellikler otomatik doldurulur.",
+      "validation": "Lütfen marka, model, yıl (1950–2100) ve yakıt türünü gir."
+    },
+    "error": {
+      "network": "Bağlantı yok — internetini kontrol et",
+      "generic": "Bir şeyler ters gitti, tekrar dene",
+      "auth": "Oturum gerekli — lütfen giriş yap",
+      "noVehicle": "Önce bir araç ekle"
+    }
   },
   "nav": {
     "sound": "Ses Teşhisi",
@@ -96,9 +149,11 @@
     "error": {
       "offline": "Çevrimdışısın — bağlantını kontrol et ve tekrar dene",
       "auth": "Oturum gerekli — lütfen giriş yap",
-      "noVehicle": "Önce bir araç seç",
+      "noVehicle": "Önce bir araç ekle",
       "noDescription": "Lütfen sesi tarif et",
-      "generic": "Bir şeyler ters gitti, tekrar dene"
+      "generic": "Bir şeyler ters gitti, tekrar dene",
+      "aiUnavailable": "Yapay zekâ servisi şu an kullanılamıyor. Lütfen sonra tekrar dene.",
+      "busy": "Servis şu an yoğun. Lütfen biraz sonra tekrar dene."
     }
   },
   "history": {
@@ -134,7 +189,7 @@
     "error": {
       "offline": "Çevrimdışısın — bağlantını kontrol et ve tekrar dene",
       "auth": "Oturum gerekli — lütfen giriş yap",
-      "noVehicle": "Önce bir araç seç",
+      "noVehicle": "Önce bir araç ekle",
       "generic": "Bir şeyler ters gitti, tekrar dene"
     }
   },
@@ -178,7 +233,10 @@
       "offline": "Çevrimdışısın — bağlantını kontrol et ve tekrar dene",
       "auth": "Oturum gerekli — lütfen giriş yap",
       "noTask": "Önce bir görev seç",
-      "generic": "Bir şeyler ters gitti, tekrar dene"
+      "noVehicle": "Önce bir araç ekle",
+      "generic": "Bir şeyler ters gitti, tekrar dene",
+      "aiUnavailable": "Yapay zekâ servisi şu an kullanılamıyor. Lütfen sonra tekrar dene.",
+      "busy": "Servis şu an yoğun. Lütfen biraz sonra tekrar dene."
     }
   },
   "common": {

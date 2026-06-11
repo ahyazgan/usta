@@ -222,6 +222,81 @@ async def test_sound_metalik_vuruntu_forces_mechanic(client, fake_claude):
     assert body["guvenlik_uyarisi"]
 
 
+# --------------------------------------------------------------------------- #
+# AI dayanıklılığı — temiz hata eşlemesi (çıplak 500 yerine)
+# --------------------------------------------------------------------------- #
+
+
+class _RaisingClaude:
+    def __init__(self, exc: Exception) -> None:
+        self.exc = exc
+
+    async def complete_json(self, **kwargs):
+        raise self.exc
+
+
+class _BadDataClaude:
+    """Şemaya uymayan veri döndürür (eksik alanlar)."""
+
+    async def complete_json(self, **kwargs):
+        from app.services.ai.claude_client import ClaudeResult
+
+        return ClaudeResult(data={"tespit": "eksik"}, tokens_in=10, tokens_out=5)
+
+
+async def _setup_vehicle(client):
+    headers = await register_and_login(client, f"resil{id(client)}@usta.app")
+    vehicle = await create_vehicle(client, headers)
+    return headers, vehicle["id"]
+
+
+@pytest.mark.asyncio
+async def test_ai_not_configured_returns_503(client):
+    from app.domain.ai_errors import AINotConfigured
+    from app.services.ai.claude_client import get_claude_client
+
+    headers, vid = await _setup_vehicle(client)
+    app.dependency_overrides[get_claude_client] = lambda: _RaisingClaude(AINotConfigured())
+    r = await client.post("/v1/ai/diagnose/image", json=_image_payload(vid), headers=headers)
+    assert r.status_code == 503
+    assert r.json()["code"] == "ai_not_configured"
+
+
+@pytest.mark.asyncio
+async def test_ai_upstream_error_returns_502(client):
+    from app.domain.ai_errors import AIUpstreamError
+    from app.services.ai.claude_client import get_claude_client
+
+    headers, vid = await _setup_vehicle(client)
+    app.dependency_overrides[get_claude_client] = lambda: _RaisingClaude(AIUpstreamError())
+    r = await client.post("/v1/ai/diagnose/image", json=_image_payload(vid), headers=headers)
+    assert r.status_code == 502
+    assert r.json()["code"] == "ai_upstream"
+
+
+@pytest.mark.asyncio
+async def test_ai_rate_limited_returns_429(client):
+    from app.domain.ai_errors import AIRateLimited
+    from app.services.ai.claude_client import get_claude_client
+
+    headers, vid = await _setup_vehicle(client)
+    app.dependency_overrides[get_claude_client] = lambda: _RaisingClaude(AIRateLimited())
+    r = await client.post("/v1/ai/diagnose/sound", json=_sound_payload(vid), headers=headers)
+    assert r.status_code == 429
+    assert r.json()["code"] == "ai_rate_limited"
+
+
+@pytest.mark.asyncio
+async def test_ai_bad_schema_returns_502(client):
+    from app.services.ai.claude_client import get_claude_client
+
+    headers, vid = await _setup_vehicle(client)
+    app.dependency_overrides[get_claude_client] = lambda: _BadDataClaude()
+    r = await client.post("/v1/ai/diagnose/image", json=_image_payload(vid), headers=headers)
+    assert r.status_code == 502
+    assert r.json()["code"] == "ai_upstream"
+
+
 @pytest.mark.asyncio
 async def test_tokens_logged_to_ai_session(client, fake_claude):
     """Token sayıları AISession'a yazılmalı (maliyet denetimi)."""

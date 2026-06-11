@@ -9,11 +9,13 @@ from contextlib import asynccontextmanager
 import structlog
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from sqlalchemy import text
 
 from .api import ai, auth, maintenance, tasks, vehicles
 from .config import get_settings
 from .database import SessionLocal, create_all
+from .domain.ai_errors import AIError
 from .domain.schemas import HealthResponse
 
 settings = get_settings()
@@ -59,6 +61,16 @@ async def request_context(request: Request, call_next):
     logger.info("request", method=request.method, status=response.status_code, ms=duration_ms)
     structlog.contextvars.clear_contextvars()
     return response
+
+
+@app.exception_handler(AIError)
+async def ai_error_handler(request: Request, exc: AIError) -> JSONResponse:
+    """AI hatalarını çıplak 500 yerine temiz, kullanıcı-dostu yanıta çevirir."""
+    logger.warning("ai_error", code=exc.code, status=exc.status_code, detail=exc.message)
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.message, "code": exc.code},
+    )
 
 
 @app.get("/health", response_model=HealthResponse, tags=["meta"])

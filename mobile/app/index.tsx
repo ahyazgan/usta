@@ -1,7 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect } from 'react';
 import {
+  ActivityIndicator,
+  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -10,45 +12,48 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { createApiClient, type Task } from '@/lib/api';
+import { type Task, type Vehicle } from '@/lib/api';
 import { i18n, t } from '@/lib/i18n';
-import { useUstaStore, type ChipState } from '@/lib/store';
+import { useUstaStore } from '@/lib/store';
 import { theme } from '@/lib/theme';
 import { useAuth } from '@/lib/useAuth';
-
-/**
- * Local fallback task ids + risk, used when GET /v1/tasks is unavailable.
- * Titles are resolved from i18n (no hardcoded user-facing strings).
- */
-const DEFAULT_TASK_IDS: { id: string; risk: Task['risk'] }[] = [
-  { id: 'oil_change', risk: 'orta' },
-  { id: 'battery', risk: 'orta' },
-  { id: 'cabin_filter', risk: 'dusuk' },
-];
-
-const DEFAULT_TASKS: Task[] = DEFAULT_TASK_IDS.map(({ id, risk }) => ({
-  id,
-  title_tr: t(`garage.tasks.${id}`, { locale: 'tr' }),
-  title_en: t(`garage.tasks.${id}`, { locale: 'en' }),
-  risk,
-}));
+import { useGarageStatus, type GarageChipState } from '@/lib/useGarageStatus';
+import { useVehicleTasks } from '@/lib/useVehicleTasks';
+import { useVehicles } from '@/lib/useVehicles';
 
 function taskTitle(task: Task): string {
   return i18n.locale === 'en' ? task.title_en : task.title_tr;
 }
 
-function chipColor(state: ChipState): string {
-  // Amber for anything needing attention; muted secondary for OK.
-  // Green is reserved exclusively for verification / correct-place state.
-  return state === 'ok' ? theme.colors.textSecondary : theme.colors.accent;
+/**
+ * Chip color for a reminder-derived garage status. Green is reserved
+ * exclusively for camera verification, so it never appears here:
+ * due → danger, soon → accent, ok → secondary, unknown → muted secondary.
+ */
+function chipColor(state: GarageChipState): string {
+  if (state === 'due') return theme.colors.danger;
+  if (state === 'soon') return theme.colors.accent;
+  return theme.colors.textSecondary;
 }
 
-function StatusChip({ label, state }: { label: string; state: ChipState }) {
+function StatusChip({
+  label,
+  state,
+}: {
+  label: string;
+  state: GarageChipState;
+}) {
   const color = chipColor(state);
   return (
     <View style={[styles.chip, { borderColor: color }]}>
       <Text style={[styles.chipLabel, { color }]}>{label}</Text>
-      <Text style={[styles.chipState, { color }]}>
+      <Text
+        style={[
+          styles.chipState,
+          { color },
+          state === 'unknown' && styles.chipStateMuted,
+        ]}
+      >
         {t(`garage.chipState.${state}`)}
       </Text>
     </View>
@@ -93,40 +98,108 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   );
 }
 
+function VehicleSwitcher({
+  vehicles,
+  currentId,
+  onSelect,
+}: {
+  vehicles: Vehicle[];
+  currentId: number;
+  onSelect: (id: number) => void;
+}) {
+  return (
+    <View style={styles.switcher}>
+      <Text style={styles.switchLabel}>{t('vehicle.switch')}</Text>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.switcherRow}
+      >
+        {vehicles.map((v) => {
+          const selected = v.id === currentId;
+          const color = selected
+            ? theme.colors.accent
+            : theme.colors.textSecondary;
+          return (
+            <Pressable
+              key={v.id}
+              accessibilityRole="button"
+              accessibilityState={{ selected }}
+              onPress={() => onSelect(v.id)}
+              style={({ pressed }) => [
+                styles.switchChip,
+                { borderColor: color },
+                selected && styles.switchChipSelected,
+                pressed && styles.pressed,
+              ]}
+            >
+              <Text style={[styles.switchChipLabel, { color }]}>
+                {v.make} {v.model}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </ScrollView>
+    </View>
+  );
+}
+
 export default function GarageScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const vehicle = useUstaStore((s) => s.vehicle);
-  const maintenance = useUstaStore((s) => s.maintenance);
   const authToken = useUstaStore((s) => s.authToken);
   const selectedTask = useUstaStore((s) => s.selectedTask);
   const setSelectedTask = useUstaStore((s) => s.setSelectedTask);
   const { logout } = useAuth();
 
+  const {
+    vehicles,
+    currentVehicle,
+    loading: vehiclesLoading,
+    selectVehicle,
+    removeVehicle,
+  } = useVehicles();
+  const { chips } = useGarageStatus(currentVehicle?.id ?? null);
+  // Only the tasks applicable to this vehicle's fuel type (filtered server-side).
+  const { tasks } = useVehicleTasks(currentVehicle?.id ?? null);
+
   const isAuthenticated = authToken != null;
 
-  const [tasks, setTasks] = useState<Task[]>(DEFAULT_TASKS);
-
-  const client = useMemo(
-    () => createApiClient(undefined, () => authToken),
-    [authToken],
-  );
-
+  // If the previously selected task no longer applies to the current vehicle
+  // (e.g. switched to / edited a diesel and spark_plug vanished), clear it.
   useEffect(() => {
-    let active = true;
-    client
-      .getTasks()
-      .then((fetched) => {
-        if (active && fetched.length > 0) setTasks(fetched);
-      })
-      // Graceful fallback: keep the localized DEFAULT_TASKS already in state.
-      .catch(() => undefined);
-    return () => {
-      active = false;
-    };
-  }, [client]);
+    if (selectedTask == null) return;
+    if (tasks.length === 0) return;
+    if (!tasks.some((task) => task.id === selectedTask.id)) {
+      setSelectedTask(null);
+    }
+  }, [tasks, selectedTask, setSelectedTask]);
 
   const hasSelection = selectedTask != null;
+
+  function handleEdit(vehicle: Vehicle) {
+    router.push({ pathname: '/vehicle-new', params: { id: String(vehicle.id) } });
+  }
+
+  function handleDelete(vehicle: Vehicle) {
+    Alert.alert(
+      t('vehicle.delete.confirmTitle'),
+      t('vehicle.delete.confirmMessage', {
+        make: vehicle.make,
+        model: vehicle.model,
+      }),
+      [
+        { text: t('vehicle.delete.cancel'), style: 'cancel' },
+        {
+          text: t('vehicle.delete.confirm'),
+          style: 'destructive',
+          onPress: () => {
+            void removeVehicle(vehicle.id);
+          },
+        },
+      ],
+    );
+  }
 
   if (!isAuthenticated) {
     return (
@@ -151,50 +224,147 @@ export default function GarageScreen() {
     );
   }
 
+  const header = (
+    <View style={styles.headerRow}>
+      <Text style={styles.title}>{t('garage.title')}</Text>
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => void logout()}
+        style={({ pressed }) => [styles.logoutButton, pressed && styles.pressed]}
+      >
+        <Ionicons name="log-out" size={20} color={theme.colors.textSecondary} />
+        <Text style={styles.logoutText}>{t('auth.logout')}</Text>
+      </Pressable>
+    </View>
+  );
+
+  // Loading the vehicle list.
+  if (vehiclesLoading) {
+    return (
+      <View
+        style={[styles.container, { paddingTop: insets.top + theme.spacing.lg }]}
+      >
+        {header}
+        <View style={styles.loadingBox}>
+          <ActivityIndicator color={theme.colors.accent} />
+          <Text style={styles.loadingText}>{t('garage.loading')}</Text>
+        </View>
+      </View>
+    );
+  }
+
+  // No vehicles yet — prominent empty state CTA.
+  if (!currentVehicle) {
+    return (
+      <View
+        style={[styles.container, { paddingTop: insets.top + theme.spacing.lg }]}
+      >
+        {header}
+        <View style={styles.emptyBox}>
+          <Ionicons
+            name="car-sport-outline"
+            size={72}
+            color={theme.colors.textSecondary}
+          />
+          <Text style={styles.emptyTitle}>{t('vehicle.empty.title')}</Text>
+          <Text style={styles.emptyDesc}>{t('vehicle.empty.desc')}</Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.push('/vehicle-new')}
+            style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
+          >
+            <Ionicons name="add-circle" size={22} color={theme.colors.background} />
+            <Text style={styles.ctaText}>{t('vehicle.add')}</Text>
+          </Pressable>
+        </View>
+      </View>
+    );
+  }
+
+  const fuelLabel = t(`vehicle.fuel.${currentVehicle.fuel_type}`);
+
   return (
     <View style={[styles.container, { paddingTop: insets.top + theme.spacing.lg }]}>
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.headerRow}>
-          <Text style={styles.title}>{t('garage.title')}</Text>
+        {header}
+
+        {vehicles.length > 1 && (
+          <VehicleSwitcher
+            vehicles={vehicles}
+            currentId={currentVehicle.id}
+            onSelect={selectVehicle}
+          />
+        )}
+
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>
+            {currentVehicle.make} {currentVehicle.model}
+          </Text>
+
+          <InfoRow label={t('garage.labels.make')} value={currentVehicle.make} />
+          <InfoRow label={t('garage.labels.model')} value={currentVehicle.model} />
+          <InfoRow
+            label={t('garage.labels.year')}
+            value={String(currentVehicle.year)}
+          />
+          {currentVehicle.engine_code != null &&
+            currentVehicle.engine_code.length > 0 && (
+              <InfoRow
+                label={t('garage.labels.engineCode')}
+                value={currentVehicle.engine_code}
+              />
+            )}
+          <InfoRow label={t('garage.labels.fuel')} value={fuelLabel} />
+          {currentVehicle.current_km != null && (
+            <InfoRow
+              label={t('garage.labels.km')}
+              value={`${currentVehicle.current_km.toLocaleString('tr-TR')} km`}
+            />
+          )}
+
+          <View style={styles.chipRow}>
+            <StatusChip label={t('garage.chips.oil')} state={chips.oil} />
+            <StatusChip label={t('garage.chips.filter')} state={chips.filter} />
+            <StatusChip label={t('garage.chips.battery')} state={chips.battery} />
+          </View>
+        </View>
+
+        <View style={styles.manageRow}>
           <Pressable
             accessibilityRole="button"
-            onPress={() => void logout()}
-            style={({ pressed }) => [styles.logoutButton, pressed && styles.pressed]}
+            onPress={() => handleEdit(currentVehicle)}
+            style={({ pressed }) => [
+              styles.manageButton,
+              pressed && styles.pressed,
+            ]}
           >
-            <Ionicons name="log-out" size={20} color={theme.colors.textSecondary} />
-            <Text style={styles.logoutText}>{t('auth.logout')}</Text>
+            <Ionicons name="create-outline" size={18} color={theme.colors.accent} />
+            <Text style={styles.manageButtonText}>{t('vehicle.edit.cta')}</Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => handleDelete(currentVehicle)}
+            style={({ pressed }) => [
+              styles.deleteButton,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Ionicons name="trash-outline" size={18} color={theme.colors.danger} />
+            <Text style={styles.deleteButtonText}>{t('vehicle.delete.cta')}</Text>
           </Pressable>
         </View>
 
-        {vehicle && (
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>
-              {vehicle.make} {vehicle.model}
-            </Text>
-
-            <InfoRow label={t('garage.labels.make')} value={vehicle.make} />
-            <InfoRow label={t('garage.labels.model')} value={vehicle.model} />
-            <InfoRow label={t('garage.labels.year')} value={String(vehicle.year)} />
-            <InfoRow
-              label={t('garage.labels.engine')}
-              value={`${vehicle.engine} (${vehicle.engine_code})`}
-            />
-            <InfoRow label={t('garage.labels.fuel')} value={vehicle.fuel} />
-            <InfoRow
-              label={t('garage.labels.km')}
-              value={`${vehicle.current_km.toLocaleString('tr-TR')} km`}
-            />
-
-            <View style={styles.chipRow}>
-              <StatusChip label={t('garage.chips.oil')} state={maintenance.oil} />
-              <StatusChip label={t('garage.chips.filter')} state={maintenance.filter} />
-              <StatusChip label={t('garage.chips.battery')} state={maintenance.battery} />
-            </View>
-          </View>
-        )}
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push('/vehicle-new')}
+          style={({ pressed }) => [styles.addVehicle, pressed && styles.pressed]}
+        >
+          <Ionicons name="add" size={18} color={theme.colors.accent} />
+          <Text style={styles.addVehicleText}>{t('vehicle.add')}</Text>
+        </Pressable>
 
         <Text style={styles.sectionTitle}>{t('garage.tasks.title')}</Text>
         <View style={styles.taskRow}>
@@ -295,6 +465,67 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     textAlign: 'center',
   },
+  loadingBox: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.md,
+  },
+  loadingText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+  },
+  emptyBox: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+  },
+  emptyTitle: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 22,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    textAlign: 'center',
+    marginTop: theme.spacing.md,
+  },
+  emptyDesc: {
+    fontFamily: theme.fonts.body,
+    fontSize: 15,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: theme.spacing.md,
+  },
+  switcher: {
+    marginBottom: theme.spacing.md,
+  },
+  switchLabel: {
+    fontFamily: theme.fonts.body,
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.sm,
+  },
+  switcherRow: {
+    gap: theme.spacing.sm,
+    paddingRight: theme.spacing.lg,
+  },
+  switchChip: {
+    minHeight: theme.touchTarget,
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderRadius: theme.radius.pill,
+    paddingHorizontal: theme.spacing.lg,
+  },
+  switchChipSelected: {
+    backgroundColor: theme.colors.surface,
+  },
+  switchChipLabel: {
+    fontFamily: theme.fonts.body,
+    fontSize: 14,
+    fontWeight: '700',
+  },
   navRow: {
     flexDirection: 'row',
     gap: theme.spacing.md,
@@ -356,6 +587,64 @@ const styles = StyleSheet.create({
     gap: theme.spacing.sm,
     marginTop: theme.spacing.lg,
   },
+  manageRow: {
+    flexDirection: 'row',
+    gap: theme.spacing.md,
+    marginTop: theme.spacing.md,
+  },
+  manageButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.xs,
+    minHeight: theme.touchTarget,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.accent,
+    paddingHorizontal: theme.spacing.md,
+  },
+  manageButtonText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.accent,
+  },
+  deleteButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.xs,
+    minHeight: theme.touchTarget,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.danger,
+    paddingHorizontal: theme.spacing.md,
+  },
+  deleteButtonText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.danger,
+  },
+  addVehicle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.xs,
+    minHeight: theme.touchTarget,
+    marginTop: theme.spacing.md,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.accent,
+  },
+  addVehicleText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.accent,
+  },
   sectionTitle: {
     fontFamily: theme.fonts.heading,
     fontSize: 18,
@@ -402,6 +691,9 @@ const styles = StyleSheet.create({
     fontSize: 11,
     marginTop: 2,
   },
+  chipStateMuted: {
+    opacity: 0.6,
+  },
   ctaWrap: {
     paddingTop: theme.spacing.md,
   },
@@ -413,6 +705,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.lg,
   },
   ctaPressed: {
     opacity: 0.85,

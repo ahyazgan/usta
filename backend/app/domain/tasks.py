@@ -1,14 +1,15 @@
 """Bakım görevi kayıt defteri.
 
-Her görev bir vision prompt dosyasına bağlıdır. Mobil uygulama görev listesini
-buradan (GET /v1/tasks) alır; prompt dosyalarıyla senkron kalır.
+Her görev bir vision prompt dosyasına bağlıdır ve hangi yakıt türlerine
+uygulanabileceğini belirtir (örn. buji dizelde yok, yağ değişimi elektrikte yok).
+Mobil uygulama araca özel görev listesini buradan türetir.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
-from .enums import Aciliyet
+from .enums import Aciliyet, FuelType
 
 
 @dataclass(slots=True, frozen=True)
@@ -18,12 +19,38 @@ class MaintenanceTask:
     title_en: str
     risk: Aciliyet
     prompt_file: str  # backend/prompts/ altına görelidir
+    # Boş demet = tüm yakıtlara uygulanır.
+    applies_to_fuels: tuple[FuelType, ...] = field(default=())
 
+
+_ALL_COMBUSTION = (FuelType.benzin, FuelType.dizel, FuelType.lpg, FuelType.hibrit)
+_SPARK = (FuelType.benzin, FuelType.lpg, FuelType.hibrit)  # bujili motorlar
 
 TASKS: tuple[MaintenanceTask, ...] = (
-    MaintenanceTask("oil_change", "Yağ Değişimi", "Oil Change", Aciliyet.orta, "vision/oil_change.md"),
-    MaintenanceTask("battery", "Akü Kontrolü", "Battery Check", Aciliyet.yuksek, "vision/battery.md"),
-    MaintenanceTask("cabin_filter", "Polen Filtresi", "Cabin Filter", Aciliyet.dusuk, "vision/cabin_filter.md"),
+    MaintenanceTask(
+        "oil_change", "Yağ Değişimi", "Oil Change", Aciliyet.orta,
+        "vision/oil_change.md", applies_to_fuels=_ALL_COMBUSTION,  # elektrikte yağ yok
+    ),
+    MaintenanceTask(
+        "spark_plug", "Buji Değişimi", "Spark Plug", Aciliyet.orta,
+        "vision/spark_plug.md", applies_to_fuels=_SPARK,  # dizel/elektrikte buji yok
+    ),
+    MaintenanceTask(
+        "battery", "Akü Kontrolü", "Battery Check", Aciliyet.yuksek,
+        "vision/battery.md",  # tüm yakıtlar (elektrikte de 12V akü var)
+    ),
+    MaintenanceTask(
+        "brake_check", "Fren Kontrolü", "Brake Check", Aciliyet.yuksek,
+        "vision/brake_check.md",  # tüm yakıtlar; güvenlik-kritik, kontrol odaklı
+    ),
+    MaintenanceTask(
+        "air_filter", "Hava Filtresi", "Air Filter", Aciliyet.dusuk,
+        "vision/air_filter.md", applies_to_fuels=_ALL_COMBUSTION,  # elektrikte motor hava filtresi yok
+    ),
+    MaintenanceTask(
+        "cabin_filter", "Polen Filtresi", "Cabin Filter", Aciliyet.dusuk,
+        "vision/cabin_filter.md",  # tüm yakıtlar
+    ),
 )
 
 _BY_ID = {t.id: t for t in TASKS}
@@ -35,3 +62,8 @@ def get_tasks() -> tuple[MaintenanceTask, ...]:
 
 def get_task(task_id: str) -> MaintenanceTask | None:
     return _BY_ID.get(task_id)
+
+
+def tasks_for_fuel(fuel: FuelType) -> tuple[MaintenanceTask, ...]:
+    """Bir yakıt türüne uygulanabilir görevleri döndürür."""
+    return tuple(t for t in TASKS if not t.applies_to_fuels or fuel in t.applies_to_fuels)

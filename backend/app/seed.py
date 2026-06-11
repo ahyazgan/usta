@@ -8,8 +8,13 @@ katalogdan otomatik dolar. Üretim için değildir; geliştirme/demo amaçlıdı
 from __future__ import annotations
 
 import asyncio
+import sys
 
 from sqlalchemy import select
+
+# Windows konsolu (cp1254) "✓" gibi karakterlerde çöker; çıktıyı UTF-8'e sabitle.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
 
 from .core.security import hash_password
 from .database import SessionLocal, create_all

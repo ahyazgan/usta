@@ -12,7 +12,7 @@ import {
   type MaintenanceLogInput,
   type Reminder,
 } from '@/lib/api';
-import { useUstaStore } from '@/lib/store';
+import { selectCurrentVehicle, useUstaStore } from '@/lib/store';
 
 export interface UseHistory {
   loading: boolean;
@@ -36,7 +36,7 @@ function errorKey(err: unknown): string {
 }
 
 export function useHistory(): UseHistory {
-  const vehicle = useUstaStore((s) => s.vehicle);
+  const vehicle = useUstaStore(selectCurrentVehicle);
   const authToken = useUstaStore((s) => s.authToken);
 
   const [loading, setLoading] = useState(true);

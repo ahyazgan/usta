@@ -11,7 +11,7 @@ import {
   type KayitKosulu,
   type SoundDiagnoseResult,
 } from '@/lib/api';
-import { useUstaStore } from '@/lib/store';
+import { selectCurrentVehicle, useUstaStore } from '@/lib/store';
 
 export interface UseSoundDiagnose {
   loading: boolean;
@@ -35,7 +35,7 @@ function errorKey(err: unknown): string {
 }
 
 export function useSoundDiagnose(): UseSoundDiagnose {
-  const vehicle = useUstaStore((s) => s.vehicle);
+  const vehicle = useUstaStore(selectCurrentVehicle);
   const authToken = useUstaStore((s) => s.authToken);
 
   const [loading, setLoading] = useState(false);

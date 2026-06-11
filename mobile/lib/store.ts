@@ -1,37 +1,24 @@
 import { create } from 'zustand';
 
-import type { DiagnoseResult, Task } from '@/lib/api';
+import type { DiagnoseResult, Task, Vehicle } from '@/lib/api';
 
-export type FuelType = 'dizel' | 'benzin' | 'lpg' | 'elektrik' | 'hibrit';
-
-export interface Vehicle {
-  id: number;
-  make: string;
-  model: string;
-  year: number;
-  engine: string;
-  engine_code: string;
-  fuel: FuelType;
-  current_km: number;
-}
+// Re-export the canonical types so existing imports keep working. The backend
+// `Vehicle` shape in lib/api is the single source of truth.
+export type { FuelType, Vehicle } from '@/lib/api';
 
 export type ChipState = 'ok' | 'due' | 'soon';
 
-export interface MaintenanceStatus {
-  oil: ChipState;
-  filter: ChipState;
-  battery: ChipState;
-}
-
 export interface UstaState {
-  vehicle: Vehicle | null;
-  maintenance: MaintenanceStatus;
+  /** All vehicles owned by the logged-in user. */
+  vehicles: Vehicle[];
+  /** Id of the active vehicle, or null when none is selected. */
+  currentVehicleId: number | null;
   authToken: string | null;
   refreshToken: string | null;
   selectedTask: Task | null;
   lastResult: DiagnoseResult | null;
-  setVehicle: (vehicle: Vehicle | null) => void;
-  setMaintenance: (status: Partial<MaintenanceStatus>) => void;
+  setVehicles: (vehicles: Vehicle[]) => void;
+  selectVehicle: (id: number) => void;
   setAuthToken: (token: string | null) => void;
   setRefreshToken: (token: string | null) => void;
   /** Set both tokens at once (login/hydrate) or clear both (logout). */
@@ -45,40 +32,38 @@ export function selectIsAuthenticated(state: UstaState): boolean {
   return state.authToken != null;
 }
 
-const demoVehicle: Vehicle = {
-  id: 1,
-  make: 'Renault',
-  model: 'Clio',
-  year: 2019,
-  engine: '1.5 dCi',
-  engine_code: 'K9K',
-  fuel: 'dizel',
-  current_km: 138420,
-};
-
-const demoMaintenance: MaintenanceStatus = {
-  oil: 'due',
-  filter: 'soon',
-  battery: 'ok',
-};
+/** The active vehicle (by id), falling back to the first one, or null. */
+export function selectCurrentVehicle(state: UstaState): Vehicle | null {
+  if (state.vehicles.length === 0) return null;
+  if (state.currentVehicleId != null) {
+    const match = state.vehicles.find((v) => v.id === state.currentVehicleId);
+    if (match) return match;
+  }
+  return state.vehicles[0] ?? null;
+}
 
 export const useUstaStore = create<UstaState>((set) => ({
-  vehicle: demoVehicle,
-  maintenance: demoMaintenance,
+  vehicles: [],
+  currentVehicleId: null,
   authToken: null,
   refreshToken: null,
   selectedTask: null,
   lastResult: null,
-  setVehicle: (vehicle) => set({ vehicle }),
-  setMaintenance: (status) =>
-    set((state) => ({ maintenance: { ...state.maintenance, ...status } })),
+  setVehicles: (vehicles) => set({ vehicles }),
+  selectVehicle: (id) => set({ currentVehicleId: id }),
   setAuthToken: (authToken) => set({ authToken }),
   setRefreshToken: (refreshToken) => set({ refreshToken }),
   setTokens: (tokens) =>
     set(
       tokens
         ? { authToken: tokens.access, refreshToken: tokens.refresh }
-        : { authToken: null, refreshToken: null },
+        : {
+            authToken: null,
+            refreshToken: null,
+            // Clear vehicle state on logout so the next user starts clean.
+            vehicles: [],
+            currentVehicleId: null,
+          },
     ),
   setSelectedTask: (selectedTask) => set({ selectedTask }),
   setLastResult: (lastResult) => set({ lastResult }),

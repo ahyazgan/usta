@@ -5,11 +5,13 @@
   },
   "garage": {
     "title": "Garajım",
+    "loading": "Garajın yükleniyor…",
     "labels": {
       "make": "Marka",
       "model": "Model",
       "year": "Yıl",
       "engine": "Motor",
+      "engineCode": "Motor kodu",
       "fuel": "Yakıt",
       "km": "Kilometre"
     },
@@ -21,7 +23,8 @@
     "chipState": {
       "ok": "Tamam",
       "due": "Zamanı geldi",
-      "soon": "Yaklaşıyor"
+      "soon": "Yaklaşıyor",
+      "unknown": "Bilinmiyor"
     },
     "tasks": {
       "title": "Ne yapacaksın?",
@@ -31,6 +34,44 @@
       "cabin_filter": "Polen Filtresi"
     },
     "cta": "Ustaya Göster"
+  },
+  "vehicle": {
+    "add": "Araç Ekle",
+    "switch": "Değiştir",
+    "empty": {
+      "title": "Henüz araç eklemedin",
+      "desc": "Sana özel rehberlik için önce aracını tanıt."
+    },
+    "fuel": {
+      "benzin": "Benzin",
+      "dizel": "Dizel",
+      "lpg": "LPG",
+      "hibrit": "Hibrit",
+      "elektrik": "Elektrik"
+    },
+    "form": {
+      "title": "Araç Ekle",
+      "make": "Marka",
+      "makePlaceholder": "Örn: Renault",
+      "model": "Model",
+      "modelPlaceholder": "Örn: Clio",
+      "year": "Yıl",
+      "yearPlaceholder": "Örn: 2019",
+      "engineCode": "Motor kodu (isteğe bağlı)",
+      "engineCodePlaceholder": "Örn: K9K",
+      "km": "Kilometre (isteğe bağlı)",
+      "kmPlaceholder": "Örn: 138420",
+      "fuel": "Yakıt",
+      "save": "Kaydet",
+      "specAutoHint": "Bilinen TR araçları için teknik özellikler otomatik doldurulur.",
+      "validation": "Lütfen marka, model, yıl (1950–2100) ve yakıt türünü gir."
+    },
+    "error": {
+      "network": "Bağlantı yok — internetini kontrol et",
+      "generic": "Bir şeyler ters gitti, tekrar dene",
+      "auth": "Oturum gerekli — lütfen giriş yap",
+      "noVehicle": "Önce bir araç ekle"
+    }
   },
   "nav": {
     "sound": "Ses Teşhisi",
@@ -96,7 +137,7 @@
     "error": {
       "offline": "Çevrimdışısın — bağlantını kontrol et ve tekrar dene",
       "auth": "Oturum gerekli — lütfen giriş yap",
-      "noVehicle": "Önce bir araç seç",
+      "noVehicle": "Önce bir araç ekle",
       "noDescription": "Lütfen sesi tarif et",
       "generic": "Bir şeyler ters gitti, tekrar dene"
     }
@@ -134,7 +175,7 @@
     "error": {
       "offline": "Çevrimdışısın — bağlantını kontrol et ve tekrar dene",
       "auth": "Oturum gerekli — lütfen giriş yap",
-      "noVehicle": "Önce bir araç seç",
+      "noVehicle": "Önce bir araç ekle",
       "generic": "Bir şeyler ters gitti, tekrar dene"
     }
   },
@@ -178,6 +219,7 @@
       "offline": "Çevrimdışısın — bağlantını kontrol et ve tekrar dene",
       "auth": "Oturum gerekli — lütfen giriş yap",
       "noTask": "Önce bir görev seç",
+      "noVehicle": "Önce bir araç ekle",
       "generic": "Bir şeyler ters gitti, tekrar dene"
     }
   },

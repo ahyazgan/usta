@@ -47,6 +47,7 @@ export default function RootLayout() {
         <Stack.Screen name="login" />
         <Stack.Screen name="sound" />
         <Stack.Screen name="history" />
+        <Stack.Screen name="vehicle-new" />
       </Stack>
     </SafeAreaProvider>
   );

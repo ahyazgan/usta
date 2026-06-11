@@ -5,11 +5,13 @@
   },
   "garage": {
     "title": "My Garage",
+    "loading": "Loading your garage…",
     "labels": {
       "make": "Make",
       "model": "Model",
       "year": "Year",
       "engine": "Engine",
+      "engineCode": "Engine code",
       "fuel": "Fuel",
       "km": "Mileage"
     },
@@ -21,7 +23,8 @@
     "chipState": {
       "ok": "OK",
       "due": "Due now",
-      "soon": "Coming up"
+      "soon": "Coming up",
+      "unknown": "Unknown"
     },
     "tasks": {
       "title": "What are you doing?",
@@ -31,6 +34,44 @@
       "cabin_filter": "Cabin Filter"
     },
     "cta": "Show the Master"
+  },
+  "vehicle": {
+    "add": "Add Vehicle",
+    "switch": "Switch",
+    "empty": {
+      "title": "No vehicle added yet",
+      "desc": "Tell us about your car first for tailored guidance."
+    },
+    "fuel": {
+      "benzin": "Petrol",
+      "dizel": "Diesel",
+      "lpg": "LPG",
+      "hibrit": "Hybrid",
+      "elektrik": "Electric"
+    },
+    "form": {
+      "title": "Add Vehicle",
+      "make": "Make",
+      "makePlaceholder": "e.g. Renault",
+      "model": "Model",
+      "modelPlaceholder": "e.g. Clio",
+      "year": "Year",
+      "yearPlaceholder": "e.g. 2019",
+      "engineCode": "Engine code (optional)",
+      "engineCodePlaceholder": "e.g. K9K",
+      "km": "Mileage (optional)",
+      "kmPlaceholder": "e.g. 138420",
+      "fuel": "Fuel",
+      "save": "Save",
+      "specAutoHint": "Specs are auto-filled for known TR vehicles.",
+      "validation": "Please enter make, model, year (1950–2100) and fuel type."
+    },
+    "error": {
+      "network": "No connection — check your internet",
+      "generic": "Something went wrong, try again",
+      "auth": "Sign-in required — please log in",
+      "noVehicle": "Add a vehicle first"
+    }
   },
   "nav": {
     "sound": "Sound Diagnosis",
@@ -96,7 +137,7 @@
     "error": {
       "offline": "You are offline — check your connection and try again",
       "auth": "Sign-in required — please log in",
-      "noVehicle": "Select a vehicle first",
+      "noVehicle": "Add a vehicle first",
       "noDescription": "Please describe the sound",
       "generic": "Something went wrong, try again"
     }
@@ -134,7 +175,7 @@
     "error": {
       "offline": "You are offline — check your connection and try again",
       "auth": "Sign-in required — please log in",
-      "noVehicle": "Select a vehicle first",
+      "noVehicle": "Add a vehicle first",
       "generic": "Something went wrong, try again"
     }
   },
@@ -178,6 +219,7 @@
       "offline": "You are offline — check your connection and try again",
       "auth": "Sign-in required — please log in",
       "noTask": "Select a task first",
+      "noVehicle": "Add a vehicle first",
       "generic": "Something went wrong, try again"
     }
   },

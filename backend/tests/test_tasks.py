@@ -39,7 +39,8 @@ def test_tasks_for_fuel_filters_by_applicability():
     assert "oil_change" not in elektrik  # elektrikte yağ yok
     assert "spark_plug" not in elektrik
     assert "air_filter" not in elektrik  # elektrikte motor hava filtresi yok
-    assert {"battery", "cabin_filter"} <= elektrik  # her yakıtta var
+    assert {"battery", "cabin_filter", "brake_check"} <= elektrik  # her araçta var
+    assert get_task("brake_check").risk.value == "yuksek"  # güvenlik-kritik
 
 
 @pytest.mark.asyncio

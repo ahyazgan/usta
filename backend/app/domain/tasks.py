@@ -40,6 +40,10 @@ TASKS: tuple[MaintenanceTask, ...] = (
         "vision/battery.md",  # tüm yakıtlar (elektrikte de 12V akü var)
     ),
     MaintenanceTask(
+        "brake_check", "Fren Kontrolü", "Brake Check", Aciliyet.yuksek,
+        "vision/brake_check.md",  # tüm yakıtlar; güvenlik-kritik, kontrol odaklı
+    ),
+    MaintenanceTask(
         "air_filter", "Hava Filtresi", "Air Filter", Aciliyet.dusuk,
         "vision/air_filter.md", applies_to_fuels=_ALL_COMBUSTION,  # elektrikte motor hava filtresi yok
     ),

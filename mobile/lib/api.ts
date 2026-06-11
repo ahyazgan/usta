@@ -143,6 +143,46 @@ export interface Reminder {
   status: ReminderStatus;
 }
 
+/** Supported fuel types (matches the backend enum). */
+export type FuelType = 'benzin' | 'dizel' | 'lpg' | 'hibrit' | 'elektrik';
+
+/** Per-vehicle technical spec, auto-filled by the backend TR catalog. */
+export interface VehicleSpec {
+  oil_spec: string | null;
+  oil_capacity_l: number | null;
+  oil_drain_bolt_size: string | null;
+  oil_drain_location: string | null;
+  oil_filter_part: string | null;
+  air_filter_part: string | null;
+  cabin_filter_part: string | null;
+  spark_plug_part: string | null;
+  battery_spec: string | null;
+  battery_location: string | null;
+  transmission_type: string | null;
+}
+
+/** A vehicle record (matches the backend `VehicleOut`). */
+export interface Vehicle {
+  id: number;
+  make: string;
+  model: string;
+  year: number;
+  fuel_type: FuelType;
+  engine_code: string | null;
+  current_km: number | null;
+  spec: VehicleSpec | null;
+}
+
+/** Payload for creating a vehicle. `spec` is auto-filled server-side. */
+export interface VehicleCreateInput {
+  make: string;
+  model: string;
+  year: number;
+  fuel_type: FuelType;
+  engine_code?: string;
+  current_km?: number;
+}
+
 export type GetToken = () => string | null | Promise<string | null>;
 
 export interface ApiClient {
@@ -155,6 +195,9 @@ export interface ApiClient {
   addLog(vehicleId: number, input: MaintenanceLogInput): Promise<MaintenanceLog>;
   listLogs(vehicleId: number): Promise<MaintenanceLog[]>;
   getReminders(vehicleId: number): Promise<Reminder[]>;
+  listVehicles(): Promise<Vehicle[]>;
+  createVehicle(input: VehicleCreateInput): Promise<Vehicle>;
+  getVehicle(id: number): Promise<Vehicle>;
 }
 
 export class ApiError extends Error {
@@ -277,6 +320,17 @@ export function createApiClient(
         method: 'GET',
         headers,
       });
+    },
+    async listVehicles() {
+      const headers = await authHeaders();
+      return request<Vehicle[]>('/v1/vehicles', { method: 'GET', headers });
+    },
+    createVehicle(input) {
+      return post<Vehicle, VehicleCreateInput>('/v1/vehicles', input);
+    },
+    async getVehicle(id) {
+      const headers = await authHeaders();
+      return request<Vehicle>(`/v1/vehicles/${id}`, { method: 'GET', headers });
     },
   };
 }

@@ -6,7 +6,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { ApiError, createApiClient, type DiagnoseResult } from '@/lib/api';
 import { captureAndEncode } from '@/lib/capture';
-import { useUstaStore } from '@/lib/store';
+import { selectCurrentVehicle, useUstaStore } from '@/lib/store';
 
 export interface UseDiagnose {
   loading: boolean;
@@ -27,7 +27,7 @@ function errorKey(err: unknown): string {
 }
 
 export function useDiagnose(): UseDiagnose {
-  const vehicle = useUstaStore((s) => s.vehicle);
+  const vehicle = useUstaStore(selectCurrentVehicle);
   const selectedTask = useUstaStore((s) => s.selectedTask);
   const authToken = useUstaStore((s) => s.authToken);
   const lastResult = useUstaStore((s) => s.lastResult);
@@ -44,7 +44,11 @@ export function useDiagnose(): UseDiagnose {
 
   const runImageDiagnose = useCallback(
     async (photoUri: string) => {
-      if (!vehicle || !selectedTask) {
+      if (!vehicle) {
+        setError('camera.error.noVehicle');
+        return;
+      }
+      if (!selectedTask) {
         setError('camera.error.noTask');
         return;
       }

@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { FuelType } from '@/lib/api';
 import { t } from '@/lib/i18n';
+import { useUstaStore } from '@/lib/store';
 import { theme } from '@/lib/theme';
 import { useVehicles } from '@/lib/useVehicles';
 
@@ -25,14 +26,32 @@ const MAX_YEAR = 2100;
 export default function VehicleNewScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { addVehicle, error } = useVehicles();
+  const { addVehicle, updateVehicle, error } = useVehicles();
 
-  const [make, setMake] = useState('');
-  const [model, setModel] = useState('');
-  const [year, setYear] = useState('');
-  const [fuelType, setFuelType] = useState<FuelType | null>(null);
-  const [engineCode, setEngineCode] = useState('');
-  const [km, setKm] = useState('');
+  // An `id` param switches the screen into edit mode (prefilled from the store).
+  const params = useLocalSearchParams<{ id?: string }>();
+  const editId = useMemo(() => {
+    const parsed = Number(params.id);
+    return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+  }, [params.id]);
+  const isEdit = editId != null;
+
+  const editVehicle = useUstaStore((s) =>
+    editId != null ? s.vehicles.find((v) => v.id === editId) ?? null : null,
+  );
+
+  const [make, setMake] = useState(editVehicle?.make ?? '');
+  const [model, setModel] = useState(editVehicle?.model ?? '');
+  const [year, setYear] = useState(
+    editVehicle != null ? String(editVehicle.year) : '',
+  );
+  const [fuelType, setFuelType] = useState<FuelType | null>(
+    editVehicle?.fuel_type ?? null,
+  );
+  const [engineCode, setEngineCode] = useState(editVehicle?.engine_code ?? '');
+  const [km, setKm] = useState(
+    editVehicle?.current_km != null ? String(editVehicle.current_km) : '',
+  );
 
   const [submitting, setSubmitting] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -61,8 +80,7 @@ export default function VehicleNewScreen() {
         ? parsedKm
         : undefined;
 
-    setSubmitting(true);
-    const ok = await addVehicle({
+    const payload = {
       make: make.trim(),
       model: model.trim(),
       year: parsedYear,
@@ -70,7 +88,13 @@ export default function VehicleNewScreen() {
       engine_code:
         engineCode.trim().length > 0 ? engineCode.trim() : undefined,
       current_km,
-    });
+    };
+
+    setSubmitting(true);
+    const ok =
+      isEdit && editId != null
+        ? await updateVehicle(editId, payload)
+        : await addVehicle(payload);
     setSubmitting(false);
     if (ok) router.replace('/');
   }
@@ -105,18 +129,22 @@ export default function VehicleNewScreen() {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.title}>{t('vehicle.form.title')}</Text>
+        <Text style={styles.title}>
+          {isEdit ? t('vehicle.edit.title') : t('vehicle.form.title')}
+        </Text>
 
-        <View style={styles.specHint}>
-          <Ionicons
-            name="information-circle"
-            size={18}
-            color={theme.colors.textSecondary}
-          />
-          <Text style={styles.specHintText}>
-            {t('vehicle.form.specAutoHint')}
-          </Text>
-        </View>
+        {!isEdit && (
+          <View style={styles.specHint}>
+            <Ionicons
+              name="information-circle"
+              size={18}
+              color={theme.colors.textSecondary}
+            />
+            <Text style={styles.specHintText}>
+              {t('vehicle.form.specAutoHint')}
+            </Text>
+          </View>
+        )}
 
         <Text style={styles.label}>{t('vehicle.form.make')}</Text>
         <TextInput
@@ -232,11 +260,13 @@ export default function VehicleNewScreen() {
           ) : (
             <>
               <Ionicons
-                name="add-circle"
+                name={isEdit ? 'checkmark-circle' : 'add-circle'}
                 size={22}
                 color={theme.colors.background}
               />
-              <Text style={styles.saveText}>{t('vehicle.form.save')}</Text>
+              <Text style={styles.saveText}>
+                {isEdit ? t('vehicle.edit.cta') : t('vehicle.form.save')}
+              </Text>
             </>
           )}
         </Pressable>

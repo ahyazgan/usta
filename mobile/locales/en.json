@@ -31,13 +31,25 @@
       "selectHint": "Select a task to continue",
       "oil_change": "Oil Change",
       "battery": "Battery",
-      "cabin_filter": "Cabin Filter"
+      "cabin_filter": "Cabin Filter",
+      "spark_plug": "Spark Plugs"
     },
     "cta": "Show the Master"
   },
   "vehicle": {
     "add": "Add Vehicle",
     "switch": "Switch",
+    "edit": {
+      "title": "Edit Vehicle",
+      "cta": "Edit"
+    },
+    "delete": {
+      "cta": "Delete",
+      "confirmTitle": "Delete vehicle",
+      "confirmMessage": "Are you sure you want to delete {{make}} {{model}}? This cannot be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    },
     "empty": {
       "title": "No vehicle added yet",
       "desc": "Tell us about your car first for tailored guidance."

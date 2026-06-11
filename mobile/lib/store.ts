@@ -27,13 +27,22 @@ export interface UstaState {
   vehicle: Vehicle | null;
   maintenance: MaintenanceStatus;
   authToken: string | null;
+  refreshToken: string | null;
   selectedTask: Task | null;
   lastResult: DiagnoseResult | null;
   setVehicle: (vehicle: Vehicle | null) => void;
   setMaintenance: (status: Partial<MaintenanceStatus>) => void;
   setAuthToken: (token: string | null) => void;
+  setRefreshToken: (token: string | null) => void;
+  /** Set both tokens at once (login/hydrate) or clear both (logout). */
+  setTokens: (tokens: { access: string; refresh: string } | null) => void;
   setSelectedTask: (task: Task | null) => void;
   setLastResult: (result: DiagnoseResult | null) => void;
+}
+
+/** True when an access token is present. */
+export function selectIsAuthenticated(state: UstaState): boolean {
+  return state.authToken != null;
 }
 
 const demoVehicle: Vehicle = {
@@ -57,12 +66,20 @@ export const useUstaStore = create<UstaState>((set) => ({
   vehicle: demoVehicle,
   maintenance: demoMaintenance,
   authToken: null,
+  refreshToken: null,
   selectedTask: null,
   lastResult: null,
   setVehicle: (vehicle) => set({ vehicle }),
   setMaintenance: (status) =>
     set((state) => ({ maintenance: { ...state.maintenance, ...status } })),
   setAuthToken: (authToken) => set({ authToken }),
+  setRefreshToken: (refreshToken) => set({ refreshToken }),
+  setTokens: (tokens) =>
+    set(
+      tokens
+        ? { authToken: tokens.access, refreshToken: tokens.refresh }
+        : { authToken: null, refreshToken: null },
+    ),
   setSelectedTask: (selectedTask) => set({ selectedTask }),
   setLastResult: (lastResult) => set({ lastResult }),
 }));

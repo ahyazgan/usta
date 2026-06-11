@@ -14,6 +14,7 @@ import { createApiClient, type Task } from '@/lib/api';
 import { i18n, t } from '@/lib/i18n';
 import { useUstaStore, type ChipState } from '@/lib/store';
 import { theme } from '@/lib/theme';
+import { useAuth } from '@/lib/useAuth';
 
 /**
  * Local fallback task ids + risk, used when GET /v1/tasks is unavailable.
@@ -100,6 +101,9 @@ export default function GarageScreen() {
   const authToken = useUstaStore((s) => s.authToken);
   const selectedTask = useUstaStore((s) => s.selectedTask);
   const setSelectedTask = useUstaStore((s) => s.setSelectedTask);
+  const { logout } = useAuth();
+
+  const isAuthenticated = authToken != null;
 
   const [tasks, setTasks] = useState<Task[]>(DEFAULT_TASKS);
 
@@ -124,13 +128,46 @@ export default function GarageScreen() {
 
   const hasSelection = selectedTask != null;
 
+  if (!isAuthenticated) {
+    return (
+      <View
+        style={[
+          styles.container,
+          styles.gateContainer,
+          { paddingTop: insets.top + theme.spacing.lg },
+        ]}
+      >
+        <Text style={styles.title}>{t('garage.title')}</Text>
+        <Text style={styles.gatePrompt}>{t('auth.loggedOutPrompt')}</Text>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push('/login')}
+          style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
+        >
+          <Ionicons name="log-in" size={22} color={theme.colors.background} />
+          <Text style={styles.ctaText}>{t('auth.loggedOutCta')}</Text>
+        </Pressable>
+      </View>
+    );
+  }
+
   return (
     <View style={[styles.container, { paddingTop: insets.top + theme.spacing.lg }]}>
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.title}>{t('garage.title')}</Text>
+        <View style={styles.headerRow}>
+          <Text style={styles.title}>{t('garage.title')}</Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => void logout()}
+            style={({ pressed }) => [styles.logoutButton, pressed && styles.pressed]}
+          >
+            <Ionicons name="log-out" size={20} color={theme.colors.textSecondary} />
+            <Text style={styles.logoutText}>{t('auth.logout')}</Text>
+          </Pressable>
+        </View>
 
         {vehicle && (
           <View style={styles.card}>
@@ -169,6 +206,25 @@ export default function GarageScreen() {
               onPress={() => setSelectedTask(task)}
             />
           ))}
+        </View>
+
+        <View style={styles.navRow}>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.push('/sound')}
+            style={({ pressed }) => [styles.navButton, pressed && styles.pressed]}
+          >
+            <Ionicons name="pulse" size={20} color={theme.colors.accent} />
+            <Text style={styles.navText}>{t('nav.sound')}</Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.push('/history')}
+            style={({ pressed }) => [styles.navButton, pressed && styles.pressed]}
+          >
+            <Ionicons name="time" size={20} color={theme.colors.accent} />
+            <Text style={styles.navText}>{t('nav.history')}</Text>
+          </Pressable>
         </View>
       </ScrollView>
 
@@ -210,6 +266,58 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: theme.colors.textPrimary,
     marginBottom: theme.spacing.lg,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.xs,
+    minHeight: theme.touchTarget,
+    paddingHorizontal: theme.spacing.md,
+  },
+  logoutText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.textSecondary,
+  },
+  gateContainer: {
+    justifyContent: 'center',
+    gap: theme.spacing.lg,
+  },
+  gatePrompt: {
+    fontFamily: theme.fonts.body,
+    fontSize: 16,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+  },
+  navRow: {
+    flexDirection: 'row',
+    gap: theme.spacing.md,
+    marginTop: theme.spacing.xl,
+  },
+  navButton: {
+    flex: 1,
+    minHeight: theme.touchTarget,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.sm,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    paddingHorizontal: theme.spacing.md,
+  },
+  navText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 14,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
   },
   card: {
     backgroundColor: theme.colors.surface,

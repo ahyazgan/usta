@@ -153,6 +153,13 @@ class SoundDiagnoseResponse(BaseModel):
     tamirciye_git_onerisi: bool
 
 
+class TaskOut(BaseModel):
+    id: str
+    title_tr: str
+    title_en: str
+    risk: Aciliyet
+
+
 class HealthResponse(BaseModel):
     status: str
     database: str

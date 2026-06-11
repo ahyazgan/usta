@@ -71,11 +71,24 @@ Sağlık kontrolü: `GET /health` (DB ping'li).
 | Method | Yol | Açıklama |
 |---|---|---|
 | POST | `/v1/auth/register` · `/login` · `/refresh` | bcrypt12, sha256 refresh token |
-| GET/POST/PATCH/DELETE | `/v1/vehicles` | yalnızca kendi araçların (403) |
+| GET/POST/PATCH/DELETE | `/v1/vehicles` | yalnızca kendi araçların (403); spec katalogdan otomatik dolar |
+| GET | `/v1/tasks` | bakım görevleri listesi (oil_change/battery/cabin_filter) |
 | POST | `/v1/ai/diagnose/image` | görsel teşhis (3x3 konum şeması) |
 | POST | `/v1/ai/diagnose/sound` | ses **tarifi** analizi (transkripsiyon yok) |
 
 Her endpoint: JWT + kullanıcı-bazlı rate limit + 30s timeout + tenacity retry(2).
+
+### Demo verisi ve maliyet denetimi
+```bash
+python -m app.seed                  # demo kullanıcı + 3 TR aracı (idempotent)
+
+# Vision maliyet/şema harness'i (cost-guard):
+python -m app.tools.eval_vision --offline                 # anahtarsız öz-denetim
+ANTHROPIC_API_KEY=sk-ant-... python -m app.tools.eval_vision \
+    --images ./ornek_kareler --task oil_change \
+    --make Fiat --model Egea --year 2019 --fuel lpg        # gerçek kareler, $/teşhis raporu
+```
+Hedef: teşhis başına **< $0.05** (`domain/pricing.py`).
 
 ---
 

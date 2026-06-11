@@ -22,6 +22,8 @@ function errorKey(err: unknown): string {
     // status 0 = network/offline failure surfaced by the client.
     if (err.status === 0) return 'camera.error.offline';
     if (err.status === 401 || err.status === 403) return 'camera.error.auth';
+    if (err.status === 503 || err.status === 502) return 'camera.error.aiUnavailable';
+    if (err.status === 429) return 'camera.error.busy';
   }
   return 'camera.error.generic';
 }

@@ -6,9 +6,11 @@ Kullanıcının tarifi + kayıt koşulu + araç verisi ile Claude METİN analizi
 
 from __future__ import annotations
 
+from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...config import get_settings
+from ...domain.ai_errors import AIUpstreamError
 from ...domain.enums import AIKind
 from ...domain.models import AISession, User, Vehicle
 from ...domain.safety import enforce_sound_safety
@@ -48,5 +50,8 @@ async def diagnose_sound(
     )
     await db.commit()
 
-    parsed = SoundDiagnoseResponse(**result.data)
+    try:
+        parsed = SoundDiagnoseResponse(**result.data)
+    except ValidationError as exc:
+        raise AIUpstreamError("AI yanıtı beklenen şemada değil.") from exc
     return enforce_sound_safety(parsed, context=payload.user_description)

@@ -6,9 +6,11 @@ güvenlik kurallarını zorla -> token logla -> yanıt döndür.
 
 from __future__ import annotations
 
+from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...config import get_settings
+from ...domain.ai_errors import AIUpstreamError
 from ...domain.enums import AIKind
 from ...domain.models import AISession, User, Vehicle
 from ...domain.safety import enforce_image_safety
@@ -58,5 +60,8 @@ async def diagnose_image(
     )
     await db.commit()
 
-    parsed = ImageDiagnoseResponse(**result.data)
+    try:
+        parsed = ImageDiagnoseResponse(**result.data)
+    except ValidationError as exc:
+        raise AIUpstreamError("AI yanıtı beklenen şemada değil.") from exc
     return enforce_image_safety(parsed, context=payload.user_note or "")

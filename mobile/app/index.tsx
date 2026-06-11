@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Pressable,
   ScrollView,
@@ -9,9 +10,31 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { t } from '@/lib/i18n';
+import { createApiClient, type Task } from '@/lib/api';
+import { i18n, t } from '@/lib/i18n';
 import { useUstaStore, type ChipState } from '@/lib/store';
 import { theme } from '@/lib/theme';
+
+/**
+ * Local fallback task ids + risk, used when GET /v1/tasks is unavailable.
+ * Titles are resolved from i18n (no hardcoded user-facing strings).
+ */
+const DEFAULT_TASK_IDS: { id: string; risk: Task['risk'] }[] = [
+  { id: 'oil_change', risk: 'orta' },
+  { id: 'battery', risk: 'orta' },
+  { id: 'cabin_filter', risk: 'dusuk' },
+];
+
+const DEFAULT_TASKS: Task[] = DEFAULT_TASK_IDS.map(({ id, risk }) => ({
+  id,
+  title_tr: t(`garage.tasks.${id}`, { locale: 'tr' }),
+  title_en: t(`garage.tasks.${id}`, { locale: 'en' }),
+  risk,
+}));
+
+function taskTitle(task: Task): string {
+  return i18n.locale === 'en' ? task.title_en : task.title_tr;
+}
 
 function chipColor(state: ChipState): string {
   // Amber for anything needing attention; muted secondary for OK.
@@ -31,6 +54,35 @@ function StatusChip({ label, state }: { label: string; state: ChipState }) {
   );
 }
 
+function TaskChip({
+  task,
+  selected,
+  onPress,
+}: {
+  task: Task;
+  selected: boolean;
+  onPress: () => void;
+}) {
+  // Selected = amber accent; unselected = muted. Green stays reserved for
+  // verification success only.
+  const color = selected ? theme.colors.accent : theme.colors.textSecondary;
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ selected }}
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.taskChip,
+        { borderColor: color },
+        selected && styles.taskChipSelected,
+        pressed && styles.pressed,
+      ]}
+    >
+      <Text style={[styles.taskChipLabel, { color }]}>{taskTitle(task)}</Text>
+    </Pressable>
+  );
+}
+
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <View style={styles.infoRow}>
@@ -45,6 +97,32 @@ export default function GarageScreen() {
   const insets = useSafeAreaInsets();
   const vehicle = useUstaStore((s) => s.vehicle);
   const maintenance = useUstaStore((s) => s.maintenance);
+  const authToken = useUstaStore((s) => s.authToken);
+  const selectedTask = useUstaStore((s) => s.selectedTask);
+  const setSelectedTask = useUstaStore((s) => s.setSelectedTask);
+
+  const [tasks, setTasks] = useState<Task[]>(DEFAULT_TASKS);
+
+  const client = useMemo(
+    () => createApiClient(undefined, () => authToken),
+    [authToken],
+  );
+
+  useEffect(() => {
+    let active = true;
+    client
+      .getTasks()
+      .then((fetched) => {
+        if (active && fetched.length > 0) setTasks(fetched);
+      })
+      // Graceful fallback: keep the localized DEFAULT_TASKS already in state.
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [client]);
+
+  const hasSelection = selectedTask != null;
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + theme.spacing.lg }]}>
@@ -80,12 +158,33 @@ export default function GarageScreen() {
             </View>
           </View>
         )}
+
+        <Text style={styles.sectionTitle}>{t('garage.tasks.title')}</Text>
+        <View style={styles.taskRow}>
+          {tasks.map((task) => (
+            <TaskChip
+              key={task.id}
+              task={task}
+              selected={selectedTask?.id === task.id}
+              onPress={() => setSelectedTask(task)}
+            />
+          ))}
+        </View>
       </ScrollView>
 
       <View style={[styles.ctaWrap, { paddingBottom: insets.bottom + theme.spacing.lg }]}>
+        {!hasSelection && (
+          <Text style={styles.ctaHint}>{t('garage.tasks.selectHint')}</Text>
+        )}
         <Pressable
           accessibilityRole="button"
-          style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
+          accessibilityState={{ disabled: !hasSelection }}
+          disabled={!hasSelection}
+          style={({ pressed }) => [
+            styles.cta,
+            !hasSelection && styles.ctaDisabled,
+            pressed && styles.ctaPressed,
+          ]}
           onPress={() => router.push('/camera')}
         >
           <Ionicons name="camera" size={22} color={theme.colors.background} />
@@ -149,6 +248,34 @@ const styles = StyleSheet.create({
     gap: theme.spacing.sm,
     marginTop: theme.spacing.lg,
   },
+  sectionTitle: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 18,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    marginTop: theme.spacing.xl,
+    marginBottom: theme.spacing.md,
+  },
+  taskRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: theme.spacing.sm,
+  },
+  taskChip: {
+    minHeight: theme.touchTarget,
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderRadius: theme.radius.pill,
+    paddingHorizontal: theme.spacing.lg,
+  },
+  taskChipSelected: {
+    backgroundColor: theme.colors.surface,
+  },
+  taskChipLabel: {
+    fontFamily: theme.fonts.body,
+    fontSize: 15,
+    fontWeight: '700',
+  },
   chip: {
     flex: 1,
     borderWidth: 1,
@@ -181,6 +308,19 @@ const styles = StyleSheet.create({
   },
   ctaPressed: {
     opacity: 0.85,
+  },
+  ctaDisabled: {
+    opacity: 0.4,
+  },
+  pressed: {
+    opacity: 0.85,
+  },
+  ctaHint: {
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: theme.spacing.sm,
   },
   ctaText: {
     fontFamily: theme.fonts.heading,

@@ -1,9 +1,11 @@
 import { create } from 'zustand';
 
+import type { DiagnoseResult, Task } from '@/lib/api';
+
 export type FuelType = 'dizel' | 'benzin' | 'lpg' | 'elektrik' | 'hibrit';
 
 export interface Vehicle {
-  id: string;
+  id: number;
   make: string;
   model: string;
   year: number;
@@ -25,13 +27,17 @@ export interface UstaState {
   vehicle: Vehicle | null;
   maintenance: MaintenanceStatus;
   authToken: string | null;
+  selectedTask: Task | null;
+  lastResult: DiagnoseResult | null;
   setVehicle: (vehicle: Vehicle | null) => void;
   setMaintenance: (status: Partial<MaintenanceStatus>) => void;
   setAuthToken: (token: string | null) => void;
+  setSelectedTask: (task: Task | null) => void;
+  setLastResult: (result: DiagnoseResult | null) => void;
 }
 
 const demoVehicle: Vehicle = {
-  id: 'veh-demo-1',
+  id: 1,
   make: 'Renault',
   model: 'Clio',
   year: 2019,
@@ -51,10 +57,14 @@ export const useUstaStore = create<UstaState>((set) => ({
   vehicle: demoVehicle,
   maintenance: demoMaintenance,
   authToken: null,
+  selectedTask: null,
+  lastResult: null,
   setVehicle: (vehicle) => set({ vehicle }),
   setMaintenance: (status) =>
     set((state) => ({ maintenance: { ...state.maintenance, ...status } })),
   setAuthToken: (authToken) => set({ authToken }),
+  setSelectedTask: (selectedTask) => set({ selectedTask }),
+  setLastResult: (lastResult) => set({ lastResult }),
 }));
 
 export default useUstaStore;

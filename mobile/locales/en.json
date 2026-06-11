@@ -23,6 +23,13 @@
       "due": "Due now",
       "soon": "Coming up"
     },
+    "tasks": {
+      "title": "What are you doing?",
+      "selectHint": "Select a task to continue",
+      "oil_change": "Oil Change",
+      "battery": "Battery",
+      "cabin_filter": "Cabin Filter"
+    },
     "cta": "Show the Master"
   },
   "camera": {
@@ -30,9 +37,43 @@
     "stepTitle": "Find the dipstick and check the level",
     "safetyStrip": "Warning: The engine may be hot. Park on firm ground; if jacked up, support it with axle stands.",
     "check": "Check",
+    "analyzing": "Analyzing…",
+    "permissionRequest": "We need camera access to verify you are looking at the right part.",
+    "grantPermission": "Grant Access",
     "permissionDenied": "Camera permission denied. Grant access in settings to verify the correct part.",
     "offline": "You are offline — waiting for connection",
-    "hint": "Center the part in the frame and tap Check"
+    "hint": "Center the part in the frame and tap Check",
+    "guven": {
+      "yuksek": "High confidence",
+      "orta": "Medium confidence",
+      "dusuk": "Low confidence"
+    },
+    "konum": {
+      "sol_ust": "top left",
+      "orta_ust": "top center",
+      "sag_ust": "top right",
+      "sol_orta": "middle left",
+      "merkez": "center",
+      "sag_orta": "middle right",
+      "sol_alt": "bottom left",
+      "orta_alt": "bottom center",
+      "sag_alt": "bottom right"
+    },
+    "result": {
+      "correct": "You are in the right place",
+      "wrong": "This is not it",
+      "uncertain": "Couldn't see clearly, try again",
+      "locationHint": "Look toward: {{yon}}",
+      "tespit": "Finding",
+      "guven": "Confidence",
+      "sonrakiAdim": "Next step"
+    },
+    "error": {
+      "offline": "You are offline — check your connection and try again",
+      "auth": "Sign-in required — please log in",
+      "noTask": "Select a task first",
+      "generic": "Something went wrong, try again"
+    }
   },
   "common": {
     "loading": "Loading…",

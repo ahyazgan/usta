@@ -23,6 +23,13 @@
       "due": "Zamanı geldi",
       "soon": "Yaklaşıyor"
     },
+    "tasks": {
+      "title": "Ne yapacaksın?",
+      "selectHint": "Devam etmek için bir görev seç",
+      "oil_change": "Yağ Değişimi",
+      "battery": "Akü",
+      "cabin_filter": "Polen Filtresi"
+    },
     "cta": "Ustaya Göster"
   },
   "camera": {
@@ -30,9 +37,43 @@
     "stepTitle": "Yağ çubuğunu bul ve seviyeyi kontrol et",
     "safetyStrip": "Dikkat: Motor sıcak olabilir. Aracı sabit zemine al, krikoyla kaldırdıysan takozla destekle.",
     "check": "Kontrol Et",
+    "analyzing": "İnceleniyor…",
+    "permissionRequest": "Doğru parçayı doğrulamak için kamera iznine ihtiyacımız var.",
+    "grantPermission": "İzin Ver",
     "permissionDenied": "Kamera izni verilmedi. Doğru parçayı doğrulamak için ayarlardan izin ver.",
     "offline": "Çevrimdışısın — bağlantı bekleniyor",
-    "hint": "Parçayı çerçeveye ortala ve Kontrol Et'e bas"
+    "hint": "Parçayı çerçeveye ortala ve Kontrol Et'e bas",
+    "guven": {
+      "yuksek": "Yüksek güven",
+      "orta": "Orta güven",
+      "dusuk": "Düşük güven"
+    },
+    "konum": {
+      "sol_ust": "sol üst",
+      "orta_ust": "orta üst",
+      "sag_ust": "sağ üst",
+      "sol_orta": "sol orta",
+      "merkez": "merkez",
+      "sag_orta": "sağ orta",
+      "sol_alt": "sol alt",
+      "orta_alt": "orta alt",
+      "sag_alt": "sağ alt"
+    },
+    "result": {
+      "correct": "Doğru yerdesin",
+      "wrong": "Burası değil",
+      "uncertain": "Net göremedim, tekrar dene",
+      "locationHint": "Şu tarafa bak: {{yon}}",
+      "tespit": "Tespit",
+      "guven": "Güven",
+      "sonrakiAdim": "Sonraki adım"
+    },
+    "error": {
+      "offline": "Çevrimdışısın — bağlantını kontrol et ve tekrar dene",
+      "auth": "Oturum gerekli — lütfen giriş yap",
+      "noTask": "Önce bir görev seç",
+      "generic": "Bir şeyler ters gitti, tekrar dene"
+    }
   },
   "common": {
     "loading": "Yükleniyor…",

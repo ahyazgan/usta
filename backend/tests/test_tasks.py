@@ -27,6 +27,29 @@ def test_get_task_lookup():
     assert get_task("olmayan") is None
 
 
+def test_new_tasks_registered_with_expected_risk():
+    # Yeni eklenen görevler kayıt defterinde ve doğru risk seviyesinde.
+    assert get_task("coolant").risk.value == "yuksek"  # basınçlı + sıcak: güvenlik-kritik
+    assert get_task("tire").risk.value == "orta"
+    assert get_task("headlight").risk.value == "orta"
+    assert get_task("wiper").risk.value == "dusuk"
+    # Başlıklar iki dilde de dolu.
+    for tid in ("coolant", "tire", "wiper", "headlight"):
+        task = get_task(tid)
+        assert task.title_tr and task.title_en, f"başlık eksik: {tid}"
+
+
+def test_new_tasks_fuel_applicability():
+    elektrik = {t.id for t in tasks_for_fuel(FuelType.elektrik)}
+    benzin = {t.id for t in tasks_for_fuel(FuelType.benzin)}
+    # Lastik/silecek/far her araçta var (elektrik dahil).
+    assert {"tire", "wiper", "headlight"} <= elektrik
+    assert {"tire", "wiper", "headlight"} <= benzin
+    # Motor soğutma sıvısı yanmalı motorlarda var; elektrikte farklı sistem.
+    assert "coolant" in benzin
+    assert "coolant" not in elektrik
+
+
 def test_tasks_for_fuel_filters_by_applicability():
     benzin = {t.id for t in tasks_for_fuel(FuelType.benzin)}
     dizel = {t.id for t in tasks_for_fuel(FuelType.dizel)}

@@ -51,6 +51,22 @@ TASKS: tuple[MaintenanceTask, ...] = (
         "cabin_filter", "Polen Filtresi", "Cabin Filter", Aciliyet.dusuk,
         "vision/cabin_filter.md",  # tüm yakıtlar
     ),
+    MaintenanceTask(
+        "coolant", "Soğutma Sıvısı", "Coolant", Aciliyet.yuksek,
+        "vision/coolant.md", applies_to_fuels=_ALL_COMBUSTION,  # elektrikte motor soğutması farklı
+    ),
+    MaintenanceTask(
+        "tire", "Lastik Kontrolü", "Tire Check", Aciliyet.orta,
+        "vision/tire.md",  # tüm yakıtlar; güvenlik-ilgili
+    ),
+    MaintenanceTask(
+        "wiper", "Silecek", "Wiper Blades", Aciliyet.dusuk,
+        "vision/wiper.md",  # tüm yakıtlar
+    ),
+    MaintenanceTask(
+        "headlight", "Far / Ampul", "Headlight", Aciliyet.orta,
+        "vision/headlight.md",  # tüm yakıtlar
+    ),
 )
 
 _BY_ID = {t.id: t for t in TASKS}

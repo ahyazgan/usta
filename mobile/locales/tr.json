@@ -32,7 +32,13 @@
       "oil_change": "Yağ Değişimi",
       "battery": "Akü",
       "cabin_filter": "Polen Filtresi",
-      "spark_plug": "Buji Değişimi"
+      "spark_plug": "Buji Değişimi",
+      "brake_check": "Fren Kontrolü",
+      "air_filter": "Hava Filtresi",
+      "coolant": "Soğutma Sıvısı",
+      "tire": "Lastik Kontrolü",
+      "wiper": "Silecek",
+      "headlight": "Far / Ampul"
     },
     "cta": "Ustaya Göster"
   },

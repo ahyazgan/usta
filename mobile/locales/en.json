@@ -32,7 +32,13 @@
       "oil_change": "Oil Change",
       "battery": "Battery",
       "cabin_filter": "Cabin Filter",
-      "spark_plug": "Spark Plugs"
+      "spark_plug": "Spark Plugs",
+      "brake_check": "Brake Check",
+      "air_filter": "Air Filter",
+      "coolant": "Coolant",
+      "tire": "Tire Check",
+      "wiper": "Wiper Blades",
+      "headlight": "Headlight"
     },
     "cta": "Show the Master"
   },

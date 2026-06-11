@@ -42,6 +42,20 @@ class Settings(BaseSettings):
     def cors_origins(self) -> list[str]:
         return ["*"] if self.debug else [self.prod_cors_origin]
 
+    @property
+    def sqlalchemy_url(self) -> str:
+        """DB URL'ini async sürücüye normalize eder.
+
+        Render/Heroku gibi sağlayıcılar `postgres://` verir; SQLAlchemy async
+        motoru `postgresql+asyncpg://` ister.
+        """
+        url = self.database_url
+        if url.startswith("postgres://"):
+            return "postgresql+asyncpg://" + url[len("postgres://") :]
+        if url.startswith("postgresql://") and "+asyncpg" not in url:
+            return "postgresql+asyncpg://" + url[len("postgresql://") :]
+        return url
+
 
 @lru_cache
 def get_settings() -> Settings:

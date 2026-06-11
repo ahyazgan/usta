@@ -7,6 +7,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from ..domain.catalog import find_spec
 from ..domain.models import Vehicle, VehicleSpec
 from ..domain.schemas import VehicleCreate, VehicleUpdate
 
@@ -42,8 +43,16 @@ async def create_vehicle(db: AsyncSession, user_id: int, payload: VehicleCreate)
         engine_code=payload.engine_code,
         current_km=payload.current_km,
     )
-    if payload.spec is not None:
-        vehicle.spec = VehicleSpec(**payload.spec.model_dump())
+    # Spec verilmediyse TR araç parkı kataloğundan otomatik doldurmayı dene.
+    spec_in = payload.spec or find_spec(
+        payload.make,
+        payload.model,
+        payload.year,
+        fuel_type=payload.fuel_type,
+        engine_code=payload.engine_code,
+    )
+    if spec_in is not None:
+        vehicle.spec = VehicleSpec(**spec_in.model_dump())
     db.add(vehicle)
     await db.commit()
     await db.refresh(vehicle, attribute_names=["spec"])

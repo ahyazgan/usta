@@ -11,7 +11,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from .api import ai, auth, vehicles
+from .api import ai, auth, maintenance, tasks, vehicles
 from .config import get_settings
 from .database import SessionLocal, create_all
 from .domain.schemas import HealthResponse
@@ -75,4 +75,6 @@ async def health() -> HealthResponse:
 
 app.include_router(auth.router)
 app.include_router(vehicles.router)
+app.include_router(tasks.router)
+app.include_router(maintenance.router)
 app.include_router(ai.router)

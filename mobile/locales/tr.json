@@ -23,21 +23,170 @@
       "due": "Zamanı geldi",
       "soon": "Yaklaşıyor"
     },
+    "tasks": {
+      "title": "Ne yapacaksın?",
+      "selectHint": "Devam etmek için bir görev seç",
+      "oil_change": "Yağ Değişimi",
+      "battery": "Akü",
+      "cabin_filter": "Polen Filtresi"
+    },
     "cta": "Ustaya Göster"
+  },
+  "nav": {
+    "sound": "Ses Teşhisi",
+    "history": "Bakım Geçmişi"
+  },
+  "auth": {
+    "loginTitle": "Giriş Yap",
+    "registerTitle": "Kayıt Ol",
+    "emailLabel": "E-posta",
+    "emailPlaceholder": "ornek@eposta.com",
+    "passwordLabel": "Şifre",
+    "passwordPlaceholder": "Şifren",
+    "loginSubmit": "Giriş Yap",
+    "registerSubmit": "Kayıt Ol",
+    "toLogin": "Zaten hesabın var mı? Giriş yap",
+    "toRegister": "Hesabın yok mu? Kayıt ol",
+    "logout": "Çıkış Yap",
+    "loggedOutPrompt": "Garajına erişmek için giriş yap.",
+    "loggedOutCta": "Giriş Yap",
+    "error": {
+      "invalid": "E-posta veya şifre hatalı",
+      "exists": "Bu e-posta zaten kayıtlı",
+      "network": "Bağlantı yok — internetini kontrol et",
+      "generic": "Bir şeyler ters gitti, tekrar dene"
+    }
+  },
+  "sound": {
+    "title": "Ses Teşhisi",
+    "descriptionLabel": "Sesi tarif et",
+    "descriptionPlaceholder": "Örn: Soğuk çalıştırınca ön taraftan tıkırtı geliyor",
+    "recordedHint": "Motor sesi kaydedilmez — yalnızca senin tarifin gönderilir.",
+    "conditionLabel": "Ses ne zaman çıkıyor?",
+    "condition": {
+      "rolanti": "Rölantide",
+      "gazda": "Gaz verince",
+      "soguk_motor": "Soğuk motorda",
+      "seyirde": "Seyir halinde"
+    },
+    "analyze": "Analiz Et",
+    "analyzing": "İnceleniyor…",
+    "result": {
+      "title": "Teşhis",
+      "tespit": "Tespit",
+      "kategori": "Ses türü",
+      "guven": "Güven",
+      "aciliyet": "Aciliyet",
+      "sonrakiAdim": "Sonraki adım"
+    },
+    "kategori": {
+      "tikirti": "Tıkırtı",
+      "kayis_sesi": "Kayış sesi",
+      "metalik_vuruntu": "Metalik vuruntu",
+      "islik": "Islık",
+      "egzoz_patlamasi": "Egzoz patlaması",
+      "normal": "Normal",
+      "belirsiz": "Belirsiz"
+    },
+    "aciliyet": {
+      "dusuk": "Düşük",
+      "orta": "Orta",
+      "yuksek": "Yüksek"
+    },
+    "error": {
+      "offline": "Çevrimdışısın — bağlantını kontrol et ve tekrar dene",
+      "auth": "Oturum gerekli — lütfen giriş yap",
+      "noVehicle": "Önce bir araç seç",
+      "noDescription": "Lütfen sesi tarif et",
+      "generic": "Bir şeyler ters gitti, tekrar dene"
+    }
+  },
+  "history": {
+    "title": "Bakım Geçmişi",
+    "reminders": {
+      "title": "Hatırlatıcılar",
+      "empty": "Henüz hatırlatıcı yok",
+      "remaining": "{{km}} km kaldı",
+      "dueAt": "{{km}} km'de",
+      "unknownKm": "Bilinmiyor",
+      "status": {
+        "ok": "Tamam",
+        "soon": "Yaklaşıyor",
+        "due": "Zamanı geldi",
+        "unknown": "Bilinmiyor"
+      }
+    },
+    "logs": {
+      "title": "Geçmiş Kayıtlar",
+      "empty": "Henüz kayıt yok",
+      "kmValue": "{{km}} km",
+      "noKm": "Km yok"
+    },
+    "addLog": {
+      "title": "Kayıt Ekle",
+      "taskLabel": "Görev",
+      "kmLabel": "Kilometre",
+      "kmPlaceholder": "Örn: 138420",
+      "noteLabel": "Not (isteğe bağlı)",
+      "notePlaceholder": "Kısa bir not",
+      "submit": "Kaydet"
+    },
+    "error": {
+      "offline": "Çevrimdışısın — bağlantını kontrol et ve tekrar dene",
+      "auth": "Oturum gerekli — lütfen giriş yap",
+      "noVehicle": "Önce bir araç seç",
+      "generic": "Bir şeyler ters gitti, tekrar dene"
+    }
   },
   "camera": {
     "stepBanner": "Adım {{current}}/{{total}}",
     "stepTitle": "Yağ çubuğunu bul ve seviyeyi kontrol et",
     "safetyStrip": "Dikkat: Motor sıcak olabilir. Aracı sabit zemine al, krikoyla kaldırdıysan takozla destekle.",
     "check": "Kontrol Et",
+    "analyzing": "İnceleniyor…",
+    "permissionRequest": "Doğru parçayı doğrulamak için kamera iznine ihtiyacımız var.",
+    "grantPermission": "İzin Ver",
     "permissionDenied": "Kamera izni verilmedi. Doğru parçayı doğrulamak için ayarlardan izin ver.",
     "offline": "Çevrimdışısın — bağlantı bekleniyor",
-    "hint": "Parçayı çerçeveye ortala ve Kontrol Et'e bas"
+    "hint": "Parçayı çerçeveye ortala ve Kontrol Et'e bas",
+    "guven": {
+      "yuksek": "Yüksek güven",
+      "orta": "Orta güven",
+      "dusuk": "Düşük güven"
+    },
+    "konum": {
+      "sol_ust": "sol üst",
+      "orta_ust": "orta üst",
+      "sag_ust": "sağ üst",
+      "sol_orta": "sol orta",
+      "merkez": "merkez",
+      "sag_orta": "sağ orta",
+      "sol_alt": "sol alt",
+      "orta_alt": "orta alt",
+      "sag_alt": "sağ alt"
+    },
+    "result": {
+      "correct": "Doğru yerdesin",
+      "wrong": "Burası değil",
+      "uncertain": "Net göremedim, tekrar dene",
+      "locationHint": "Şu tarafa bak: {{yon}}",
+      "tespit": "Tespit",
+      "guven": "Güven",
+      "sonrakiAdim": "Sonraki adım"
+    },
+    "error": {
+      "offline": "Çevrimdışısın — bağlantını kontrol et ve tekrar dene",
+      "auth": "Oturum gerekli — lütfen giriş yap",
+      "noTask": "Önce bir görev seç",
+      "generic": "Bir şeyler ters gitti, tekrar dene"
+    }
   },
   "common": {
     "loading": "Yükleniyor…",
     "retry": "Tekrar Dene",
     "cancel": "Vazgeç",
+    "save": "Kaydet",
+    "back": "Geri",
     "goToMechanic": "Tamirciye Git"
   }
 }

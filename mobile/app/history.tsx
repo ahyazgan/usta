@@ -1,0 +1,507 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import type {
+  MaintenanceLog,
+  Reminder,
+  ReminderStatus,
+} from '@/lib/api';
+import { i18n, t } from '@/lib/i18n';
+import { theme } from '@/lib/theme';
+import { useHistory } from '@/lib/useHistory';
+
+/** Tasks reused for the add-log picker (mirrors the garage chips). */
+const TASK_IDS = ['oil_change', 'battery', 'cabin_filter'] as const;
+
+/** Resolve a task id to a localized title, falling back to the raw id. */
+function taskTitle(id: string): string {
+  const key = `garage.tasks.${id}`;
+  const translated = t(key);
+  // i18n-js returns a "[missing ...]" marker when the key is unknown.
+  return translated.startsWith('[missing') ? id : translated;
+}
+
+/** Status color — NEVER green; secondary/amber/red per the project rule. */
+function statusColor(status: ReminderStatus): string {
+  if (status === 'due') return theme.colors.danger;
+  if (status === 'soon') return theme.colors.accent;
+  // ok + unknown both render muted (unknown a touch more so via opacity).
+  return theme.colors.textSecondary;
+}
+
+function formatDate(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  return date.toLocaleDateString(i18n.locale === 'en' ? 'en-US' : 'tr-TR');
+}
+
+function ReminderRow({ reminder }: { reminder: Reminder }) {
+  const color = statusColor(reminder.status);
+  const remaining =
+    reminder.remaining_km != null
+      ? t('history.reminders.remaining', {
+          km: reminder.remaining_km.toLocaleString(),
+        })
+      : t('history.reminders.unknownKm');
+  const dueAt =
+    reminder.due_km != null
+      ? t('history.reminders.dueAt', { km: reminder.due_km.toLocaleString() })
+      : t('history.reminders.unknownKm');
+
+  return (
+    <View style={styles.reminderRow}>
+      <View style={styles.reminderMain}>
+        <Text style={styles.reminderTask}>{taskTitle(reminder.task)}</Text>
+        <Text style={styles.reminderMeta}>
+          {remaining} · {dueAt}
+        </Text>
+      </View>
+      <View style={[styles.statusBadge, { borderColor: color }]}>
+        <Text
+          style={[
+            styles.statusText,
+            { color },
+            reminder.status === 'unknown' && styles.statusMuted,
+          ]}
+        >
+          {t(`history.reminders.status.${reminder.status}`)}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
+function LogRow({ log }: { log: MaintenanceLog }) {
+  const km =
+    log.km != null
+      ? t('history.logs.kmValue', { km: log.km.toLocaleString() })
+      : t('history.logs.noKm');
+  return (
+    <View style={styles.logRow}>
+      <View style={styles.logHeader}>
+        <Text style={styles.logTask}>{taskTitle(log.task)}</Text>
+        <Text style={styles.logDate}>{formatDate(log.created_at)}</Text>
+      </View>
+      <Text style={styles.logMeta}>{km}</Text>
+      {log.note != null && log.note.length > 0 && (
+        <Text style={styles.logNote}>{log.note}</Text>
+      )}
+    </View>
+  );
+}
+
+export default function HistoryScreen() {
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const {
+    loading,
+    error,
+    reminders,
+    logs,
+    refresh,
+    addLog,
+    submitting,
+    submitError,
+  } = useHistory();
+
+  const [task, setTask] = useState<string>(TASK_IDS[0]);
+  const [km, setKm] = useState('');
+  const [note, setNote] = useState('');
+
+  async function handleAdd() {
+    if (submitting) return;
+    const parsedKm = km.trim().length > 0 ? Number(km.trim()) : undefined;
+    const ok = await addLog({
+      task,
+      km: Number.isFinite(parsedKm) ? parsedKm : undefined,
+      note: note.trim().length > 0 ? note.trim() : undefined,
+    });
+    if (ok) {
+      setKm('');
+      setNote('');
+    }
+  }
+
+  return (
+    <View
+      style={[styles.container, { paddingTop: insets.top + theme.spacing.lg }]}
+    >
+      <View style={styles.headerRow}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.back()}
+          style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
+        >
+          <Ionicons
+            name="chevron-back"
+            size={22}
+            color={theme.colors.textPrimary}
+          />
+          <Text style={styles.backText}>{t('common.back')}</Text>
+        </Pressable>
+      </View>
+
+      <ScrollView
+        contentContainerStyle={[
+          styles.scroll,
+          { paddingBottom: insets.bottom + theme.spacing.xxl },
+        ]}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Text style={styles.title}>{t('history.title')}</Text>
+
+        {loading ? (
+          <ActivityIndicator color={theme.colors.accent} style={styles.loader} />
+        ) : error ? (
+          <View style={styles.errorBox}>
+            <Ionicons
+              name="cloud-offline"
+              size={18}
+              color={theme.colors.warning}
+            />
+            <Text style={styles.errorText}>{t(error)}</Text>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => void refresh()}
+              style={({ pressed }) => [
+                styles.retryButton,
+                pressed && styles.pressed,
+              ]}
+            >
+              <Text style={styles.retryText}>{t('common.retry')}</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <>
+            <Text style={styles.sectionTitle}>
+              {t('history.reminders.title')}
+            </Text>
+            {reminders.length === 0 ? (
+              <Text style={styles.empty}>{t('history.reminders.empty')}</Text>
+            ) : (
+              <View style={styles.card}>
+                {reminders.map((reminder) => (
+                  <ReminderRow key={reminder.task} reminder={reminder} />
+                ))}
+              </View>
+            )}
+
+            <Text style={styles.sectionTitle}>{t('history.logs.title')}</Text>
+            {logs.length === 0 ? (
+              <Text style={styles.empty}>{t('history.logs.empty')}</Text>
+            ) : (
+              <View style={styles.card}>
+                {logs.map((log) => (
+                  <LogRow key={log.id} log={log} />
+                ))}
+              </View>
+            )}
+          </>
+        )}
+
+        <Text style={styles.sectionTitle}>{t('history.addLog.title')}</Text>
+        <View style={styles.card}>
+          <Text style={styles.label}>{t('history.addLog.taskLabel')}</Text>
+          <View style={styles.taskRow}>
+            {TASK_IDS.map((id) => {
+              const selected = task === id;
+              const color = selected
+                ? theme.colors.accent
+                : theme.colors.textSecondary;
+              return (
+                <Pressable
+                  key={id}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
+                  onPress={() => setTask(id)}
+                  style={({ pressed }) => [
+                    styles.taskChip,
+                    { borderColor: color },
+                    selected && styles.taskChipSelected,
+                    pressed && styles.pressed,
+                  ]}
+                >
+                  <Text style={[styles.taskChipLabel, { color }]}>
+                    {taskTitle(id)}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+
+          <Text style={styles.label}>{t('history.addLog.kmLabel')}</Text>
+          <TextInput
+            style={styles.input}
+            value={km}
+            onChangeText={setKm}
+            placeholder={t('history.addLog.kmPlaceholder')}
+            placeholderTextColor={theme.colors.textSecondary}
+            keyboardType="number-pad"
+          />
+
+          <Text style={styles.label}>{t('history.addLog.noteLabel')}</Text>
+          <TextInput
+            style={styles.input}
+            value={note}
+            onChangeText={setNote}
+            placeholder={t('history.addLog.notePlaceholder')}
+            placeholderTextColor={theme.colors.textSecondary}
+          />
+
+          {submitError && (
+            <View style={styles.errorBox}>
+              <Ionicons
+                name="alert-circle"
+                size={18}
+                color={theme.colors.danger}
+              />
+              <Text style={styles.errorText}>{t(submitError)}</Text>
+            </View>
+          )}
+
+          <Pressable
+            accessibilityRole="button"
+            accessibilityState={{ disabled: submitting }}
+            disabled={submitting}
+            onPress={handleAdd}
+            style={({ pressed }) => [
+              styles.submit,
+              submitting && styles.submitDisabled,
+              pressed && styles.pressed,
+            ]}
+          >
+            {submitting ? (
+              <ActivityIndicator color={theme.colors.background} />
+            ) : (
+              <Text style={styles.submitText}>{t('history.addLog.submit')}</Text>
+            )}
+          </Pressable>
+        </View>
+      </ScrollView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+    paddingHorizontal: theme.spacing.lg,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    minHeight: theme.touchTarget,
+    paddingRight: theme.spacing.md,
+  },
+  backText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 15,
+    fontWeight: '600',
+    color: theme.colors.textPrimary,
+  },
+  scroll: {
+    paddingBottom: theme.spacing.xxl,
+  },
+  title: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 28,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    marginBottom: theme.spacing.md,
+  },
+  loader: {
+    marginTop: theme.spacing.xl,
+  },
+  sectionTitle: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 18,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    marginTop: theme.spacing.xl,
+    marginBottom: theme.spacing.md,
+  },
+  card: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.lg,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    padding: theme.spacing.lg,
+  },
+  empty: {
+    fontFamily: theme.fonts.body,
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+  },
+  reminderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: theme.spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.colors.border,
+  },
+  reminderMain: {
+    flex: 1,
+    paddingRight: theme.spacing.md,
+  },
+  reminderTask: {
+    fontFamily: theme.fonts.body,
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  reminderMeta: {
+    fontFamily: theme.fonts.body,
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    marginTop: 2,
+  },
+  statusBadge: {
+    borderWidth: 1,
+    borderRadius: theme.radius.pill,
+    paddingVertical: theme.spacing.xs,
+    paddingHorizontal: theme.spacing.md,
+  },
+  statusText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  statusMuted: {
+    opacity: 0.6,
+  },
+  logRow: {
+    paddingVertical: theme.spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.colors.border,
+  },
+  logHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  logTask: {
+    fontFamily: theme.fonts.body,
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  logDate: {
+    fontFamily: theme.fonts.body,
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+  },
+  logMeta: {
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+    marginTop: 2,
+  },
+  logNote: {
+    fontFamily: theme.fonts.body,
+    fontSize: 14,
+    color: theme.colors.textPrimary,
+    marginTop: theme.spacing.xs,
+  },
+  label: {
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+    marginBottom: theme.spacing.sm,
+    marginTop: theme.spacing.md,
+  },
+  taskRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: theme.spacing.sm,
+  },
+  taskChip: {
+    minHeight: theme.touchTarget,
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderRadius: theme.radius.pill,
+    paddingHorizontal: theme.spacing.lg,
+  },
+  taskChipSelected: {
+    backgroundColor: theme.colors.background,
+  },
+  taskChipLabel: {
+    fontFamily: theme.fonts.body,
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  input: {
+    minHeight: theme.touchTarget,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    paddingHorizontal: theme.spacing.lg,
+    fontFamily: theme.fonts.body,
+    fontSize: 16,
+    color: theme.colors.textPrimary,
+  },
+  errorBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    marginTop: theme.spacing.lg,
+  },
+  errorText: {
+    flex: 1,
+    fontFamily: theme.fonts.body,
+    fontSize: 14,
+    color: theme.colors.danger,
+  },
+  retryButton: {
+    minHeight: theme.touchTarget,
+    justifyContent: 'center',
+    paddingHorizontal: theme.spacing.lg,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.accent,
+  },
+  retryText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.accent,
+  },
+  submit: {
+    minHeight: theme.touchTarget,
+    backgroundColor: theme.colors.accent,
+    borderRadius: theme.radius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: theme.spacing.lg,
+  },
+  submitDisabled: {
+    opacity: 0.5,
+  },
+  submitText: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 18,
+    fontWeight: '700',
+    color: theme.colors.background,
+  },
+  pressed: {
+    opacity: 0.85,
+  },
+});

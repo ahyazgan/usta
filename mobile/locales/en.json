@@ -23,21 +23,170 @@
       "due": "Due now",
       "soon": "Coming up"
     },
+    "tasks": {
+      "title": "What are you doing?",
+      "selectHint": "Select a task to continue",
+      "oil_change": "Oil Change",
+      "battery": "Battery",
+      "cabin_filter": "Cabin Filter"
+    },
     "cta": "Show the Master"
+  },
+  "nav": {
+    "sound": "Sound Diagnosis",
+    "history": "Maintenance History"
+  },
+  "auth": {
+    "loginTitle": "Log In",
+    "registerTitle": "Sign Up",
+    "emailLabel": "Email",
+    "emailPlaceholder": "you@example.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Your password",
+    "loginSubmit": "Log In",
+    "registerSubmit": "Sign Up",
+    "toLogin": "Already have an account? Log in",
+    "toRegister": "No account yet? Sign up",
+    "logout": "Log Out",
+    "loggedOutPrompt": "Log in to access your garage.",
+    "loggedOutCta": "Log In",
+    "error": {
+      "invalid": "Incorrect email or password",
+      "exists": "This email is already registered",
+      "network": "No connection — check your internet",
+      "generic": "Something went wrong, try again"
+    }
+  },
+  "sound": {
+    "title": "Sound Diagnosis",
+    "descriptionLabel": "Describe the sound",
+    "descriptionPlaceholder": "e.g. A ticking from the front on a cold start",
+    "recordedHint": "Engine sound is not recorded — only your description is sent.",
+    "conditionLabel": "When does the sound occur?",
+    "condition": {
+      "rolanti": "At idle",
+      "gazda": "On acceleration",
+      "soguk_motor": "Cold engine",
+      "seyirde": "While driving"
+    },
+    "analyze": "Analyze",
+    "analyzing": "Analyzing…",
+    "result": {
+      "title": "Diagnosis",
+      "tespit": "Finding",
+      "kategori": "Sound type",
+      "guven": "Confidence",
+      "aciliyet": "Urgency",
+      "sonrakiAdim": "Next step"
+    },
+    "kategori": {
+      "tikirti": "Ticking",
+      "kayis_sesi": "Belt noise",
+      "metalik_vuruntu": "Metallic knock",
+      "islik": "Whistle",
+      "egzoz_patlamasi": "Exhaust backfire",
+      "normal": "Normal",
+      "belirsiz": "Unclear"
+    },
+    "aciliyet": {
+      "dusuk": "Low",
+      "orta": "Medium",
+      "yuksek": "High"
+    },
+    "error": {
+      "offline": "You are offline — check your connection and try again",
+      "auth": "Sign-in required — please log in",
+      "noVehicle": "Select a vehicle first",
+      "noDescription": "Please describe the sound",
+      "generic": "Something went wrong, try again"
+    }
+  },
+  "history": {
+    "title": "Maintenance History",
+    "reminders": {
+      "title": "Reminders",
+      "empty": "No reminders yet",
+      "remaining": "{{km}} km remaining",
+      "dueAt": "at {{km}} km",
+      "unknownKm": "Unknown",
+      "status": {
+        "ok": "OK",
+        "soon": "Coming up",
+        "due": "Due now",
+        "unknown": "Unknown"
+      }
+    },
+    "logs": {
+      "title": "Past Entries",
+      "empty": "No entries yet",
+      "kmValue": "{{km}} km",
+      "noKm": "No km"
+    },
+    "addLog": {
+      "title": "Add Entry",
+      "taskLabel": "Task",
+      "kmLabel": "Mileage",
+      "kmPlaceholder": "e.g. 138420",
+      "noteLabel": "Note (optional)",
+      "notePlaceholder": "A short note",
+      "submit": "Save"
+    },
+    "error": {
+      "offline": "You are offline — check your connection and try again",
+      "auth": "Sign-in required — please log in",
+      "noVehicle": "Select a vehicle first",
+      "generic": "Something went wrong, try again"
+    }
   },
   "camera": {
     "stepBanner": "Step {{current}}/{{total}}",
     "stepTitle": "Find the dipstick and check the level",
     "safetyStrip": "Warning: The engine may be hot. Park on firm ground; if jacked up, support it with axle stands.",
     "check": "Check",
+    "analyzing": "Analyzing…",
+    "permissionRequest": "We need camera access to verify you are looking at the right part.",
+    "grantPermission": "Grant Access",
     "permissionDenied": "Camera permission denied. Grant access in settings to verify the correct part.",
     "offline": "You are offline — waiting for connection",
-    "hint": "Center the part in the frame and tap Check"
+    "hint": "Center the part in the frame and tap Check",
+    "guven": {
+      "yuksek": "High confidence",
+      "orta": "Medium confidence",
+      "dusuk": "Low confidence"
+    },
+    "konum": {
+      "sol_ust": "top left",
+      "orta_ust": "top center",
+      "sag_ust": "top right",
+      "sol_orta": "middle left",
+      "merkez": "center",
+      "sag_orta": "middle right",
+      "sol_alt": "bottom left",
+      "orta_alt": "bottom center",
+      "sag_alt": "bottom right"
+    },
+    "result": {
+      "correct": "You are in the right place",
+      "wrong": "This is not it",
+      "uncertain": "Couldn't see clearly, try again",
+      "locationHint": "Look toward: {{yon}}",
+      "tespit": "Finding",
+      "guven": "Confidence",
+      "sonrakiAdim": "Next step"
+    },
+    "error": {
+      "offline": "You are offline — check your connection and try again",
+      "auth": "Sign-in required — please log in",
+      "noTask": "Select a task first",
+      "generic": "Something went wrong, try again"
+    }
   },
   "common": {
     "loading": "Loading…",
     "retry": "Retry",
     "cancel": "Cancel",
+    "save": "Save",
+    "back": "Back",
     "goToMechanic": "Go to a Mechanic"
   }
 }

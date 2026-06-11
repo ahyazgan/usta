@@ -22,6 +22,17 @@ export type Konum =
 /** Confidence level of the diagnosis. */
 export type Guven = 'yuksek' | 'orta' | 'dusuk';
 
+/** Relative risk level of a maintenance task. */
+export type TaskRisk = 'dusuk' | 'orta' | 'yuksek';
+
+/** A selectable maintenance task fetched from the backend. */
+export interface Task {
+  id: string;
+  title_tr: string;
+  title_en: string;
+  risk: TaskRisk;
+}
+
 /** Sound classification categories. */
 export type SesKategori =
   | 'tikirti'
@@ -44,26 +55,106 @@ export interface DiagnoseResult {
 }
 
 export interface DiagnoseImageInput {
-  /** Base64-encoded image payload (no data URI prefix). */
-  imageBase64: string;
+  /** Vehicle the diagnosis is for. */
+  vehicle_id: number;
+  /** Task id the user is performing (e.g. oil_change). */
+  task: string;
   /** Optional step the user is currently on, for context. */
-  adim?: number;
-  /** Optional vehicle id for tailored guidance. */
-  vehicleId?: string;
+  step?: number;
+  /** Base64-encoded JPEG frame (no data URI prefix). */
+  frame_base64: string;
+  /** Media type of the frame — always image/jpeg client-side. */
+  media_type: 'image/jpeg';
+  /** Optional free-text note from the user. */
+  user_note?: string;
 }
 
+/** Condition under which the engine sound was heard (no audio is sent). */
+export type KayitKosulu = 'rolanti' | 'gazda' | 'soguk_motor' | 'seyirde';
+
 export interface DiagnoseSoundInput {
-  /** Base64-encoded audio payload. */
-  audioBase64: string;
-  kategori_ipucu?: SesKategori;
-  vehicleId?: string;
+  vehicle_id: number;
+  /** User's own description of the sound (engine sound is not transcribed). */
+  user_description: string;
+  condition: KayitKosulu;
+}
+
+/** Urgency level of a finding. */
+export type Aciliyet = 'dusuk' | 'orta' | 'yuksek';
+
+/** Sound diagnosis response shape (distinct from the image diagnosis shape). */
+export interface SoundDiagnoseResult {
+  tespit: string;
+  guven: Guven;
+  ses_kategorisi: SesKategori;
+  aciliyet: Aciliyet;
+  guvenlik_uyarisi: string | null;
+  sonraki_adim: string;
+  tamirciye_git_onerisi: boolean;
+}
+
+/** Auth token bundle returned by login/register-then-login/refresh. */
+export interface TokenResponse {
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+}
+
+/** Authentication request payload shared by register + login. */
+export interface AuthInput {
+  email: string;
+  password: string;
+}
+
+/** Public-facing user record returned by register. */
+export interface UserOut {
+  id: number;
+  email: string;
+  subscription_tier: string;
+  created_at: string;
+}
+
+/** A persisted maintenance log entry. */
+export interface MaintenanceLog {
+  id: number;
+  task: string;
+  km: number | null;
+  note: string | null;
+  created_at: string;
+}
+
+/** Payload for creating a maintenance log. */
+export interface MaintenanceLogInput {
+  task: string;
+  km?: number;
+  note?: string;
+}
+
+/** Reminder status returned by the backend. */
+export type ReminderStatus = 'ok' | 'soon' | 'due' | 'unknown';
+
+/** A maintenance reminder derived from logs + intervals. */
+export interface Reminder {
+  task: string;
+  interval_km: number;
+  last_km: number | null;
+  due_km: number | null;
+  remaining_km: number | null;
+  status: ReminderStatus;
 }
 
 export type GetToken = () => string | null | Promise<string | null>;
 
 export interface ApiClient {
   diagnoseImage(input: DiagnoseImageInput): Promise<DiagnoseResult>;
-  diagnoseSound(input: DiagnoseSoundInput): Promise<DiagnoseResult>;
+  diagnoseSound(input: DiagnoseSoundInput): Promise<SoundDiagnoseResult>;
+  getTasks(): Promise<Task[]>;
+  register(input: AuthInput): Promise<UserOut>;
+  login(input: AuthInput): Promise<TokenResponse>;
+  refresh(refreshToken: string): Promise<TokenResponse>;
+  addLog(vehicleId: number, input: MaintenanceLogInput): Promise<MaintenanceLog>;
+  listLogs(vehicleId: number): Promise<MaintenanceLog[]>;
+  getReminders(vehicleId: number): Promise<Reminder[]>;
 }
 
 export class ApiError extends Error {
@@ -80,38 +171,112 @@ export function createApiClient(
   baseUrl: string = API_BASE_URL,
   getToken: GetToken = () => null,
 ): ApiClient {
-  async function post<TBody extends object>(
-    path: string,
-    body: TBody,
-  ): Promise<DiagnoseResult> {
+  async function authHeaders(): Promise<Record<string, string>> {
     const token = await getToken();
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
       Accept: 'application/json',
     };
     if (token) {
       headers.Authorization = `Bearer ${token}`;
     }
+    return headers;
+  }
 
-    const res = await fetch(`${baseUrl}${path}`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(body),
-    });
+  async function request<TResult>(
+    path: string,
+    init: RequestInit,
+  ): Promise<TResult> {
+    let res: Response;
+    try {
+      res = await fetch(`${baseUrl}${path}`, init);
+    } catch (err) {
+      // Network failure / offline — surface as a catchable Error for screens.
+      throw new ApiError(0, err instanceof Error ? err.message : 'network error');
+    }
 
     if (!res.ok) {
       throw new ApiError(res.status, `Request to ${path} failed (${res.status})`);
     }
 
-    return (await res.json()) as DiagnoseResult;
+    return (await res.json()) as TResult;
+  }
+
+  async function post<TResult, TBody extends object>(
+    path: string,
+    body: TBody,
+  ): Promise<TResult> {
+    const headers = await authHeaders();
+    headers['Content-Type'] = 'application/json';
+    return request<TResult>(path, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body),
+    });
+  }
+
+  /** POST without an auth header — used by the unauthenticated auth flows. */
+  async function postPublic<TResult, TBody extends object>(
+    path: string,
+    body: TBody,
+  ): Promise<TResult> {
+    return request<TResult>(path, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
   }
 
   return {
     diagnoseImage(input) {
-      return post('/v1/ai/diagnose/image', input);
+      return post<DiagnoseResult, DiagnoseImageInput>(
+        '/v1/ai/diagnose/image',
+        input,
+      );
     },
     diagnoseSound(input) {
-      return post('/v1/ai/diagnose/sound', input);
+      return post<SoundDiagnoseResult, DiagnoseSoundInput>(
+        '/v1/ai/diagnose/sound',
+        input,
+      );
+    },
+    async getTasks() {
+      const headers = await authHeaders();
+      return request<Task[]>('/v1/tasks', { method: 'GET', headers });
+    },
+    register(input) {
+      return postPublic<UserOut, AuthInput>('/v1/auth/register', input);
+    },
+    login(input) {
+      return postPublic<TokenResponse, AuthInput>('/v1/auth/login', input);
+    },
+    refresh(refreshToken) {
+      return postPublic<TokenResponse, { refresh_token: string }>(
+        '/v1/auth/refresh',
+        { refresh_token: refreshToken },
+      );
+    },
+    addLog(vehicleId, input) {
+      return post<MaintenanceLog, MaintenanceLogInput>(
+        `/v1/vehicles/${vehicleId}/logs`,
+        input,
+      );
+    },
+    async listLogs(vehicleId) {
+      const headers = await authHeaders();
+      return request<MaintenanceLog[]>(`/v1/vehicles/${vehicleId}/logs`, {
+        method: 'GET',
+        headers,
+      });
+    },
+    async getReminders(vehicleId) {
+      const headers = await authHeaders();
+      return request<Reminder[]>(`/v1/vehicles/${vehicleId}/reminders`, {
+        method: 'GET',
+        headers,
+      });
     },
   };
 }

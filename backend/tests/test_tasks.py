@@ -35,8 +35,10 @@ def test_tasks_for_fuel_filters_by_applicability():
     assert "spark_plug" in benzin  # bujili motor
     assert "spark_plug" not in dizel  # dizelde buji yok
     assert "oil_change" in dizel
+    assert "air_filter" in dizel  # motor hava filtresi yanmalı motorlarda var
     assert "oil_change" not in elektrik  # elektrikte yağ yok
     assert "spark_plug" not in elektrik
+    assert "air_filter" not in elektrik  # elektrikte motor hava filtresi yok
     assert {"battery", "cabin_filter"} <= elektrik  # her yakıtta var
 
 

@@ -31,13 +31,25 @@
       "selectHint": "Devam etmek için bir görev seç",
       "oil_change": "Yağ Değişimi",
       "battery": "Akü",
-      "cabin_filter": "Polen Filtresi"
+      "cabin_filter": "Polen Filtresi",
+      "spark_plug": "Buji Değişimi"
     },
     "cta": "Ustaya Göster"
   },
   "vehicle": {
     "add": "Araç Ekle",
     "switch": "Değiştir",
+    "edit": {
+      "title": "Aracı Düzenle",
+      "cta": "Düzenle"
+    },
+    "delete": {
+      "cta": "Sil",
+      "confirmTitle": "Aracı sil",
+      "confirmMessage": "{{make}} {{model}} aracını silmek istediğine emin misin? Bu işlem geri alınamaz.",
+      "confirm": "Sil",
+      "cancel": "Vazgeç"
+    },
     "empty": {
       "title": "Henüz araç eklemedin",
       "desc": "Sana özel rehberlik için önce aracını tanıt."

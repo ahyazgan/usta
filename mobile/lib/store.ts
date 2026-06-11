@@ -18,7 +18,7 @@ export interface UstaState {
   selectedTask: Task | null;
   lastResult: DiagnoseResult | null;
   setVehicles: (vehicles: Vehicle[]) => void;
-  selectVehicle: (id: number) => void;
+  selectVehicle: (id: number | null) => void;
   setAuthToken: (token: string | null) => void;
   setRefreshToken: (token: string | null) => void;
   /** Set both tokens at once (login/hydrate) or clear both (logout). */

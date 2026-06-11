@@ -21,7 +21,12 @@ export interface UseVehicles {
   error: string | null;
   refresh: () => Promise<Vehicle[]>;
   addVehicle: (input: VehicleCreateInput) => Promise<boolean>;
-  selectVehicle: (id: number) => void;
+  updateVehicle: (
+    id: number,
+    patch: Partial<VehicleCreateInput>,
+  ) => Promise<boolean>;
+  removeVehicle: (id: number) => Promise<boolean>;
+  selectVehicle: (id: number | null) => void;
 }
 
 /** Maps a thrown error to an i18n key the screen can render via t(). */
@@ -93,6 +98,45 @@ export function useVehicles(): UseVehicles {
     [client, refresh, selectVehicle],
   );
 
+  const updateVehicle = useCallback(
+    async (
+      id: number,
+      patch: Partial<VehicleCreateInput>,
+    ): Promise<boolean> => {
+      setError(null);
+      try {
+        await client.updateVehicle(id, patch);
+        await refresh();
+        // Keep the edited vehicle selected so the garage reflects the change.
+        selectVehicle(id);
+        return true;
+      } catch (err) {
+        setError(errorKey(err));
+        return false;
+      }
+    },
+    [client, refresh, selectVehicle],
+  );
+
+  const removeVehicle = useCallback(
+    async (id: number): Promise<boolean> => {
+      setError(null);
+      try {
+        await client.deleteVehicle(id);
+        const remaining = await refresh();
+        // If the deleted vehicle was current, fall back to the first remaining.
+        if (currentVehicleId === id) {
+          selectVehicle(remaining.length > 0 ? remaining[0].id : null);
+        }
+        return true;
+      } catch (err) {
+        setError(errorKey(err));
+        return false;
+      }
+    },
+    [client, refresh, currentVehicleId, selectVehicle],
+  );
+
   return {
     vehicles,
     currentVehicle,
@@ -100,6 +144,8 @@ export function useVehicles(): UseVehicles {
     error,
     refresh,
     addVehicle,
+    updateVehicle,
+    removeVehicle,
     selectVehicle,
   };
 }

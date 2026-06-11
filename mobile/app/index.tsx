@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -11,30 +12,14 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { createApiClient, type Task, type Vehicle } from '@/lib/api';
+import { type Task, type Vehicle } from '@/lib/api';
 import { i18n, t } from '@/lib/i18n';
 import { useUstaStore } from '@/lib/store';
 import { theme } from '@/lib/theme';
 import { useAuth } from '@/lib/useAuth';
 import { useGarageStatus, type GarageChipState } from '@/lib/useGarageStatus';
+import { useVehicleTasks } from '@/lib/useVehicleTasks';
 import { useVehicles } from '@/lib/useVehicles';
-
-/**
- * Local fallback task ids + risk, used when GET /v1/tasks is unavailable.
- * Titles are resolved from i18n (no hardcoded user-facing strings).
- */
-const DEFAULT_TASK_IDS: { id: string; risk: Task['risk'] }[] = [
-  { id: 'oil_change', risk: 'orta' },
-  { id: 'battery', risk: 'orta' },
-  { id: 'cabin_filter', risk: 'dusuk' },
-];
-
-const DEFAULT_TASKS: Task[] = DEFAULT_TASK_IDS.map(({ id, risk }) => ({
-  id,
-  title_tr: t(`garage.tasks.${id}`, { locale: 'tr' }),
-  title_en: t(`garage.tasks.${id}`, { locale: 'en' }),
-  risk,
-}));
 
 function taskTitle(task: Task): string {
   return i18n.locale === 'en' ? task.title_en : task.title_tr;
@@ -172,34 +157,49 @@ export default function GarageScreen() {
     currentVehicle,
     loading: vehiclesLoading,
     selectVehicle,
+    removeVehicle,
   } = useVehicles();
   const { chips } = useGarageStatus(currentVehicle?.id ?? null);
+  // Only the tasks applicable to this vehicle's fuel type (filtered server-side).
+  const { tasks } = useVehicleTasks(currentVehicle?.id ?? null);
 
   const isAuthenticated = authToken != null;
 
-  const [tasks, setTasks] = useState<Task[]>(DEFAULT_TASKS);
-
-  const client = useMemo(
-    () => createApiClient(undefined, () => authToken),
-    [authToken],
-  );
-
+  // If the previously selected task no longer applies to the current vehicle
+  // (e.g. switched to / edited a diesel and spark_plug vanished), clear it.
   useEffect(() => {
-    if (!isAuthenticated) return;
-    let active = true;
-    client
-      .getTasks()
-      .then((fetched) => {
-        if (active && fetched.length > 0) setTasks(fetched);
-      })
-      // Graceful fallback: keep the localized DEFAULT_TASKS already in state.
-      .catch(() => undefined);
-    return () => {
-      active = false;
-    };
-  }, [client, isAuthenticated]);
+    if (selectedTask == null) return;
+    if (tasks.length === 0) return;
+    if (!tasks.some((task) => task.id === selectedTask.id)) {
+      setSelectedTask(null);
+    }
+  }, [tasks, selectedTask, setSelectedTask]);
 
   const hasSelection = selectedTask != null;
+
+  function handleEdit(vehicle: Vehicle) {
+    router.push({ pathname: '/vehicle-new', params: { id: String(vehicle.id) } });
+  }
+
+  function handleDelete(vehicle: Vehicle) {
+    Alert.alert(
+      t('vehicle.delete.confirmTitle'),
+      t('vehicle.delete.confirmMessage', {
+        make: vehicle.make,
+        model: vehicle.model,
+      }),
+      [
+        { text: t('vehicle.delete.cancel'), style: 'cancel' },
+        {
+          text: t('vehicle.delete.confirm'),
+          style: 'destructive',
+          onPress: () => {
+            void removeVehicle(vehicle.id);
+          },
+        },
+      ],
+    );
+  }
 
   if (!isAuthenticated) {
     return (
@@ -330,6 +330,31 @@ export default function GarageScreen() {
             <StatusChip label={t('garage.chips.filter')} state={chips.filter} />
             <StatusChip label={t('garage.chips.battery')} state={chips.battery} />
           </View>
+        </View>
+
+        <View style={styles.manageRow}>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => handleEdit(currentVehicle)}
+            style={({ pressed }) => [
+              styles.manageButton,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Ionicons name="create-outline" size={18} color={theme.colors.accent} />
+            <Text style={styles.manageButtonText}>{t('vehicle.edit.cta')}</Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => handleDelete(currentVehicle)}
+            style={({ pressed }) => [
+              styles.deleteButton,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Ionicons name="trash-outline" size={18} color={theme.colors.danger} />
+            <Text style={styles.deleteButtonText}>{t('vehicle.delete.cta')}</Text>
+          </Pressable>
         </View>
 
         <Pressable
@@ -561,6 +586,47 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: theme.spacing.sm,
     marginTop: theme.spacing.lg,
+  },
+  manageRow: {
+    flexDirection: 'row',
+    gap: theme.spacing.md,
+    marginTop: theme.spacing.md,
+  },
+  manageButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.xs,
+    minHeight: theme.touchTarget,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.accent,
+    paddingHorizontal: theme.spacing.md,
+  },
+  manageButtonText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.accent,
+  },
+  deleteButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.xs,
+    minHeight: theme.touchTarget,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.danger,
+    paddingHorizontal: theme.spacing.md,
+  },
+  deleteButtonText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.danger,
   },
   addVehicle: {
     flexDirection: 'row',

@@ -23,16 +23,24 @@ from tenacity import (
 )
 
 from ...config import Settings, get_settings
+from ...domain.ai_errors import AIError, AINotConfigured, AIRateLimited, AIUpstreamError
 
 try:  # anthropic SDK opsiyonel import — testte mock'lanır, kurulu olmayabilir.
     import anthropic
-    from anthropic import APIConnectionError, APIStatusError, AsyncAnthropic
+    from anthropic import (
+        APIConnectionError,
+        APIStatusError,
+        AsyncAnthropic,
+        RateLimitError,
+    )
 
     _RETRYABLE: tuple[type[Exception], ...] = (APIConnectionError, APIStatusError)
+    _RATE_LIMIT: tuple[type[Exception], ...] = (RateLimitError,)
 except Exception:  # pragma: no cover - SDK yoksa
     anthropic = None  # type: ignore[assignment]
     AsyncAnthropic = None  # type: ignore[assignment]
     _RETRYABLE = (ConnectionError,)
+    _RATE_LIMIT = ()
 
 
 @dataclass(slots=True)
@@ -62,9 +70,7 @@ class ClaudeClient:
         max_tokens: int | None = None,
     ) -> ClaudeResult:
         if self._client is None:
-            raise RuntimeError(
-                "Claude istemcisi yapılandırılmadı (ANTHROPIC_API_KEY eksik)."
-            )
+            raise AINotConfigured()
 
         max_tokens = max_tokens or self.settings.ai_max_tokens
         messages = [{"role": "user", "content": content}]
@@ -85,11 +91,24 @@ class ClaudeClient:
                 messages=messages,
             )
 
-        message = await _call()
+        try:
+            message = await _call()
+        except _RATE_LIMIT as exc:
+            raise AIRateLimited() from exc
+        except _RETRYABLE as exc:
+            raise AIUpstreamError() from exc
+        except AIError:
+            raise
+        except Exception as exc:  # beklenmedik üst-servis hatası
+            raise AIUpstreamError() from exc
+
         text = "".join(
             block.text for block in message.content if getattr(block, "type", None) == "text"
         )
-        data = _parse_json(text)
+        try:
+            data = _parse_json(text)
+        except (json.JSONDecodeError, ValueError) as exc:
+            raise AIUpstreamError("AI yanıtı çözümlenemedi.") from exc
         usage = message.usage
         return ClaudeResult(
             data=data,

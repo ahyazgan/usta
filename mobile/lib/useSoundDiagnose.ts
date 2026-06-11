@@ -30,6 +30,8 @@ function errorKey(err: unknown): string {
   if (err instanceof ApiError) {
     if (err.status === 0) return 'sound.error.offline';
     if (err.status === 401 || err.status === 403) return 'sound.error.auth';
+    if (err.status === 503 || err.status === 502) return 'sound.error.aiUnavailable';
+    if (err.status === 429) return 'sound.error.busy';
   }
   return 'sound.error.generic';
 }

@@ -139,7 +139,9 @@
       "auth": "Oturum gerekli — lütfen giriş yap",
       "noVehicle": "Önce bir araç ekle",
       "noDescription": "Lütfen sesi tarif et",
-      "generic": "Bir şeyler ters gitti, tekrar dene"
+      "generic": "Bir şeyler ters gitti, tekrar dene",
+      "aiUnavailable": "Yapay zekâ servisi şu an kullanılamıyor. Lütfen sonra tekrar dene.",
+      "busy": "Servis şu an yoğun. Lütfen biraz sonra tekrar dene."
     }
   },
   "history": {
@@ -220,7 +222,9 @@
       "auth": "Oturum gerekli — lütfen giriş yap",
       "noTask": "Önce bir görev seç",
       "noVehicle": "Önce bir araç ekle",
-      "generic": "Bir şeyler ters gitti, tekrar dene"
+      "generic": "Bir şeyler ters gitti, tekrar dene",
+      "aiUnavailable": "Yapay zekâ servisi şu an kullanılamıyor. Lütfen sonra tekrar dene.",
+      "busy": "Servis şu an yoğun. Lütfen biraz sonra tekrar dene."
     }
   },
   "common": {

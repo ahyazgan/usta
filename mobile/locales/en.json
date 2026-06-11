@@ -139,7 +139,9 @@
       "auth": "Sign-in required — please log in",
       "noVehicle": "Add a vehicle first",
       "noDescription": "Please describe the sound",
-      "generic": "Something went wrong, try again"
+      "generic": "Something went wrong, try again",
+      "aiUnavailable": "The AI service is currently unavailable. Please try again later.",
+      "busy": "The service is busy right now. Please try again shortly."
     }
   },
   "history": {
@@ -220,7 +222,9 @@
       "auth": "Sign-in required — please log in",
       "noTask": "Select a task first",
       "noVehicle": "Add a vehicle first",
-      "generic": "Something went wrong, try again"
+      "generic": "Something went wrong, try again",
+      "aiUnavailable": "The AI service is currently unavailable. Please try again later.",
+      "busy": "The service is busy right now. Please try again shortly."
     }
   },
   "common": {

@@ -45,6 +45,7 @@ class Vehicle(Base):
     make: Mapped[str] = mapped_column(String(80), nullable=False)
     model: Mapped[str] = mapped_column(String(80), nullable=False)
     year: Mapped[int] = mapped_column(Integer, nullable=False)
+    plate: Mapped[str | None] = mapped_column(String(15), nullable=True)
     engine_code: Mapped[str | None] = mapped_column(String(40), nullable=True)
     fuel_type: Mapped[FuelType] = mapped_column(SAEnum(FuelType), nullable=False)
     current_km: Mapped[int | None] = mapped_column(Integer, nullable=True)

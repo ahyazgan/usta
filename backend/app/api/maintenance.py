@@ -9,8 +9,14 @@ from ..core.deps import get_current_user
 from ..core.rate_limit import enforce_rate_limit
 from ..database import get_db
 from ..domain.models import User
-from ..domain.schemas import MaintenanceLogCreate, MaintenanceLogOut, ReminderOut, TaskOut
-from ..domain.tasks import tasks_for_fuel
+from ..domain.schemas import (
+    MaintenanceLogCreate,
+    MaintenanceLogOut,
+    ReminderOut,
+    TaskOut,
+    VehicleSummaryOut,
+)
+from ..domain.tasks import get_task, tasks_for_fuel
 from ..services import maintenance_service, vehicle_service
 
 router = APIRouter(
@@ -63,3 +69,21 @@ async def get_reminders(
 ) -> list[ReminderOut]:
     reminders = await maintenance_service.get_reminders(db, user.id, vehicle_id)
     return [ReminderOut(**asdict(r)) for r in reminders]
+
+
+@router.get("/summary", response_model=VehicleSummaryOut)
+async def vehicle_summary(
+    vehicle_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> VehicleSummaryOut:
+    """Kayıtlı bakım sayısı + tahmini DIY tasarrufu (loglardan toplanır)."""
+    # Sahiplik doğrulaması (kendi aracı değilse 404/403).
+    await vehicle_service.get_owned(db, user.id, vehicle_id)
+    logs = await maintenance_service.list_logs(db, user.id, vehicle_id)
+    savings = 0
+    for log in logs:
+        task = get_task(log.task)
+        if task is not None:
+            savings += task.diy_saving_try
+    return VehicleSummaryOut(maintenance_count=len(logs), savings_try=savings)

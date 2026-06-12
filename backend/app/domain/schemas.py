@@ -79,6 +79,7 @@ class VehicleCreate(BaseModel):
     make: str = Field(min_length=1, max_length=80)
     model: str = Field(min_length=1, max_length=80)
     year: int = Field(ge=1950, le=2100)
+    plate: str | None = Field(default=None, max_length=15)
     fuel_type: FuelType
     engine_code: str | None = Field(default=None, max_length=40)
     current_km: int | None = Field(default=None, ge=0)
@@ -89,6 +90,7 @@ class VehicleUpdate(BaseModel):
     make: str | None = Field(default=None, max_length=80)
     model: str | None = Field(default=None, max_length=80)
     year: int | None = Field(default=None, ge=1950, le=2100)
+    plate: str | None = Field(default=None, max_length=15)
     fuel_type: FuelType | None = None
     engine_code: str | None = Field(default=None, max_length=40)
     current_km: int | None = Field(default=None, ge=0)
@@ -101,10 +103,18 @@ class VehicleOut(BaseModel):
     make: str
     model: str
     year: int
+    plate: str | None
     fuel_type: FuelType
     engine_code: str | None
     current_km: int | None
     spec: VehicleSpecOut | None = None
+
+
+class VehicleSummaryOut(BaseModel):
+    """Ana sayfa özeti: kayıtlı bakım sayısı + tahmini DIY tasarrufu (TL)."""
+
+    maintenance_count: int
+    savings_try: int
 
 
 # --------------------------------------------------------------------------- #

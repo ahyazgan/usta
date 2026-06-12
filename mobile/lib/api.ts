@@ -139,6 +139,30 @@ export interface VehicleSummary {
   savings_try: number;
 }
 
+/** One step of a maintenance guide (spec values already filled server-side). */
+export interface GuideStep {
+  step: number;
+  instruction_tr: string;
+  instruction_en: string;
+  tool_tr: string | null;
+  tool_en: string | null;
+  torque_nm: number | null;
+  warning_tr: string | null;
+  warning_en: string | null;
+}
+
+/** Step-by-step guide for a maintenance task, tailored to a vehicle. */
+export interface TaskGuide {
+  task_id: string;
+  title_tr: string;
+  title_en: string;
+  risk: TaskRisk;
+  est_minutes: number;
+  steps: GuideStep[];
+  mechanic_note_tr: string;
+  mechanic_note_en: string;
+}
+
 /** A maintenance reminder derived from logs + intervals. */
 export interface Reminder {
   task: string;
@@ -204,6 +228,8 @@ export interface ApiClient {
   listLogs(vehicleId: number): Promise<MaintenanceLog[]>;
   getReminders(vehicleId: number): Promise<Reminder[]>;
   getSummary(vehicleId: number): Promise<VehicleSummary>;
+  /** Step-by-step guide for a task, filled with this vehicle's spec. */
+  getGuide(vehicleId: number, taskId: string): Promise<TaskGuide>;
   listVehicles(): Promise<Vehicle[]>;
   createVehicle(input: VehicleCreateInput): Promise<Vehicle>;
   getVehicle(id: number): Promise<Vehicle>;
@@ -368,6 +394,13 @@ export function createApiClient(
         method: 'GET',
         headers,
       });
+    },
+    async getGuide(vehicleId, taskId) {
+      const headers = await authHeaders();
+      return request<TaskGuide>(
+        `/v1/vehicles/${vehicleId}/tasks/${taskId}/guide`,
+        { method: 'GET', headers },
+      );
     },
     async listVehicles() {
       const headers = await authHeaders();

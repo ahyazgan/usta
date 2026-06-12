@@ -40,6 +40,15 @@
       "yuksek": "Yüksek risk"
     }
   },
+  "guide": {
+    "estMinutes": "~{{min}} dk",
+    "stepOf": "Adım {{current}} / {{total}}",
+    "toolLabel": "Gerekli:",
+    "torqueLabel": "Tork:",
+    "verifyCta": "Doğru yeri buldun mu? Kamerayı tut, kontrol edeyim.",
+    "next": "Yaptım, devam ▸",
+    "finish": "Bitir ve kaydet"
+  },
   "diagnosis": {
     "title": "Neyin var?",
     "show": {

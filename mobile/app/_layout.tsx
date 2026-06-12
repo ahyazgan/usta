@@ -58,6 +58,7 @@ export default function RootLayout() {
       >
         <Stack.Screen name="index" />
         <Stack.Screen name="maintenance" />
+        <Stack.Screen name="guide" />
         <Stack.Screen name="camera" />
         <Stack.Screen name="login" />
         <Stack.Screen name="sound" />

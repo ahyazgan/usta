@@ -1,0 +1,507 @@
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import {
+  ApiError,
+  createApiClient,
+  type GuideStep,
+  type TaskGuide,
+} from '@/lib/api';
+import { i18n, t } from '@/lib/i18n';
+import { goBack } from '@/lib/nav';
+import { useUstaStore } from '@/lib/store';
+import { theme } from '@/lib/theme';
+import { useVehicles } from '@/lib/useVehicles';
+
+const TR = () => i18n.locale !== 'en';
+
+function instruction(step: GuideStep): string {
+  return TR() ? step.instruction_tr : step.instruction_en;
+}
+function tool(step: GuideStep): string | null {
+  return TR() ? step.tool_tr : step.tool_en;
+}
+function warning(step: GuideStep): string | null {
+  return TR() ? step.warning_tr : step.warning_en;
+}
+
+/** Progress dots: done ✓ / active number / upcoming number. */
+function ProgressRow({ total, current }: { total: number; current: number }) {
+  const items: React.ReactNode[] = [];
+  for (let i = 0; i < total; i += 1) {
+    const done = i < current;
+    const active = i === current;
+    items.push(
+      <View
+        key={`dot-${i}`}
+        style={[styles.dot, done && styles.dotDone, active && styles.dotActive]}
+      >
+        {done ? (
+          <Ionicons name="checkmark" size={14} color={theme.colors.onInk} />
+        ) : (
+          <Text style={[styles.dotNum, active && styles.dotNumActive]}>{i + 1}</Text>
+        )}
+      </View>,
+    );
+    if (i < total - 1) {
+      items.push(
+        <View key={`line-${i}`} style={[styles.line, done && styles.lineDone]} />,
+      );
+    }
+  }
+  return <View style={styles.progressRow}>{items}</View>;
+}
+
+export default function GuideScreen() {
+  const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const authToken = useUstaStore((s) => s.authToken);
+  const selectedTask = useUstaStore((s) => s.selectedTask);
+  const { currentVehicle } = useVehicles();
+
+  const client = useMemo(
+    () => createApiClient(undefined, () => authToken),
+    [authToken],
+  );
+
+  const [guide, setGuide] = useState<TaskGuide | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [current, setCurrent] = useState(0);
+  const [finishing, setFinishing] = useState(false);
+
+  const load = useCallback(async () => {
+    if (currentVehicle == null || selectedTask == null) {
+      setLoading(false);
+      setError('camera.error.noTask');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      setGuide(await client.getGuide(currentVehicle.id, selectedTask.id));
+    } catch (err) {
+      setError(
+        err instanceof ApiError && err.status === 0
+          ? 'vehicle.error.network'
+          : 'vehicle.error.generic',
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, [client, currentVehicle, selectedTask]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const step = guide?.steps[current] ?? null;
+  const total = guide?.steps.length ?? 0;
+  const isLast = guide != null && current === total - 1;
+
+  async function handleNext() {
+    if (guide == null || currentVehicle == null) return;
+    if (!isLast) {
+      setCurrent((c) => c + 1);
+      return;
+    }
+    // Son adım: bakımı geçmişe işle (tasarruf bandını besler) ve eve dön.
+    if (finishing) return;
+    setFinishing(true);
+    try {
+      await client.addLog(currentVehicle.id, {
+        task: guide.task_id,
+        km: currentVehicle.current_km ?? undefined,
+      });
+    } catch {
+      /* kayıt başarısız olsa da kullanıcıyı rehberde kilitleme */
+    }
+    setFinishing(false);
+    router.replace('/');
+  }
+
+  const title = guide
+    ? TR()
+      ? guide.title_tr
+      : guide.title_en
+    : selectedTask
+      ? TR()
+        ? selectedTask.title_tr
+        : selectedTask.title_en
+      : '';
+
+  return (
+    <View style={[styles.container, { paddingTop: insets.top + theme.spacing.md }]}>
+      {/* Başlık */}
+      <View style={styles.header}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => goBack(router)}
+          style={({ pressed }) => [styles.back, pressed && styles.pressed]}
+        >
+          <Ionicons name="chevron-back" size={20} color={theme.colors.success} />
+          <Text style={styles.backText}>{t('common.back')}</Text>
+        </Pressable>
+        <Text style={styles.title}>{title}</Text>
+        {currentVehicle && guide && (
+          <Text style={styles.subtitle}>
+            {currentVehicle.make} {currentVehicle.model} ·{' '}
+            {t('guide.estMinutes', { min: guide.est_minutes })}
+          </Text>
+        )}
+      </View>
+
+      {loading ? (
+        <View style={styles.center}>
+          <ActivityIndicator color={theme.colors.ink} />
+        </View>
+      ) : error || guide == null ? (
+        <View style={styles.center}>
+          <Ionicons name="cloud-offline-outline" size={48} color={theme.colors.textSecondary} />
+          <Text style={styles.errorText}>{t(error ?? 'vehicle.error.generic')}</Text>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => void load()}
+            style={({ pressed }) => [styles.retry, pressed && styles.pressed]}
+          >
+            <Text style={styles.retryText}>{t('common.retry')}</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <>
+          <ProgressRow total={total} current={current} />
+
+          <ScrollView
+            contentContainerStyle={styles.scroll}
+            showsVerticalScrollIndicator={false}
+          >
+            {/* Adım uyarısı */}
+            {step != null && warning(step) != null && (
+              <View style={styles.warnStrip}>
+                <Ionicons name="warning" size={16} color={theme.colors.warnSoftText} />
+                <Text style={styles.warnText}>{warning(step)}</Text>
+              </View>
+            )}
+
+            {/* Adım kartı */}
+            {step != null && (
+              <View style={styles.stepCard}>
+                <Text style={styles.stepNum}>
+                  {t('guide.stepOf', { current: current + 1, total })}
+                </Text>
+                <Text style={styles.instruction}>{instruction(step)}</Text>
+                {(tool(step) != null || step.torque_nm != null) && (
+                  <View style={styles.toolRow}>
+                    <Ionicons name="construct" size={16} color={theme.colors.textSecondary} />
+                    <Text style={styles.toolText}>
+                      {tool(step) != null && (
+                        <>
+                          {t('guide.toolLabel')}{' '}
+                          <Text style={styles.toolStrong}>{tool(step)}</Text>
+                        </>
+                      )}
+                      {tool(step) != null && step.torque_nm != null && ' · '}
+                      {step.torque_nm != null && (
+                        <>
+                          {t('guide.torqueLabel')}{' '}
+                          <Text style={styles.toolStrong}>{step.torque_nm} Nm</Text>
+                        </>
+                      )}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            )}
+
+            {/* Kamera doğrulama bandı */}
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => router.push('/camera')}
+              style={({ pressed }) => [styles.verifyBanner, pressed && styles.pressed]}
+            >
+              <Ionicons name="camera" size={20} color={theme.colors.savingsText} />
+              <Text style={styles.verifyText}>{t('guide.verifyCta')}</Text>
+              <Ionicons name="chevron-forward" size={16} color={theme.colors.savingsText} />
+            </Pressable>
+
+            {/* Tamirciye git çıkışı */}
+            <View style={styles.mechanicNote}>
+              <Ionicons name="information-circle" size={16} color={theme.colors.textSecondary} />
+              <Text style={styles.mechanicNoteText}>
+                {TR() ? guide.mechanic_note_tr : guide.mechanic_note_en}
+              </Text>
+            </View>
+          </ScrollView>
+
+          {/* Alt eylemler */}
+          <View style={[styles.footer, { paddingBottom: insets.bottom + theme.spacing.md }]}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityState={{ disabled: current === 0 }}
+              disabled={current === 0}
+              onPress={() => setCurrent((c) => Math.max(0, c - 1))}
+              style={({ pressed }) => [
+                styles.btnBack,
+                current === 0 && styles.btnDisabled,
+                pressed && styles.pressed,
+              ]}
+            >
+              <Text style={styles.btnBackText}>{t('common.back')}</Text>
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => void handleNext()}
+              style={({ pressed }) => [styles.btnNext, pressed && styles.pressed]}
+            >
+              {finishing ? (
+                <ActivityIndicator color={theme.colors.onInk} />
+              ) : (
+                <Text style={styles.btnNextText}>
+                  {isLast ? t('guide.finish') : t('guide.next')}
+                </Text>
+              )}
+            </Pressable>
+          </View>
+        </>
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.colors.background },
+  header: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+  },
+  back: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    minHeight: 32,
+    marginBottom: theme.spacing.xs,
+  },
+  backText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    fontWeight: '600',
+    color: theme.colors.success,
+  },
+  title: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 22,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    letterSpacing: -0.3,
+  },
+  subtitle: {
+    fontFamily: theme.fonts.body,
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    marginTop: 2,
+  },
+  progressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.md,
+  },
+  dot: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: theme.colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dotDone: { backgroundColor: theme.colors.success },
+  dotActive: { backgroundColor: theme.colors.ink },
+  dotNum: {
+    fontFamily: theme.fonts.body,
+    fontSize: 11,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
+  },
+  dotNumActive: { color: theme.colors.onInk },
+  line: {
+    flex: 1,
+    height: 2,
+    borderRadius: 1,
+    backgroundColor: theme.colors.border,
+  },
+  lineDone: { backgroundColor: theme.colors.success },
+  scroll: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.lg,
+  },
+  warnStrip: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: theme.spacing.sm,
+    backgroundColor: theme.colors.warnSoftBg,
+    borderLeftWidth: 3,
+    borderLeftColor: theme.colors.warningBright,
+    borderRadius: theme.radius.sm,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+  },
+  warnText: {
+    flex: 1,
+    fontFamily: theme.fonts.body,
+    fontSize: 12,
+    lineHeight: 18,
+    color: theme.colors.warnSoftText,
+  },
+  stepCard: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.lg,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    padding: theme.spacing.lg,
+    marginBottom: theme.spacing.md,
+  },
+  stepNum: {
+    fontFamily: theme.fonts.body,
+    fontSize: 11,
+    fontWeight: '700',
+    color: theme.colors.success,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    marginBottom: theme.spacing.sm,
+  },
+  instruction: {
+    fontFamily: theme.fonts.body,
+    fontSize: 15,
+    lineHeight: 24,
+    color: theme.colors.textPrimary,
+    marginBottom: theme.spacing.md,
+  },
+  toolRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+  },
+  toolText: {
+    flex: 1,
+    fontFamily: theme.fonts.body,
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+  },
+  toolStrong: {
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  verifyBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.md,
+    backgroundColor: theme.colors.savingsBg,
+    borderWidth: 1,
+    borderColor: theme.colors.savingsBorder,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+  },
+  verifyText: {
+    flex: 1,
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    fontWeight: '600',
+    color: theme.colors.savingsText,
+  },
+  mechanicNote: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.xs,
+  },
+  mechanicNoteText: {
+    flex: 1,
+    fontFamily: theme.fonts.body,
+    fontSize: 12,
+    lineHeight: 18,
+    color: theme.colors.textSecondary,
+  },
+  center: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+  },
+  errorText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+  },
+  retry: {
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingHorizontal: theme.spacing.xl,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.ink,
+  },
+  retryText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.ink,
+  },
+  footer: {
+    flexDirection: 'row',
+    gap: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+  },
+  btnBack: {
+    flex: 1,
+    minHeight: theme.touchTarget,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  btnBackText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.textSecondary,
+  },
+  btnNext: {
+    flex: 2,
+    minHeight: theme.touchTarget,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.ink,
+  },
+  btnNextText: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.onInk,
+  },
+  btnDisabled: { opacity: 0.4 },
+  pressed: { opacity: 0.85 },
+});

@@ -72,7 +72,7 @@ export default function MaintenanceScreen() {
 
   function startTask(task: Task) {
     setSelectedTask(task);
-    router.push('/camera');
+    router.push('/guide');
   }
 
   let body: React.ReactNode;

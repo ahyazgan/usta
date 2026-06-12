@@ -40,6 +40,15 @@
       "yuksek": "High risk"
     }
   },
+  "guide": {
+    "estMinutes": "~{{min}} min",
+    "stepOf": "Step {{current}} / {{total}}",
+    "toolLabel": "Needed:",
+    "torqueLabel": "Torque:",
+    "verifyCta": "Found the right spot? Point the camera, I'll check.",
+    "next": "Done, next ▸",
+    "finish": "Finish & log it"
+  },
   "diagnosis": {
     "title": "What's wrong?",
     "show": {

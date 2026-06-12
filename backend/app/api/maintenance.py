@@ -2,17 +2,20 @@
 
 from dataclasses import asdict
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..core.deps import get_current_user
 from ..core.rate_limit import enforce_rate_limit
 from ..database import get_db
 from ..domain.models import User
+from ..domain.guides import fill_template, get_guide
 from ..domain.schemas import (
+    GuideStepOut,
     MaintenanceLogCreate,
     MaintenanceLogOut,
     ReminderOut,
+    TaskGuideOut,
     TaskOut,
     VehicleSummaryOut,
 )
@@ -69,6 +72,60 @@ async def get_reminders(
 ) -> list[ReminderOut]:
     reminders = await maintenance_service.get_reminders(db, user.id, vehicle_id)
     return [ReminderOut(**asdict(r)) for r in reminders]
+
+
+@router.get("/tasks/{task_id}/guide", response_model=TaskGuideOut)
+async def task_guide(
+    vehicle_id: int,
+    task_id: str,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> TaskGuideOut:
+    """Araca özel doldurulmuş adım adım bakım rehberi.
+
+    Talimatlardaki {yer_tutucular} aracın spec'inden doldurulur (örn. tıpa
+    ölçüsü "14mm"); görev bu aracın yakıtına uygulanamıyorsa 404 döner.
+    """
+    vehicle = await vehicle_service.get_owned(db, user.id, vehicle_id)
+    task = get_task(task_id)
+    guide = get_guide(task_id)
+    if task is None or guide is None:
+        raise HTTPException(status_code=404, detail="Görev bulunamadı")
+    if task.applies_to_fuels and vehicle.fuel_type not in task.applies_to_fuels:
+        raise HTTPException(status_code=404, detail="Görev bu araca uygulanamaz")
+
+    spec_values: dict[str, object] = {}
+    if vehicle.spec is not None:
+        for key in (
+            "oil_spec", "oil_capacity_l", "oil_drain_bolt_size", "oil_filter_part",
+            "air_filter_part", "cabin_filter_part", "spark_plug_part",
+            "battery_spec", "battery_location",
+        ):
+            spec_values[key] = getattr(vehicle.spec, key, None)
+
+    steps = [
+        GuideStepOut(
+            step=i,
+            instruction_tr=fill_template(s.instruction_tr, spec_values, "tr"),
+            instruction_en=fill_template(s.instruction_en, spec_values, "en"),
+            tool_tr=fill_template(s.tool_tr, spec_values, "tr") if s.tool_tr else None,
+            tool_en=fill_template(s.tool_en, spec_values, "en") if s.tool_en else None,
+            torque_nm=s.torque_nm,
+            warning_tr=s.warning_tr,
+            warning_en=s.warning_en,
+        )
+        for i, s in enumerate(guide.steps, start=1)
+    ]
+    return TaskGuideOut(
+        task_id=task.id,
+        title_tr=task.title_tr,
+        title_en=task.title_en,
+        risk=task.risk,
+        est_minutes=guide.est_minutes,
+        steps=steps,
+        mechanic_note_tr=guide.mechanic_note_tr,
+        mechanic_note_en=guide.mechanic_note_en,
+    )
 
 
 @router.get("/summary", response_model=VehicleSummaryOut)

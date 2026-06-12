@@ -117,6 +117,33 @@ class VehicleSummaryOut(BaseModel):
     savings_try: int
 
 
+class GuideStepOut(BaseModel):
+    """Adım adım rehberin tek adımı (araç spec'iyle doldurulmuş)."""
+
+    step: int
+    instruction_tr: str
+    instruction_en: str
+    tool_tr: str | None = None
+    tool_en: str | None = None
+    torque_nm: int | None = None
+    warning_tr: str | None = None
+    warning_en: str | None = None
+
+
+class TaskGuideOut(BaseModel):
+    """Bir bakım görevinin adım adım rehberi."""
+
+    task_id: str
+    title_tr: str
+    title_en: str
+    risk: Aciliyet
+    est_minutes: int
+    steps: list[GuideStepOut]
+    # Zorunlu "vazgeç, tamirciye git" çıkışı.
+    mechanic_note_tr: str
+    mechanic_note_en: str
+
+
 # --------------------------------------------------------------------------- #
 # AI — Görüntü teşhisi
 # --------------------------------------------------------------------------- #

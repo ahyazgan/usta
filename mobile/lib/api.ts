@@ -352,6 +352,8 @@ export interface ApiClient {
   ): Promise<void>;
   /** Right to erasure: delete the account and all its data (204). */
   deleteAccount(): Promise<void>;
+  /** Known catalog brands for a vehicle type (form quick-pick). */
+  getCatalogBrands(vehicleType: VehicleType): Promise<string[]>;
   listVehicles(): Promise<Vehicle[]>;
   createVehicle(input: VehicleCreateInput): Promise<Vehicle>;
   getVehicle(id: number): Promise<Vehicle>;
@@ -571,6 +573,13 @@ export function createApiClient(
     async deleteAccount() {
       const headers = await authHeaders();
       await requestVoid('/v1/me', { method: 'DELETE', headers });
+    },
+    async getCatalogBrands(vehicleType) {
+      const headers = await authHeaders();
+      return request<string[]>(`/v1/catalog/brands?vehicle_type=${vehicleType}`, {
+        method: 'GET',
+        headers,
+      });
     },
     async listVehicles() {
       const headers = await authHeaders();

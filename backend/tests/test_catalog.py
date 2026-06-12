@@ -47,6 +47,24 @@ def test_find_spec_motorcycle_catalog():
 
 
 @pytest.mark.asyncio
+async def test_catalog_brands_endpoint(client):
+    headers = await register_and_login(client, "brands@usta.app")
+    cars = (await client.get("/v1/catalog/brands?vehicle_type=araba", headers=headers)).json()
+    motos = (await client.get("/v1/catalog/brands?vehicle_type=motosiklet", headers=headers)).json()
+    assert "Fiat" in cars and "Volkswagen" in cars
+    assert "Fiat" not in motos  # araba markası moto listesinde yok
+    assert "Yamaha" in motos and "Bajaj" in motos
+    assert cars == sorted(cars)  # alfabetik
+    # vehicle_type yoksa araba varsayılır.
+    assert (await client.get("/v1/catalog/brands", headers=headers)).json() == cars
+
+
+@pytest.mark.asyncio
+async def test_catalog_brands_requires_auth_401(client):
+    assert (await client.get("/v1/catalog/brands")).status_code == 401
+
+
+@pytest.mark.asyncio
 async def test_create_motorcycle_autofills_spec(client):
     headers = await register_and_login(client, "moto-cat@usta.app")
     payload = {

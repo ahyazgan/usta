@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -13,7 +13,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BrandBadge } from '@/components/BrandBadge';
-import type { FuelType, VehicleType } from '@/lib/api';
+import { createApiClient, type FuelType, type VehicleType } from '@/lib/api';
 import { formatTrDate, parseTrDate } from '@/lib/dateReminders';
 import { t } from '@/lib/i18n';
 import { goBack } from '@/lib/nav';
@@ -65,6 +65,28 @@ export default function VehicleNewScreen() {
 
   const [submitting, setSubmitting] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
+
+  // Katalogdaki markalar (türe göre) — "yazmak yerine dokun" hızlı seçim.
+  const authToken = useUstaStore((s) => s.authToken);
+  const client = useMemo(
+    () => createApiClient(undefined, () => authToken),
+    [authToken],
+  );
+  const [brands, setBrands] = useState<string[]>([]);
+  useEffect(() => {
+    let active = true;
+    client
+      .getCatalogBrands(vehicleType)
+      .then((b) => {
+        if (active) setBrands(b);
+      })
+      .catch(() => {
+        if (active) setBrands([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, [client, vehicleType]);
 
   async function handleSave() {
     if (submitting) return;
@@ -216,6 +238,36 @@ export default function VehicleNewScreen() {
             autoCapitalize="words"
           />
         </View>
+        {brands.length > 0 && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={styles.brandRow}
+          >
+            {brands.map((b) => {
+              const selected = make.trim().toLowerCase() === b.toLowerCase();
+              return (
+                <Pressable
+                  key={b}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
+                  onPress={() => setMake(b)}
+                  style={({ pressed }) => [
+                    styles.brandChip,
+                    selected && styles.brandChipSelected,
+                    pressed && styles.pressed,
+                  ]}
+                >
+                  <BrandBadge make={b} size={18} onInk={selected} />
+                  <Text style={[styles.brandChipText, selected && styles.brandChipTextSelected]}>
+                    {b}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+        )}
 
         <Text style={styles.label}>{t('vehicle.form.model')}</Text>
         <TextInput
@@ -457,6 +509,35 @@ const styles = StyleSheet.create({
   },
   makeInput: {
     flex: 1,
+  },
+  brandRow: {
+    gap: theme.spacing.sm,
+    paddingTop: theme.spacing.sm,
+    paddingRight: theme.spacing.lg,
+  },
+  brandChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.xs,
+    minHeight: 40,
+    paddingHorizontal: theme.spacing.md,
+    borderRadius: theme.radius.pill,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  brandChipSelected: {
+    backgroundColor: theme.colors.ink,
+    borderColor: theme.colors.ink,
+  },
+  brandChipText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
+  },
+  brandChipTextSelected: {
+    color: theme.colors.onInk,
   },
   fuelRow: {
     flexDirection: 'row',

@@ -3,9 +3,14 @@
 Türkiye'de yaygın araçlar için yağ/filtre/akü gibi bakım verilerini tutar.
 Araç oluştururken kullanıcı `spec` vermezse buradan otomatik doldurulur.
 
-⚠️ Bu değerler ÖRNEK seed verisidir. Üretimde araç kullanım kılavuzuna ve
-yetkili katalog parça numaralarına karşı doğrulanmalıdır. AI rehberliği bu
-verileri "kesin" değil referans olarak kullanır.
+⚠️ Veriler KARIŞIK güvendedir:
+- Bazı specler (yağ vizkozitesi/kapasite, buji tipi, akü) en çok satan modeller
+  için web kaynaklarından doğrulandı — "örnek:" ön eki YOK.
+- "örnek:" ön ekli değerler (özellikle filtre OE parça no'ları) hâlâ YER TUTUCU;
+  üretimde araç el kitabına / yetkili parça kataloğuna karşı doğrulanmalı.
+NOT: Tek-girdi-per-model yapısı motor varyantını (yıl/facelift) tam yakalayamaz;
+gerçek OE parça uyumluluğu için harici parça verisi (perakendeci/TecDoc) gerekir.
+AI rehberliği bu verileri "kesin" değil referans olarak kullanır.
 """
 
 from __future__ import annotations
@@ -37,16 +42,17 @@ CATALOG: tuple[CatalogEntry, ...] = (
         year_min=2015,
         year_max=2024,
         fuels=(FuelType.benzin, FuelType.lpg),
-        engine_codes=("843A1000",),
+        engine_codes=("843A1000",),  # 1.4 Fire 95hp
         spec=VehicleSpecIn(
+            # 1.4 Fire (843A1000): yağ ~3.0L, buji NGK DCPR7E-N-10 (web-doğrulandı).
             oil_spec="5W-40",
-            oil_capacity_l=4.0,
+            oil_capacity_l=3.0,
             oil_drain_bolt_size="14mm",
             oil_drain_location="yağ karteri alt-arka köşe",
             oil_filter_part="örnek: 55256470",
             air_filter_part="örnek: 51897064",
             cabin_filter_part="örnek: 77367464",
-            spark_plug_part="örnek: NGK ZKR7A-10",
+            spark_plug_part="NGK DCPR7E-N-10",
             battery_spec="60Ah / 540A",
             battery_location="motor bölmesi sol ön",
             transmission_type="manuel",
@@ -81,8 +87,9 @@ CATALOG: tuple[CatalogEntry, ...] = (
         fuels=(FuelType.dizel,),
         engine_codes=("K9K",),
         spec=VehicleSpecIn(
+            # 1.5 dCi K9K: yağ 5W-30 ~4.8L (web-doğrulandı). Dizel → buji yok.
             oil_spec="5W-30",
-            oil_capacity_l=4.5,
+            oil_capacity_l=4.8,
             oil_drain_bolt_size="8mm iç altıgen (allen)",
             oil_drain_location="yağ karteri alt orta",
             oil_filter_part="örnek: 8200768927",
@@ -123,6 +130,7 @@ CATALOG: tuple[CatalogEntry, ...] = (
         fuels=(FuelType.benzin, FuelType.lpg),
         engine_codes=("1ZR-FAE",),
         spec=VehicleSpecIn(
+            # 1ZR-FAE: yağ 0W-20 ~4.2L, buji NGK ILKAR7B-11 / Denso SC16HR11 (web-doğrulandı).
             oil_spec="0W-20",
             oil_capacity_l=4.2,
             oil_drain_bolt_size="14mm",
@@ -130,8 +138,8 @@ CATALOG: tuple[CatalogEntry, ...] = (
             oil_filter_part="örnek: 04152-YZZA1",
             air_filter_part="örnek: 17801-0T050",
             cabin_filter_part="örnek: 87139-0N010",
-            spark_plug_part="örnek: Denso FK20HR11",
-            battery_spec="55Ah / 470A",
+            spark_plug_part="NGK ILKAR7B-11 (Denso SC16HR11)",
+            battery_spec="60Ah / 540A",
             battery_location="motor bölmesi sol ön",
             transmission_type="manuel",
         ),

@@ -148,6 +148,50 @@ class AISession(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
 
 
+class Mechanic(Base):
+    """Küratörlü tamirci dizini (Faz C MVP — gerçek tedarik iş-geliştirme adımı).
+
+    `systems` = ilgilendiği araç sistemleri (virgülle, ArizaSistem değerleri);
+    boş = genel. Triyaj/teşhis sonrası kullanıcı buradan tamirci bulur.
+    """
+
+    __tablename__ = "mechanics"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    city: Mapped[str] = mapped_column(String(40), nullable=False, index=True)
+    district: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    phone: Mapped[str] = mapped_column(String(20), nullable=False)
+    whatsapp: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    address: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    maps_url: Mapped[str | None] = mapped_column(String(300), nullable=True)
+    specialties: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    systems: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+
+
+class MechanicLead(Base):
+    """Tamirci yönlendirme sinyali (lead-gen gelir modelinin temeli).
+
+    Kullanıcı bir tamirciyi aradığında/WhatsApp veya yol tarifi açtığında kaydedilir;
+    ileride tamircilerden lead başına ücretlendirme bu tabloya dayanır.
+    """
+
+    __tablename__ = "mechanic_leads"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    mechanic_id: Mapped[int] = mapped_column(
+        ForeignKey("mechanics.id", ondelete="CASCADE"), index=True
+    )
+    ai_session_id: Mapped[int | None] = mapped_column(
+        ForeignKey("ai_sessions.id", ondelete="SET NULL"), nullable=True
+    )
+    channel: Mapped[str] = mapped_column(String(20), nullable=False)  # call|whatsapp|directions
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+
+
 class RefreshToken(Base):
     """Yenileme token'ları sha256 hash olarak saklanır (düz metin DB'de tutulmaz)."""
 

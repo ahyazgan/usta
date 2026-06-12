@@ -285,6 +285,24 @@ export interface SystemStat {
   dogruluk_orani: number | null;
 }
 
+/** Küratörlü tamirci dizini kaydı. */
+export interface Mechanic {
+  id: number;
+  name: string;
+  city: string;
+  district: string | null;
+  phone: string;
+  whatsapp: string | null;
+  address: string | null;
+  maps_url: string | null;
+  specialties: string | null;
+  systems: string | null;
+  verified: boolean;
+}
+
+/** Tamirciye ulaşma kanalı (lead). */
+export type LeadChannel = 'call' | 'whatsapp' | 'directions';
+
 export type GetToken = () => string | null | Promise<string | null>;
 
 export interface ApiClient {
@@ -319,6 +337,14 @@ export interface ApiClient {
   updateConsent(patch: Partial<Consent>): Promise<Consent>;
   /** Anonymous aggregate stats (k-anonymity, consent-gated server-side). */
   getSystemStats(): Promise<SystemStat[]>;
+  /** Curated mechanic directory, filtered by city/system. */
+  getMechanics(city?: string, system?: string): Promise<Mechanic[]>;
+  /** Record a lead when the user reaches out to a mechanic. */
+  sendMechanicLead(
+    mechanicId: number,
+    channel: LeadChannel,
+    aiSessionId?: number,
+  ): Promise<void>;
   /** Right to erasure: delete the account and all its data (204). */
   deleteAccount(): Promise<void>;
   listVehicles(): Promise<Vehicle[]>;
@@ -522,6 +548,20 @@ export function createApiClient(
     async getSystemStats() {
       const headers = await authHeaders();
       return request<SystemStat[]>('/v1/stats/systems', { method: 'GET', headers });
+    },
+    async getMechanics(city, system) {
+      const headers = await authHeaders();
+      const qs = new URLSearchParams();
+      if (city) qs.set('city', city);
+      if (system) qs.set('system', system);
+      const suffix = qs.toString() ? `?${qs.toString()}` : '';
+      return request<Mechanic[]>(`/v1/mechanics${suffix}`, { method: 'GET', headers });
+    },
+    sendMechanicLead(mechanicId, channel, aiSessionId) {
+      return post<{ id: number }, { channel: LeadChannel; ai_session_id?: number }>(
+        `/v1/mechanics/${mechanicId}/lead`,
+        { channel, ai_session_id: aiSessionId },
+      ).then(() => undefined);
     },
     async deleteAccount() {
       const headers = await authHeaders();

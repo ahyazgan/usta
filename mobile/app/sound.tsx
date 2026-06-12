@@ -117,6 +117,7 @@ export default function DiagnosisScreen() {
         aciliyet: result.aciliyet,
         sonrakiAdim: result.sonraki_adim,
         guvenlikUyarisi: result.guvenlik_uyarisi,
+        sessionId: result.session_id ?? undefined,
       }
     : null;
 

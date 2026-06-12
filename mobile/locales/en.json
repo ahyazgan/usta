@@ -370,6 +370,7 @@
     "sheetTitle": "Show a Mechanic",
     "sheetHint": "Show this summary to your mechanic or share it.",
     "share": "Share",
+    "findMechanic": "Find a Mechanic",
     "title": "🔧 USTA PRE-ASSESSMENT",
     "vehicle": "Vehicle",
     "engine": "Engine",
@@ -385,6 +386,17 @@
     "kindSound": "Sound diagnosis",
     "disclaimer": "⚠️ This is an AI PRE-assessment, not a definitive diagnosis. Please do your own check.",
     "footer": "— Usta app"
+  },
+  "mechanics": {
+    "title": "Find a Mechanic",
+    "verified": "Verified",
+    "call": "Call",
+    "whatsapp": "WhatsApp",
+    "directions": "Directions",
+    "allCities": "All cities",
+    "showAll": "Show all cities",
+    "empty": "Mechanics in your area will be listed here soon.",
+    "disclaimer": "Mechanics are independent; Usta only refers and isn't responsible for the service."
   },
   "feedback": {
     "question": "Was this diagnosis right?",

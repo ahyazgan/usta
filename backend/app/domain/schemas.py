@@ -198,6 +198,31 @@ class ConsentUpdate(BaseModel):
     data: bool | None = None
 
 
+class MechanicOut(BaseModel):
+    """Küratörlü tamirci dizini kaydı."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    city: str
+    district: str | None
+    phone: str
+    whatsapp: str | None
+    address: str | None
+    maps_url: str | None
+    specialties: str | None
+    systems: str | None
+    verified: bool
+
+
+class MechanicLeadIn(BaseModel):
+    """Tamirci yönlendirme sinyali — hangi kanaldan ulaşıldı."""
+
+    channel: str = Field(pattern=r"^(call|whatsapp|directions)$")
+    ai_session_id: int | None = Field(default=None, ge=1)
+
+
 class SystemStatOut(BaseModel):
     """Anonim küme istatistiği — bir araç sistemi için (kişi-bağımsız).
 

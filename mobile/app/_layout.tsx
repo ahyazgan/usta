@@ -80,6 +80,7 @@ export default function RootLayout() {
         <Stack.Screen name="history" />
         <Stack.Screen name="vehicle-new" />
         <Stack.Screen name="privacy" />
+        <Stack.Screen name="mechanics" />
       </Stack>
     </SafeAreaProvider>
   );

@@ -137,6 +137,7 @@ export default function CameraScreen() {
         guven: result.guven,
         sonrakiAdim: result.sonraki_adim,
         guvenlikUyarisi: result.guvenlik_uyarisi,
+        sessionId: result.session_id ?? undefined,
       }
     : null;
 

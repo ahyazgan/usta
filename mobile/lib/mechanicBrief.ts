@@ -9,7 +9,7 @@
  * Yeni AI üretimi YOK; yalnızca güvenlik kuralları zaten uygulanmış çıktıyı
  * yeniden biçimlendirir.
  */
-import type { Aciliyet, Guven, Vehicle } from '@/lib/api';
+import type { Aciliyet, ArizaSistem, Guven, Vehicle } from '@/lib/api';
 import { t } from '@/lib/i18n';
 
 /** Normalleştirilmiş teşhis — kamera/ses sonucundan ya da geçmişten doldurulur. */
@@ -32,6 +32,10 @@ export interface BriefDiag {
   guvenlikUyarisi?: string | null;
   /** Gösterim için tarih (geçmişten gelirse). */
   dateLabel?: string;
+  /** Ham sistem kodu — "Tamirci Bul" filtresi için (geçmişte mevcut). */
+  sistem?: ArizaSistem | null;
+  /** Lead'i teşhise bağlamak için oturum id'si. */
+  sessionId?: number | null;
 }
 
 /** Mekaniğe gösterilecek/paylaşılacak özet metni. */

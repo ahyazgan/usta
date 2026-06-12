@@ -215,6 +215,8 @@ export default function HistoryScreen() {
       sistemLabel: item.ariza_sistem ? t(`sistem.${item.ariza_sistem}`) : undefined,
       guven: item.guven,
       dateLabel: formatDate(item.created_at),
+      sistem: item.ariza_sistem,
+      sessionId: item.id,
     });
   }
 

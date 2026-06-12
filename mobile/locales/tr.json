@@ -370,6 +370,7 @@
     "sheetTitle": "Mekaniğe Göster",
     "sheetHint": "Bu özeti tamirciye gösterebilir ya da paylaşabilirsin.",
     "share": "Paylaş",
+    "findMechanic": "Tamirci Bul",
     "title": "🔧 USTA ÖN DEĞERLENDİRME",
     "vehicle": "Araç",
     "engine": "Motor",
@@ -385,6 +386,17 @@
     "kindSound": "Ses teşhisi",
     "disclaimer": "⚠️ Bu bir yapay zekâ ÖN değerlendirmesidir, kesin teşhis değildir. Lütfen kendi kontrolünüzü yapın.",
     "footer": "— Usta uygulaması"
+  },
+  "mechanics": {
+    "title": "Tamirci Bul",
+    "verified": "Doğrulanmış",
+    "call": "Ara",
+    "whatsapp": "WhatsApp",
+    "directions": "Yol Tarifi",
+    "allCities": "Tüm şehirler",
+    "showAll": "Tüm şehirleri göster",
+    "empty": "Yakında bölgendeki tamirciler burada listelenecek.",
+    "disclaimer": "Tamirciler bağımsızdır; Usta yalnızca yönlendirir, hizmetten sorumlu değildir."
   },
   "feedback": {
     "question": "Bu teşhis doğru çıktı mı?",

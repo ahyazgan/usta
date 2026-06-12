@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -25,11 +26,24 @@ export function MechanicBriefSheet({
   diag: BriefDiag | null;
   onClose: () => void;
 }) {
+  const router = useRouter();
+
   useEffect(() => {
     if (visible) void capture('mechanic_brief_opened');
   }, [visible]);
 
   const text = vehicle != null && diag != null ? buildBriefText(vehicle, diag) : '';
+
+  function findMechanic() {
+    onClose();
+    router.push({
+      pathname: '/mechanics',
+      params: {
+        system: diag?.sistem ?? '',
+        sessionId: diag?.sessionId != null ? String(diag.sessionId) : '',
+      },
+    });
+  }
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
@@ -57,6 +71,14 @@ export function MechanicBriefSheet({
             <Text style={styles.briefText}>{text}</Text>
           </ScrollView>
 
+          <Pressable
+            accessibilityRole="button"
+            onPress={findMechanic}
+            style={({ pressed }) => [styles.findButton, pressed && styles.pressed]}
+          >
+            <Ionicons name="location" size={18} color={theme.colors.ink} />
+            <Text style={styles.findText}>{t('brief.findMechanic')}</Text>
+          </Pressable>
           <Pressable
             accessibilityRole="button"
             onPress={() => void shareMechanicBrief(text)}
@@ -138,6 +160,23 @@ const styles = StyleSheet.create({
     lineHeight: 21,
     color: theme.colors.textPrimary,
   },
+  findButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.sm,
+    minHeight: theme.touchTarget,
+    borderRadius: theme.radius.md,
+    borderWidth: 1.5,
+    borderColor: theme.colors.ink,
+    marginTop: theme.spacing.md,
+  },
+  findText: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.ink,
+  },
   shareButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -146,7 +185,7 @@ const styles = StyleSheet.create({
     minHeight: theme.touchTarget,
     borderRadius: theme.radius.md,
     backgroundColor: theme.colors.ink,
-    marginTop: theme.spacing.md,
+    marginTop: theme.spacing.sm,
   },
   shareText: {
     fontFamily: theme.fonts.heading,

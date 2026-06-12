@@ -426,7 +426,11 @@
     "kendim_cozdum": "Kendim çözdüm",
     "tamirci_cozdu": "Tamirci çözdü",
     "sorun_devam": "Sorun devam ediyor",
-    "yanlis_teshis": "Yanlış teşhis"
+    "yanlis_teshis": "Yanlış teşhis",
+    "costPrompt": "Tamirciye ne ödedin? (isteğe bağlı — başkalarına yardımcı olur)",
+    "costPlaceholder": "Örn: 2000",
+    "costSave": "Kaydet",
+    "costSkip": "Atla"
   },
   "sistem": {
     "motor": "Motor",

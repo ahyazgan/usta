@@ -81,14 +81,15 @@ async def _task_costs(db: AsyncSession, task_id: str, vehicle_type: VehicleType 
 async def _system_costs(
     db: AsyncSession, ariza_sistem: str, vehicle_type: VehicleType | None
 ) -> list[int]:
+    # Kaynak: teşhis kapanışında "tamirci çözdü" + beyan edilen ödeme
+    # (AISession.cost_try). Sadece tamirci ödemeleri → band temiz kalır.
     rows = await db.scalars(
-        select(MaintenanceLog.cost_try)
-        .join(AISession, MaintenanceLog.ai_session_id == AISession.id)
-        .join(Vehicle, MaintenanceLog.vehicle_id == Vehicle.id)
+        select(AISession.cost_try)
+        .join(Vehicle, AISession.vehicle_id == Vehicle.id)
         .where(
             AISession.ariza_sistem == ariza_sistem,
-            MaintenanceLog.cost_try.is_not(None),
-            MaintenanceLog.cost_try > 0,
+            AISession.cost_try.is_not(None),
+            AISession.cost_try > 0,
             _vehicle_type_clause(vehicle_type),
         )
     )

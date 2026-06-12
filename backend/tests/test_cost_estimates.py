@@ -1,11 +1,33 @@
 """Maliyet tahmini: tohum bantları + topluluk harmanı + uçlar."""
 
 import pytest
+from sqlalchemy import select
 
 from app.domain.cost_estimates import seed_system_band, seed_task_band
-from app.domain.enums import ArizaSistem, VehicleType
+from app.domain.enums import AIKind, ArizaSistem, VehicleType
+from app.domain.models import AISession, User
 
-from .conftest import register_and_login
+from .conftest import TestSession, register_and_login
+
+
+async def _seed_diagnoses(email: str, vehicle_id: int, sistem: str, costs: list[int]) -> None:
+    """Belirtilen kullanıcı/araç için 'tamirci çözdü' ödemeli teşhisler ekler."""
+    async with TestSession() as s:
+        uid = (await s.scalar(select(User).where(User.email == email))).id
+        for c in costs:
+            s.add(
+                AISession(
+                    user_id=uid,
+                    vehicle_id=vehicle_id,
+                    kind=AIKind.sound,
+                    model="test",
+                    ariza_sistem=sistem,
+                    resolution="tamirci_cozdu",
+                    cost_try=c,
+                    tespit="büyük ihtimalle test",
+                )
+            )
+        await s.commit()
 
 
 # --- Birim: tohum bantları --------------------------------------------------- #
@@ -111,3 +133,68 @@ async def test_diagnosis_estimate_seed(client):
 async def test_diagnosis_estimate_requires_auth_401(client):
     r = await client.get("/v1/estimate/diagnosis?ariza_sistem=fren")
     assert r.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_system_estimate_community_from_resolutions(client):
+    """Teşhis kapanışındaki tamirci ödemeleri sistem bandını topluluğa taşır."""
+    email = "cost4@usta.app"
+    headers = await register_and_login(client, email)
+    vid = await _make_car(client, headers)
+    await _seed_diagnoses(email, vid, "fren", [1000, 1500, 2000, 2500, 3000])
+
+    r = await client.get(
+        "/v1/estimate/diagnosis?ariza_sistem=fren&vehicle_type=araba", headers=headers
+    )
+    body = r.json()
+    assert body["source"] == "community"
+    assert body["sample_size"] == 5
+    assert body["low_try"] == 1500 and body["high_try"] == 2500  # p25..p75
+
+
+# --- Çark yakıtı: kapanışta tamirci ödemesini yakala ------------------------- #
+
+async def _one_diagnosis(email: str, vehicle_id: int) -> int:
+    async with TestSession() as s:
+        uid = (await s.scalar(select(User).where(User.email == email))).id
+        sess = AISession(
+            user_id=uid, vehicle_id=vehicle_id, kind=AIKind.sound, model="test",
+            ariza_sistem="fren", tespit="büyük ihtimalle test",
+        )
+        s.add(sess)
+        await s.commit()
+        return sess.id
+
+
+@pytest.mark.asyncio
+async def test_resolution_captures_mechanic_cost(client):
+    email = "cost5@usta.app"
+    headers = await register_and_login(client, email)
+    vid = await _make_car(client, headers)
+    sid = await _one_diagnosis(email, vid)
+
+    r = await client.post(
+        f"/v1/vehicles/{vid}/diagnoses/{sid}/resolution",
+        json={"resolution": "tamirci_cozdu", "cost_try": 2000},
+        headers=headers,
+    )
+    assert r.status_code == 200
+    assert r.json()["resolution"] == "tamirci_cozdu"
+    assert r.json()["cost_try"] == 2000
+
+
+@pytest.mark.asyncio
+async def test_resolution_non_mechanic_ignores_cost(client):
+    """Tamirci dışı kapanışta ödeme yazılmaz (band kirlenmesin)."""
+    email = "cost6@usta.app"
+    headers = await register_and_login(client, email)
+    vid = await _make_car(client, headers)
+    sid = await _one_diagnosis(email, vid)
+
+    r = await client.post(
+        f"/v1/vehicles/{vid}/diagnoses/{sid}/resolution",
+        json={"resolution": "kendim_cozdum", "cost_try": 9999},
+        headers=headers,
+    )
+    assert r.status_code == 200
+    assert r.json()["cost_try"] is None

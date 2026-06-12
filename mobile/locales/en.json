@@ -426,7 +426,11 @@
     "kendim_cozdum": "Fixed it myself",
     "tamirci_cozdu": "Mechanic fixed it",
     "sorun_devam": "Still a problem",
-    "yanlis_teshis": "Wrong diagnosis"
+    "yanlis_teshis": "Wrong diagnosis",
+    "costPrompt": "What did you pay the mechanic? (optional — helps others)",
+    "costPlaceholder": "e.g. 2000",
+    "costSave": "Save",
+    "costSkip": "Skip"
   },
   "sistem": {
     "motor": "Engine",

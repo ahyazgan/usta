@@ -11,6 +11,7 @@ from ..database import get_db
 from ..domain.models import User
 from sqlalchemy import select
 
+from ..domain.enums import ResolutionDurum
 from ..domain.guides import fill_template, get_guide
 from ..domain.models import AISession
 from ..domain.schemas import (
@@ -239,6 +240,10 @@ async def diagnosis_resolution(
     if session is None:
         raise HTTPException(status_code=404, detail="Teşhis bulunamadı")
     session.resolution = payload.resolution.value
+    # Fiyat çarkı: yalnızca "tamirci çözdü" kapanışında ödeme yazılır
+    # (DIY/yanlış teşhis maliyetleri sistem bandını kirletmesin).
+    if payload.resolution == ResolutionDurum.tamirci_cozdu and payload.cost_try is not None:
+        session.cost_try = payload.cost_try
     await db.commit()
     await db.refresh(session)
     return DiagnosisHistoryOut.model_validate(session)

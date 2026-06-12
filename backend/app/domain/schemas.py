@@ -175,6 +175,8 @@ class DiagnosisHistoryOut(BaseModel):
     ariza_sistem: ArizaSistem | None = None
     feedback_dogru: bool | None = None
     resolution: ResolutionDurum | None = None
+    # Tamirci çözdüyse beyan edilen ödeme (TL; fiyat çarkı yakıtı).
+    cost_try: int | None = None
     created_at: datetime
 
 
@@ -182,6 +184,8 @@ class DiagnosisResolutionIn(BaseModel):
     """Kapanış sinyali: teşhis nasıl sonuçlandı? (tahmin doğruluğunu ölçer)"""
 
     resolution: ResolutionDurum
+    # Yalnızca resolution=tamirci_cozdu ile anlamlı: tamirciye ödenen tutar (TL).
+    cost_try: int | None = Field(default=None, ge=0, le=1_000_000)
 
 
 # --------------------------------------------------------------------------- #

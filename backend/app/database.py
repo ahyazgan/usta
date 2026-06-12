@@ -52,6 +52,8 @@ _COLUMN_MIGRATIONS: tuple[tuple[str, str, str], ...] = (
     ("users", "consent_at", "TIMESTAMP"),
     # Araç türü (araba/motosiklet).
     ("vehicles", "vehicle_type", "VARCHAR(12)"),
+    # Teşhis kapanışında beyan edilen tamirci ödemesi (fiyat çarkı).
+    ("ai_sessions", "cost_try", "INTEGER"),
 )
 
 

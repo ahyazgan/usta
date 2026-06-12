@@ -149,6 +149,9 @@ class AISession(Base):
     feedback_dogru: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
     # Kapanış sinyali: sorun nasıl çözüldü? (tahmin doğruluğunu ölçer)
     resolution: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    # Tamirci çözdüyse beyan edilen ödeme (TL) — sistem fiyat bandının yakıtı.
+    # Yalnızca resolution=tamirci_cozdu olduğunda yazılır (bandı kirletmez).
+    cost_try: Mapped[int | None] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
 
 

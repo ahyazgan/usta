@@ -225,6 +225,8 @@ export interface DiagnosisHistory {
   feedback_dogru: boolean | null;
   /** Closure signal: how it was resolved (null = not reported). */
   resolution: ResolutionDurum | null;
+  /** Real mechanic price the user paid (only for 'tamirci_cozdu'). */
+  cost_try: number | null;
   created_at: string;
 }
 
@@ -348,11 +350,16 @@ export interface ApiClient {
     sessionId: number,
     dogru: boolean,
   ): Promise<DiagnosisHistory>;
-  /** Closure signal: how the diagnosis was resolved. Re-reporting overwrites. */
+  /**
+   * Closure signal: how the diagnosis was resolved. Re-reporting overwrites.
+   * costTry is the real mechanic price (only stored for 'tamirci_cozdu') —
+   * the fuel that turns estimates from seed to community data.
+   */
   sendDiagnosisResolution(
     vehicleId: number,
     sessionId: number,
     resolution: ResolutionDurum,
+    costTry?: number,
   ): Promise<DiagnosisHistory>;
   /** KVKK consent: read + partial update. */
   getConsent(): Promise<Consent>;
@@ -563,11 +570,14 @@ export function createApiClient(
         { dogru },
       );
     },
-    sendDiagnosisResolution(vehicleId, sessionId, resolution) {
-      return post<DiagnosisHistory, { resolution: ResolutionDurum }>(
-        `/v1/vehicles/${vehicleId}/diagnoses/${sessionId}/resolution`,
-        { resolution },
-      );
+    sendDiagnosisResolution(vehicleId, sessionId, resolution, costTry) {
+      return post<
+        DiagnosisHistory,
+        { resolution: ResolutionDurum; cost_try?: number }
+      >(`/v1/vehicles/${vehicleId}/diagnoses/${sessionId}/resolution`, {
+        resolution,
+        ...(costTry != null ? { cost_try: costTry } : {}),
+      });
     },
     async getConsent() {
       const headers = await authHeaders();

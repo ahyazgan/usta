@@ -15,6 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomTabBar } from '@/components/BottomTabBar';
+import { BrandBadge } from '@/components/BrandBadge';
 import { type Reminder, type Vehicle } from '@/lib/api';
 import { dateStatus, daysUntil, formatTrDate } from '@/lib/dateReminders';
 import { capture } from '@/lib/analytics';
@@ -411,6 +412,7 @@ export default function HomeScreen() {
                   onPress={() => selectVehicle(v.id)}
                   style={[styles.switchChip, selected && styles.switchChipSelected]}
                 >
+                  <BrandBadge make={v.make} size={20} onInk={selected} />
                   <Text style={[styles.switchChipText, selected && styles.switchChipTextSelected]}>
                     {v.make} {v.model}
                   </Text>
@@ -442,9 +444,12 @@ export default function HomeScreen() {
               <Text style={styles.plateText}>{currentVehicle.plate}</Text>
             </View>
           )}
-          <Text style={styles.carName}>
-            {currentVehicle.make} {currentVehicle.model}
-          </Text>
+          <View style={styles.carNameRow}>
+            <BrandBadge make={currentVehicle.make} size={34} onInk />
+            <Text style={styles.carName}>
+              {currentVehicle.make} {currentVehicle.model}
+            </Text>
+          </View>
           <Text style={styles.carSub}>{subParts.join(' · ')}</Text>
           <View style={styles.healthRow}>
             <View style={styles.healthTrack}>
@@ -752,8 +757,11 @@ const styles = StyleSheet.create({
   },
   switchChip: {
     minHeight: 40,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.xs,
     justifyContent: 'center',
-    paddingHorizontal: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.md,
     borderRadius: theme.radius.pill,
     borderWidth: 1,
     borderColor: theme.colors.border,
@@ -885,7 +893,14 @@ const styles = StyleSheet.create({
     color: theme.colors.ink,
     letterSpacing: 1,
   },
+  carNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    paddingRight: 64, // km rozetiyle çakışmasın
+  },
   carName: {
+    flex: 1,
     fontFamily: theme.fonts.heading,
     fontSize: 22,
     fontWeight: '700',

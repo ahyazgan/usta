@@ -70,6 +70,33 @@ class AIKind(str, Enum):
     sound = "sound"
 
 
+class ArizaSistem(str, Enum):
+    """Araç sistemi taksonomisi — istatistik/öngörü için kaba ama sorgulanabilir.
+
+    Teşhisler bu üst sisteme eşlenir (görev id'si veya ses kategorisinden).
+    """
+
+    motor = "motor"            # yağ, soğutma, genel motor sesi
+    ates_leme = "atesleme"     # buji, ateşleme
+    fren = "fren"
+    elektrik = "elektrik"      # akü, far, elektrik
+    lastik = "lastik"
+    filtre = "filtre"          # hava/polen filtresi
+    suspansiyon = "suspansiyon"
+    sanziman = "sanziman"      # kayış/şanzıman sesleri
+    gorus = "gorus"            # silecek, far görüş
+    diger = "diger"
+
+
+class ResolutionDurum(str, Enum):
+    """Teşhis kapanış sinyali — tahmin doğruluğunu ölçmenin anahtarı."""
+
+    kendim_cozdum = "kendim_cozdum"      # rehberle kendi çözdü
+    tamirci_cozdu = "tamirci_cozdu"      # tamirciye gitti, çözüldü
+    sorun_devam = "sorun_devam"          # çözülmedi
+    yanlis_teshis = "yanlis_teshis"      # AI yanlış teşhis koydu
+
+
 class ReminderStatus(str, Enum):
     """Bakım hatırlatma durumu (km bazlı)."""
 

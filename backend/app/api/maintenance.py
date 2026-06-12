@@ -16,6 +16,7 @@ from ..domain.models import AISession
 from ..domain.schemas import (
     DiagnosisFeedbackIn,
     DiagnosisHistoryOut,
+    DiagnosisResolutionIn,
     GuideStepOut,
     MaintenanceLogCreate,
     MaintenanceLogOut,
@@ -182,6 +183,35 @@ async def diagnosis_feedback(
     if session is None:
         raise HTTPException(status_code=404, detail="Teşhis bulunamadı")
     session.feedback_dogru = payload.dogru
+    await db.commit()
+    await db.refresh(session)
+    return DiagnosisHistoryOut.model_validate(session)
+
+
+@router.post("/diagnoses/{session_id}/resolution", response_model=DiagnosisHistoryOut)
+async def diagnosis_resolution(
+    vehicle_id: int,
+    session_id: int,
+    payload: DiagnosisResolutionIn,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> DiagnosisHistoryOut:
+    """Kapanış sinyali — teşhis nasıl sonuçlandı? (kendim/tamirci/devam/yanlış).
+
+    Bu kapanış, AI tahmin doğruluğunu ölçmenin anahtarıdır; veri toplama
+    katmanını tamamlar. Yalnızca kendi aracındaki kendi teşhisin işaretlenir.
+    """
+    await vehicle_service.get_owned(db, user.id, vehicle_id)
+    session = await db.scalar(
+        select(AISession).where(
+            AISession.id == session_id,
+            AISession.user_id == user.id,
+            AISession.vehicle_id == vehicle_id,
+        )
+    )
+    if session is None:
+        raise HTTPException(status_code=404, detail="Teşhis bulunamadı")
+    session.resolution = payload.resolution.value
     await db.commit()
     await db.refresh(session)
     return DiagnosisHistoryOut.model_validate(session)

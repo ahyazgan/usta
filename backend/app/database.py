@@ -43,6 +43,9 @@ _COLUMN_MIGRATIONS: tuple[tuple[str, str, str], ...] = (
     ("ai_sessions", "feedback_dogru", "BOOLEAN"),
     ("maintenance_logs", "ai_session_id", "INTEGER"),
     ("maintenance_logs", "cost_try", "INTEGER"),
+    # Arıza taksonomisi + kapanış sinyali (toplama katmanını tamamlar).
+    ("ai_sessions", "ariza_sistem", "VARCHAR(20)"),
+    ("ai_sessions", "resolution", "VARCHAR(20)"),
 )
 
 

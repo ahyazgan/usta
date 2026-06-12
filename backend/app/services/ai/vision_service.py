@@ -15,6 +15,7 @@ from ...domain.enums import AIKind
 from ...domain.models import AISession, User, Vehicle
 from ...domain.safety import enforce_image_safety
 from ...domain.schemas import ImageDiagnoseRequest, ImageDiagnoseResponse
+from ...domain.taxonomy import sistem_for_task
 from .claude_client import ClaudeClient
 from .prompts import build_vision_prompt
 
@@ -72,6 +73,7 @@ async def diagnose_image(
     session.guven = final.guven.value
     session.tamirciye_git = final.tamirciye_git_onerisi
     session.kategori = payload.task  # görüntüde kategori = görev id'si
+    session.ariza_sistem = sistem_for_task(payload.task).value
     db.add(session)
     await db.commit()
     await db.refresh(session)

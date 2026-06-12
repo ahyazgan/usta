@@ -192,6 +192,71 @@ async def test_feedback_foreign_session_404(client):
 
 
 @pytest.mark.asyncio
+async def test_diagnose_tags_ariza_sistem(client):
+    """Görüntü ve ses teşhisleri sorgulanabilir araç sistemine eşlenir."""
+    headers = await register_and_login(client, "tax1@usta.app")
+    vehicle = await create_vehicle(client, headers)
+    vid = vehicle["id"]
+    await _diagnose_and_get_session_id(client, headers, vid)  # task=battery
+    await _run_sound_diagnose(client, headers, vid)  # mock -> kayis_sesi
+
+    body = (await client.get(f"/v1/vehicles/{vid}/diagnoses", headers=headers)).json()
+    image = next(x for x in body if x["kind"] == "image")
+    sound = next(x for x in body if x["kind"] == "sound")
+    assert image["ariza_sistem"] == "elektrik"  # battery -> elektrik
+    assert sound["ariza_sistem"] == "sanziman"  # kayis_sesi -> sanziman
+
+
+@pytest.mark.asyncio
+async def test_resolution_roundtrip_and_revote(client):
+    headers = await register_and_login(client, "res1@usta.app")
+    vehicle = await create_vehicle(client, headers)
+    vid = vehicle["id"]
+    sid = await _diagnose_and_get_session_id(client, headers, vid)
+
+    r = await client.post(
+        f"/v1/vehicles/{vid}/diagnoses/{sid}/resolution",
+        json={"resolution": "kendim_cozdum"},
+        headers=headers,
+    )
+    assert r.status_code == 200
+    assert r.json()["resolution"] == "kendim_cozdum"
+
+    # Fikir değiştirme: son değer yazılır.
+    r = await client.post(
+        f"/v1/vehicles/{vid}/diagnoses/{sid}/resolution",
+        json={"resolution": "tamirci_cozdu"},
+        headers=headers,
+    )
+    assert r.json()["resolution"] == "tamirci_cozdu"
+
+    body = (await client.get(f"/v1/vehicles/{vid}/diagnoses", headers=headers)).json()
+    assert body[0]["resolution"] == "tamirci_cozdu"
+
+
+@pytest.mark.asyncio
+async def test_resolution_requires_auth_401(client):
+    r = await client.post(
+        "/v1/vehicles/1/diagnoses/1/resolution", json={"resolution": "kendim_cozdum"}
+    )
+    assert r.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_resolution_invalid_value_422(client):
+    headers = await register_and_login(client, "res2@usta.app")
+    vehicle = await create_vehicle(client, headers)
+    vid = vehicle["id"]
+    sid = await _diagnose_and_get_session_id(client, headers, vid)
+    r = await client.post(
+        f"/v1/vehicles/{vid}/diagnoses/{sid}/resolution",
+        json={"resolution": "uydurma_deger"},
+        headers=headers,
+    )
+    assert r.status_code == 422
+
+
+@pytest.mark.asyncio
 async def test_log_links_session_and_stores_cost(client):
     headers = await register_and_login(client, "fb-link@usta.app")
     vehicle = await create_vehicle(client, headers)

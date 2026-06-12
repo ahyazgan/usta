@@ -174,6 +174,26 @@ export interface TaskGuide {
   mechanic_note_en: string;
 }
 
+/** Vehicle-system taxonomy a diagnosis maps to (queryable stats). */
+export type ArizaSistem =
+  | 'motor'
+  | 'atesleme'
+  | 'fren'
+  | 'elektrik'
+  | 'lastik'
+  | 'filtre'
+  | 'suspansiyon'
+  | 'sanziman'
+  | 'gorus'
+  | 'diger';
+
+/** How a diagnosis was resolved — the closure signal. */
+export type ResolutionDurum =
+  | 'kendim_cozdum'
+  | 'tamirci_cozdu'
+  | 'sorun_devam'
+  | 'yanlis_teshis';
+
 /** A past AI diagnosis (image or sound), newest first. */
 export interface DiagnosisHistory {
   id: number;
@@ -184,8 +204,12 @@ export interface DiagnosisHistory {
   tamirciye_git: boolean | null;
   /** Structured category: task id (image) or sound type (sound). */
   kategori: string | null;
+  /** Vehicle-system taxonomy (motor / fren / elektrik …). */
+  ariza_sistem: ArizaSistem | null;
   /** User feedback: was the diagnosis right? (null = not voted yet) */
   feedback_dogru: boolean | null;
+  /** Closure signal: how it was resolved (null = not reported). */
+  resolution: ResolutionDurum | null;
   created_at: string;
 }
 
@@ -269,6 +293,12 @@ export interface ApiClient {
     vehicleId: number,
     sessionId: number,
     dogru: boolean,
+  ): Promise<DiagnosisHistory>;
+  /** Closure signal: how the diagnosis was resolved. Re-reporting overwrites. */
+  sendDiagnosisResolution(
+    vehicleId: number,
+    sessionId: number,
+    resolution: ResolutionDurum,
   ): Promise<DiagnosisHistory>;
   listVehicles(): Promise<Vehicle[]>;
   createVehicle(input: VehicleCreateInput): Promise<Vehicle>;
@@ -453,6 +483,12 @@ export function createApiClient(
       return post<DiagnosisHistory, { dogru: boolean }>(
         `/v1/vehicles/${vehicleId}/diagnoses/${sessionId}/feedback`,
         { dogru },
+      );
+    },
+    sendDiagnosisResolution(vehicleId, sessionId, resolution) {
+      return post<DiagnosisHistory, { resolution: ResolutionDurum }>(
+        `/v1/vehicles/${vehicleId}/diagnoses/${sessionId}/resolution`,
+        { resolution },
       );
     },
     async listVehicles() {

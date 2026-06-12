@@ -345,6 +345,26 @@
     "question": "Was this diagnosis right?",
     "thanks": "Thanks — recorded 🙌"
   },
+  "resolution": {
+    "title": "How did it turn out?",
+    "thanks": "Thanks — recorded 🙌",
+    "kendim_cozdum": "Fixed it myself",
+    "tamirci_cozdu": "Mechanic fixed it",
+    "sorun_devam": "Still a problem",
+    "yanlis_teshis": "Wrong diagnosis"
+  },
+  "sistem": {
+    "motor": "Engine",
+    "atesleme": "Ignition",
+    "fren": "Brakes",
+    "elektrik": "Electrical",
+    "lastik": "Tires",
+    "filtre": "Filter",
+    "suspansiyon": "Suspension",
+    "sanziman": "Transmission",
+    "gorus": "Visibility",
+    "diger": "Other"
+  },
   "notifications": {
     "title": "Usta reminder 🔧",
     "body": "{{name}} {{label}} is coming up: {{date}} ({{days}} days left)."

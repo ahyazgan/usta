@@ -345,6 +345,26 @@
     "question": "Bu teşhis doğru çıktı mı?",
     "thanks": "Teşekkürler — kaydedildi 🙌"
   },
+  "resolution": {
+    "title": "Bu nasıl sonuçlandı?",
+    "thanks": "Teşekkürler — kaydedildi 🙌",
+    "kendim_cozdum": "Kendim çözdüm",
+    "tamirci_cozdu": "Tamirci çözdü",
+    "sorun_devam": "Sorun devam ediyor",
+    "yanlis_teshis": "Yanlış teşhis"
+  },
+  "sistem": {
+    "motor": "Motor",
+    "atesleme": "Ateşleme",
+    "fren": "Fren",
+    "elektrik": "Elektrik",
+    "lastik": "Lastik",
+    "filtre": "Filtre",
+    "suspansiyon": "Süspansiyon",
+    "sanziman": "Şanzıman",
+    "gorus": "Görüş",
+    "diger": "Diğer"
+  },
   "notifications": {
     "title": "Usta hatırlatıyor 🔧",
     "body": "{{name}} {{label}} tarihi yaklaşıyor: {{date}} ({{days}} gün kaldı)."

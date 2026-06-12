@@ -15,6 +15,7 @@ from ...domain.enums import AIKind
 from ...domain.models import AISession, User, Vehicle
 from ...domain.safety import enforce_sound_safety
 from ...domain.schemas import SoundDiagnoseRequest, SoundDiagnoseResponse
+from ...domain.taxonomy import sistem_for_ses
 from .claude_client import ClaudeClient
 from .prompts import build_audio_prompt
 
@@ -62,6 +63,7 @@ async def diagnose_sound(
     session.guven = final.guven.value
     session.tamirciye_git = final.tamirciye_git_onerisi
     session.kategori = final.ses_kategorisi.value  # seste kategori = ses türü
+    session.ariza_sistem = sistem_for_ses(final.ses_kategorisi.value).value
     db.add(session)
     await db.commit()
     await db.refresh(session)

@@ -133,9 +133,13 @@ class AISession(Base):
     tamirciye_git: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
     # Yapılandırılmış kategori: görüntüde görev id'si, seste ses_kategorisi.
     kategori: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    # Arıza taksonomisi: sorgulanabilir araç sistemi (motor/fren/elektrik…).
+    ariza_sistem: Mapped[str | None] = mapped_column(String(20), nullable=True)
     # Kullanıcı geri bildirimi: teşhis doğru çıktı mı? (👍/👎; null = oylanmadı)
     # Bu etiket, veri setini doğrulanmış arıza-örüntü verisine çevirir.
     feedback_dogru: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    # Kapanış sinyali: sorun nasıl çözüldü? (tahmin doğruluğunu ölçer)
+    resolution: Mapped[str | None] = mapped_column(String(20), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
 
 

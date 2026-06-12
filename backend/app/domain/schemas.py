@@ -10,7 +10,9 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from .enums import (
     Aciliyet,
     AIKind,
+    ArizaSistem,
     FuelType,
+    ResolutionDurum,
     Guven,
     KayitKosulu,
     Konum,
@@ -165,8 +167,16 @@ class DiagnosisHistoryOut(BaseModel):
     guven: Guven | None
     tamirciye_git: bool | None
     kategori: str | None = None
+    ariza_sistem: ArizaSistem | None = None
     feedback_dogru: bool | None = None
+    resolution: ResolutionDurum | None = None
     created_at: datetime
+
+
+class DiagnosisResolutionIn(BaseModel):
+    """Kapanış sinyali: teşhis nasıl sonuçlandı? (tahmin doğruluğunu ölçer)"""
+
+    resolution: ResolutionDurum
 
 
 # --------------------------------------------------------------------------- #

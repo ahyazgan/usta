@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomTabBar } from '@/components/BottomTabBar';
 import { FeedbackRow } from '@/components/FeedbackRow';
+import { ResolutionRow } from '@/components/ResolutionRow';
 import {
   createApiClient,
   type DiagnosisHistory,
@@ -110,6 +111,11 @@ function DiagnosisRow({
           <Text style={[styles.diagText, styles.diagTextFlex]} numberOfLines={2}>
             {item.tespit}
           </Text>
+          {item.ariza_sistem != null && (
+            <View style={styles.sistemPill}>
+              <Text style={styles.sistemPillText}>{t(`sistem.${item.ariza_sistem}`)}</Text>
+            </View>
+          )}
           {item.tamirciye_git === true && (
             <View style={styles.diagPill}>
               <Text style={styles.diagPillText}>{t('history.diagnoses.mechanic')}</Text>
@@ -123,6 +129,15 @@ function DiagnosisRow({
               vehicleId={vehicleId}
               sessionId={item.id}
               initial={item.feedback_dogru}
+            />
+          </View>
+        )}
+        {vehicleId != null && (
+          <View style={styles.diagResolution}>
+            <ResolutionRow
+              vehicleId={vehicleId}
+              sessionId={item.id}
+              initial={item.resolution}
             />
           </View>
         )}
@@ -527,6 +542,24 @@ const styles = StyleSheet.create({
   diagTextFlex: { flex: 1 },
   diagFeedback: {
     marginTop: theme.spacing.sm,
+  },
+  diagResolution: {
+    marginTop: theme.spacing.sm,
+    paddingTop: theme.spacing.sm,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: theme.colors.border,
+  },
+  sistemPill: {
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radius.pill,
+    paddingVertical: 2,
+    paddingHorizontal: theme.spacing.sm,
+  },
+  sistemPillText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 10,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
   },
   diagMeta: {
     fontFamily: theme.fonts.body,

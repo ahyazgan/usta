@@ -13,6 +13,7 @@ from sqlalchemy import select
 
 from ..domain.enums import ResolutionDurum
 from ..domain.guides import fill_template, get_guide
+from ..domain.prep import prep_parts_for_task
 from ..domain.models import AISession
 from ..domain.schemas import (
     CostEstimateOut,
@@ -23,6 +24,7 @@ from ..domain.schemas import (
     GuideStepOut,
     MaintenanceLogCreate,
     MaintenanceLogOut,
+    PrepPartOut,
     ReminderOut,
     TaskGuideOut,
     TaskOut,
@@ -127,6 +129,7 @@ async def task_guide(
         )
         for i, s in enumerate(guide.steps, start=1)
     ]
+    parts = [PrepPartOut(**p) for p in prep_parts_for_task(task_id, spec_values)]
     return TaskGuideOut(
         task_id=task.id,
         title_tr=task.title_tr,
@@ -134,6 +137,7 @@ async def task_guide(
         risk=task.risk,
         est_minutes=guide.est_minutes,
         diy_saving_try=task.diy_saving_try,
+        parts=parts,
         steps=steps,
         mechanic_note_tr=guide.mechanic_note_tr,
         mechanic_note_en=guide.mechanic_note_en,

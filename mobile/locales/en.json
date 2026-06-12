@@ -88,6 +88,11 @@
       "seed": "Turkey average (estimated range)",
       "community": "based on {{count}} users' payments"
     },
+    "prep": {
+      "title": "Prep before you start",
+      "parts": "Parts",
+      "tools": "Tools"
+    },
     "next": "Done, next ▸",
     "finish": "Finish & log it",
     "done": {

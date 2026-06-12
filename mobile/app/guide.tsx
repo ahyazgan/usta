@@ -137,6 +137,17 @@ export default function GuideScreen() {
   const total = guide?.steps.length ?? 0;
   const isLast = guide != null && current === total - 1;
 
+  // Hazırlık: adımlardaki benzersiz aletler (parçalar guide.parts'tan gelir).
+  const tools = useMemo(() => {
+    if (guide == null) return [] as string[];
+    const set = new Set<string>();
+    for (const s of guide.steps) {
+      const tl = TR() ? s.tool_tr : s.tool_en;
+      if (tl != null && tl.length > 0) set.add(tl);
+    }
+    return [...set];
+  }, [guide]);
+
   async function handleNext() {
     if (guide == null || currentVehicle == null) return;
     if (!isLast) {
@@ -226,6 +237,33 @@ export default function GuideScreen() {
             contentContainerStyle={styles.scroll}
             showsVerticalScrollIndicator={false}
           >
+            {/* Hazırlık listesi — başlamadan önce ne lazım (DIY) */}
+            {(guide.parts.length > 0 || tools.length > 0) && (
+              <View style={styles.prepCard}>
+                <View style={styles.prepHead}>
+                  <Ionicons name="bag-check" size={16} color={theme.colors.ink} />
+                  <Text style={styles.prepTitle}>{t('guide.prep.title')}</Text>
+                </View>
+                {guide.parts.length > 0 && (
+                  <>
+                    <Text style={styles.prepSection}>{t('guide.prep.parts')}</Text>
+                    {guide.parts.map((p) => (
+                      <View key={p.label_tr} style={styles.prepRow}>
+                        <Text style={styles.prepLabel}>{TR() ? p.label_tr : p.label_en}</Text>
+                        <Text style={styles.prepValue}>{p.value}</Text>
+                      </View>
+                    ))}
+                  </>
+                )}
+                {tools.length > 0 && (
+                  <>
+                    <Text style={styles.prepSection}>{t('guide.prep.tools')}</Text>
+                    <Text style={styles.prepTools}>{tools.join(' · ')}</Text>
+                  </>
+                )}
+              </View>
+            )}
+
             {/* Adım uyarısı */}
             {step != null && warning(step) != null && (
               <View style={styles.warnStrip}>
@@ -453,6 +491,61 @@ const styles = StyleSheet.create({
   scroll: {
     paddingHorizontal: theme.spacing.lg,
     paddingBottom: theme.spacing.lg,
+  },
+  prepCard: {
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+    gap: theme.spacing.xs,
+  },
+  prepHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    marginBottom: theme.spacing.xs,
+  },
+  prepTitle: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  prepSection: {
+    fontFamily: theme.fonts.body,
+    fontSize: 11,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+    marginTop: theme.spacing.xs,
+  },
+  prepRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: theme.spacing.md,
+    paddingVertical: 2,
+  },
+  prepLabel: {
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+  },
+  prepValue: {
+    flexShrink: 1,
+    textAlign: 'right',
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  prepTools: {
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    color: theme.colors.textPrimary,
   },
   warnStrip: {
     flexDirection: 'row',

@@ -164,6 +164,13 @@ export interface GuideStep {
   warning_en: string | null;
 }
 
+/** One prep-list item: a vehicle-specific part/consumable (label + value). */
+export interface PrepPart {
+  label_tr: string;
+  label_en: string;
+  value: string;
+}
+
 /** Step-by-step guide for a maintenance task, tailored to a vehicle. */
 export interface TaskGuide {
   task_id: string;
@@ -173,6 +180,8 @@ export interface TaskGuide {
   est_minutes: number;
   /** Estimated labour saved by doing it yourself (TRY) — celebration screen. */
   diy_saving_try: number;
+  /** "Prep before you start" — vehicle-specific parts/numbers from the spec. */
+  parts: PrepPart[];
   steps: GuideStep[];
   mechanic_note_tr: string;
   mechanic_note_en: string;

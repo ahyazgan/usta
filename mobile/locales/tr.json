@@ -88,6 +88,11 @@
       "seed": "Türkiye ortalaması (tahmini aralık)",
       "community": "{{count}} kullanıcının ödediğine göre"
     },
+    "prep": {
+      "title": "Başlamadan önce hazırla",
+      "parts": "Parçalar",
+      "tools": "Aletler"
+    },
     "next": "Yaptım, devam ▸",
     "finish": "Bitir ve kaydet",
     "done": {

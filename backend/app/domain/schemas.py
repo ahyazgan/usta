@@ -144,6 +144,14 @@ class GuideStepOut(BaseModel):
     warning_en: str | None = None
 
 
+class PrepPartOut(BaseModel):
+    """Hazırlık listesi satırı: araca özel parça/sarf (etiket + değer)."""
+
+    label_tr: str
+    label_en: str
+    value: str
+
+
 class TaskGuideOut(BaseModel):
     """Bir bakım görevinin adım adım rehberi."""
 
@@ -154,6 +162,8 @@ class TaskGuideOut(BaseModel):
     est_minutes: int
     # Bu işi kendin yapınca tahmini işçilik tasarrufu (TL) — bitiş ekranında gösterilir.
     diy_saving_try: int
+    # "Başlamadan önce hazırla" — araca özel parça numaraları (spec'ten).
+    parts: list[PrepPartOut] = []
     steps: list[GuideStepOut]
     # Zorunlu "vazgeç, tamirciye git" çıkışı.
     mechanic_note_tr: str

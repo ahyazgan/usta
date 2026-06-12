@@ -61,6 +61,26 @@ async def test_guide_oil_change_happy(client):
 
 
 @pytest.mark.asyncio
+async def test_guide_includes_prep_parts(client):
+    """Hazırlık listesi: araca özel parça numaraları guide yanıtında gelir."""
+    headers = await register_and_login(client, "guideprep@usta.app")
+    vehicle = await create_vehicle(client, headers)
+    vid = vehicle["id"]
+
+    body = (await client.get(f"/v1/vehicles/{vid}/tasks/oil_change/guide", headers=headers)).json()
+    parts = body["parts"]
+    assert len(parts) >= 3
+    values = {p["value"] for p in parts}
+    assert "55256470" in values and "5W-30" in values  # yağ filtresi + motor yağı
+    assert "Yağ filtresi" in {p["label_tr"] for p in parts}
+    assert {"label_tr", "label_en", "value"} <= parts[0].keys()
+
+    # Parça eşlemesi olmayan görevde liste boş.
+    fren = (await client.get(f"/v1/vehicles/{vid}/tasks/brake_check/guide", headers=headers)).json()
+    assert fren["parts"] == []
+
+
+@pytest.mark.asyncio
 async def test_guide_requires_auth_401(client):
     """Token olmadan istek → 401."""
     r = await client.get("/v1/vehicles/1/tasks/oil_change/guide")

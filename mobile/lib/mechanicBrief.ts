@@ -36,6 +36,9 @@ export interface BriefDiag {
   sistem?: ArizaSistem | null;
   /** Lead'i teşhise bağlamak için oturum id'si. */
   sessionId?: number | null;
+  /** Tamirciye tahmini maliyet aralığı (TL) — pazarlık silahı. */
+  costLow?: number | null;
+  costHigh?: number | null;
 }
 
 /** Mekaniğe gösterilecek/paylaşılacak özet metni. */
@@ -69,6 +72,12 @@ export function buildBriefText(vehicle: Vehicle, diag: BriefDiag): string {
   if (meta.length) lines.push(meta.join(' · '));
 
   if (diag.sonrakiAdim) lines.push(`${t('brief.nextStep')}: ${diag.sonrakiAdim}`);
+  // Fiyat şeffaflığı: tamirciye gösterilen tahmini aralık (pazarlık silahı).
+  if (diag.costLow != null && diag.costHigh != null) {
+    lines.push(
+      `${t('brief.estimate')}: ~${diag.costLow.toLocaleString('tr-TR')}–${diag.costHigh.toLocaleString('tr-TR')} ₺`,
+    );
+  }
   if (diag.guvenlikUyarisi) lines.push(`⚠️ ${diag.guvenlikUyarisi}`);
   if (diag.dateLabel) lines.push(`${t('brief.date')}: ${diag.dateLabel}`);
 

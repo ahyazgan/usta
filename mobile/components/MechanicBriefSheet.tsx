@@ -67,6 +67,16 @@ export function MechanicBriefSheet({
 
           <Text style={styles.hint}>{t('brief.sheetHint')}</Text>
 
+          {diag?.costLow != null && diag?.costHigh != null && (
+            <View style={styles.estBanner}>
+              <Ionicons name="pricetags" size={16} color={theme.colors.ink} />
+              <Text style={styles.estText}>
+                {t('brief.estimate')}: ~{diag.costLow.toLocaleString('tr-TR')}–
+                {diag.costHigh.toLocaleString('tr-TR')} ₺
+              </Text>
+            </View>
+          )}
+
           <ScrollView style={styles.cardScroll} contentContainerStyle={styles.card}>
             <Text style={styles.briefText}>{text}</Text>
           </ScrollView>
@@ -143,6 +153,25 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     marginTop: theme.spacing.xs,
     marginBottom: theme.spacing.md,
+  },
+  estBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.ink,
+    borderRadius: theme.radius.md,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+  },
+  estText: {
+    flex: 1,
+    fontFamily: theme.fonts.heading,
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
   },
   cardScroll: {
     flexGrow: 0,

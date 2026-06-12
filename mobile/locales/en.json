@@ -410,6 +410,7 @@
     "confidence": "Confidence",
     "urgency": "Urgency",
     "nextStep": "Suggestion",
+    "estimate": "Usta's mechanic estimate",
     "date": "Date",
     "kindImage": "Image diagnosis",
     "kindSound": "Sound diagnosis",

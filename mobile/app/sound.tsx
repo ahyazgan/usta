@@ -139,6 +139,8 @@ export default function DiagnosisScreen() {
         sonrakiAdim: result.sonraki_adim,
         guvenlikUyarisi: result.guvenlik_uyarisi,
         sessionId: result.session_id ?? undefined,
+        costLow: result.cost_estimate?.low_try ?? undefined,
+        costHigh: result.cost_estimate?.high_try ?? undefined,
       }
     : null;
 

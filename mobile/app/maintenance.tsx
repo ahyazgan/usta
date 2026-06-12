@@ -11,6 +11,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomTabBar } from '@/components/BottomTabBar';
+import { BrandBadge } from '@/components/BrandBadge';
 import { type Task, type TaskRisk } from '@/lib/api';
 import { i18n, t } from '@/lib/i18n';
 import { useUstaStore } from '@/lib/store';
@@ -48,7 +49,7 @@ export default function MaintenanceScreen() {
       <Text style={styles.title}>{t('maintenance.title')}</Text>
       {currentVehicle && (
         <View style={styles.carTag}>
-          <Ionicons name="car-sport" size={14} color={theme.colors.textSecondary} />
+          <BrandBadge make={currentVehicle.make} size={18} />
           <Text style={styles.carTagText}>
             {currentVehicle.make} {currentVehicle.model}
           </Text>

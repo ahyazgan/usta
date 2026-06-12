@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { BrandBadge } from '@/components/BrandBadge';
 import type { FuelType, VehicleType } from '@/lib/api';
 import { formatTrDate, parseTrDate } from '@/lib/dateReminders';
 import { t } from '@/lib/i18n';
@@ -204,14 +205,17 @@ export default function VehicleNewScreen() {
         </View>
 
         <Text style={styles.label}>{t('vehicle.form.make')}</Text>
-        <TextInput
-          style={styles.input}
-          value={make}
-          onChangeText={setMake}
-          placeholder={t('vehicle.form.makePlaceholder')}
-          placeholderTextColor={theme.colors.textSecondary}
-          autoCapitalize="words"
-        />
+        <View style={styles.makeRow}>
+          {make.trim().length > 0 && <BrandBadge make={make} size={36} />}
+          <TextInput
+            style={[styles.input, styles.makeInput]}
+            value={make}
+            onChangeText={setMake}
+            placeholder={t('vehicle.form.makePlaceholder')}
+            placeholderTextColor={theme.colors.textSecondary}
+            autoCapitalize="words"
+          />
+        </View>
 
         <Text style={styles.label}>{t('vehicle.form.model')}</Text>
         <TextInput
@@ -444,6 +448,14 @@ const styles = StyleSheet.create({
     gap: theme.spacing.md,
   },
   dateCol: {
+    flex: 1,
+  },
+  makeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+  },
+  makeInput: {
     flex: 1,
   },
   fuelRow: {

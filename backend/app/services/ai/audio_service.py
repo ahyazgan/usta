@@ -17,6 +17,7 @@ from ...domain.safety import enforce_sound_safety
 from ...domain.schemas import SoundDiagnoseRequest, SoundDiagnoseResponse
 from ...domain.taxonomy import sistem_for_ses
 from .claude_client import ClaudeClient
+from .cost import build_cost_estimate
 from .prompts import build_audio_prompt
 
 
@@ -67,5 +68,7 @@ async def diagnose_sound(
     db.add(session)
     await db.commit()
     await db.refresh(session)
+    # Fiyat şeffaflığı: tamirciye tahmini maliyet (arıza sistemine göre).
+    cost = await build_cost_estimate(db, session.ariza_sistem, vehicle.vehicle_type)
     # 👍/👎 geri bildirimi bu id'ye bağlanır.
-    return final.model_copy(update={"session_id": session.id})
+    return final.model_copy(update={"session_id": session.id, "cost_estimate": cost})

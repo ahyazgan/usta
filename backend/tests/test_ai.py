@@ -53,6 +53,11 @@ async def test_image_diagnose_happy(client, fake_claude):
     # Vision modeli sonnet olmalı (Opus yasak).
     assert "opus" not in fake_claude.calls[0]["model"].lower()
     assert "sonnet" in fake_claude.calls[0]["model"].lower()
+    # Fiyat şeffaflığı: teşhis yanıtı tamirci maliyet tahmini içerir.
+    ce = body["cost_estimate"]
+    assert ce is not None
+    assert ce["low_try"] > 0 and ce["high_try"] >= ce["low_try"]
+    assert ce["source"] in {"seed", "community"} and ce["currency"] == "TRY"
 
 
 @pytest.mark.asyncio
@@ -183,9 +188,13 @@ async def test_sound_diagnose_happy(client, fake_claude):
 
     r = await client.post("/v1/ai/diagnose/sound", json=_sound_payload(vehicle["id"]), headers=headers)
     assert r.status_code == 200
-    assert r.json()["ses_kategorisi"] in {
+    body = r.json()
+    assert body["ses_kategorisi"] in {
         "tikirti", "kayis_sesi", "metalik_vuruntu", "islik", "egzoz_patlamasi", "normal", "belirsiz",
     }
+    # Fiyat şeffaflığı: ses teşhisi de tamirci maliyet tahmini içerir.
+    assert body["cost_estimate"] is not None
+    assert body["cost_estimate"]["high_try"] >= body["cost_estimate"]["low_try"] > 0
 
 
 @pytest.mark.asyncio

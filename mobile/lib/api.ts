@@ -54,6 +54,8 @@ export interface DiagnoseResult {
   tamirciye_git_onerisi: boolean;
   /** AISession id — 👍/👎 feedback attaches to this. */
   session_id: number | null;
+  /** Mechanic cost estimate for the detected fault system (price transparency). */
+  cost_estimate?: CostEstimate | null;
 }
 
 export interface DiagnoseImageInput {
@@ -95,6 +97,8 @@ export interface SoundDiagnoseResult {
   tamirciye_git_onerisi: boolean;
   /** AISession id — 👍/👎 feedback attaches to this. */
   session_id: number | null;
+  /** Mechanic cost estimate for the detected fault system (price transparency). */
+  cost_estimate?: CostEstimate | null;
 }
 
 /** Auth token bundle returned by login/register-then-login/refresh. */

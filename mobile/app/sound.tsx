@@ -27,12 +27,16 @@ const CONDITIONS: KayitKosulu[] = ['rolanti', 'gazda', 'soguk_motor', 'seyirde']
 /** Sohbet balonu türleri (mockup ekran 3). */
 interface Msg {
   id: number;
-  kind: 'usta' | 'user' | 'warning';
+  kind: 'usta' | 'user' | 'warning' | 'price';
   text: string;
   /** Usta balonunda güven satırı. */
   conf?: Guven;
   /** Usta balonunda küçük meta satırı (kategori · aciliyet). */
   meta?: string;
+  /** 'price' balonu: tamirci maliyet aralığı + kaynak notu. */
+  priceLow?: number;
+  priceHigh?: number;
+  priceNote?: string;
 }
 
 function ModeCard({
@@ -70,6 +74,23 @@ function Bubble({ msg }: { msg: Msg }) {
       <View style={styles.warnBubble}>
         <Ionicons name="warning" size={16} color={theme.colors.urgentSoftText} />
         <Text style={styles.warnBubbleText}>{msg.text}</Text>
+      </View>
+    );
+  }
+  if (msg.kind === 'price') {
+    return (
+      <View style={styles.priceBubble}>
+        <View style={styles.priceIcon}>
+          <Ionicons name="pricetags" size={18} color={theme.colors.ink} />
+        </View>
+        <View style={styles.priceBody}>
+          <Text style={styles.priceLabel}>{t('sound.estimate.title')}</Text>
+          <Text style={styles.priceRange}>
+            ~{(msg.priceLow ?? 0).toLocaleString('tr-TR')}–
+            {(msg.priceHigh ?? 0).toLocaleString('tr-TR')} ₺
+          </Text>
+          {msg.priceNote != null && <Text style={styles.priceNote}>{msg.priceNote}</Text>}
+        </View>
       </View>
     );
   }
@@ -139,6 +160,21 @@ export default function DiagnosisScreen() {
       additions.push({ id: nextId++, kind: 'warning', text: result.guvenlik_uyarisi });
     }
     additions.push({ id: nextId++, kind: 'usta', text: result.sonraki_adim });
+    // Fiyat şeffaflığı: tamirciye tahmini maliyet (kazıklanma kaygısına anlık cevap).
+    if (result.cost_estimate != null) {
+      const ce = result.cost_estimate;
+      additions.push({
+        id: nextId++,
+        kind: 'price',
+        text: '',
+        priceLow: ce.low_try,
+        priceHigh: ce.high_try,
+        priceNote:
+          ce.source === 'community'
+            ? t('sound.estimate.community', { count: ce.sample_size })
+            : t('sound.estimate.seed'),
+      });
+    }
     setMessages((m) => [...m, ...additions]);
     setShowMechanic(result.tamirciye_git_onerisi === true);
   }, [result]);
@@ -467,6 +503,47 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 18,
     color: theme.colors.urgentSoftText,
+  },
+  priceBubble: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
+    maxWidth: '95%',
+    alignSelf: 'flex-start',
+  },
+  priceIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  priceBody: { flex: 1, gap: 2 },
+  priceLabel: {
+    fontFamily: theme.fonts.body,
+    fontSize: 11,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  priceRange: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 19,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  priceNote: {
+    fontFamily: theme.fonts.body,
+    fontSize: 11,
+    color: theme.colors.textSecondary,
   },
   typing: {
     flexDirection: 'row',

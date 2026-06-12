@@ -241,6 +241,11 @@
     },
     "analyze": "Analiz Et",
     "analyzing": "İnceleniyor…",
+    "estimate": {
+      "title": "Tamirciye yaklaşık",
+      "seed": "Türkiye ortalaması (tahmini aralık)",
+      "community": "{{count}} kullanıcının ödediğine göre"
+    },
     "result": {
       "title": "Teşhis",
       "tespit": "Tespit",

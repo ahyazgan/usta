@@ -241,6 +241,11 @@
     },
     "analyze": "Analyze",
     "analyzing": "Analyzing…",
+    "estimate": {
+      "title": "At a mechanic, roughly",
+      "seed": "Turkey average (estimated range)",
+      "community": "based on {{count}} users' payments"
+    },
     "result": {
       "title": "Diagnosis",
       "tespit": "Finding",

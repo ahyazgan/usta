@@ -15,6 +15,8 @@
     "tasksTitle": "To-do",
     "tasksEmpty": "Add maintenance entries and your to-dos will appear here.",
     "allMaintenance": "All →",
+    "shareReport": "Share your Usta Report",
+    "invite": "Invite a friend",
     "signingIn": "Signing in…",
     "connectError": "Couldn't reach the server. Check your connection and retry.",
     "savingsTeaser": "Keep up with upkeep to extend your car's life and avoid surprise costs.",
@@ -65,6 +67,7 @@
       "title": "Nice work! 🔧",
       "desc": "{{task}} is done and saved to your history.",
       "savings": "+₺{{amount}} kept in your pocket",
+      "share": "Share",
       "cta": "Back to garage"
     }
   },
@@ -340,6 +343,16 @@
       "aiUnavailable": "The AI service is currently unavailable. Please try again later.",
       "busy": "The service is busy right now. Please try again shortly."
     }
+  },
+  "share": {
+    "report": {
+      "title": "🔧 Usta Report",
+      "km": "📍 {{km}} km",
+      "maintenance": "✅ Did {{count}} services myself, saved ~₺{{savings}}",
+      "cta": "A master mechanic in your pocket — try Usta: {{link}}"
+    },
+    "invite": "🔧 Try Usta — do car maintenance yourself step by step, verify with AI, save money: {{link}}",
+    "achievement": "🔧 Did the {{task}} job myself, saved ~₺{{savings}} — with Usta!"
   },
   "feedback": {
     "question": "Was this diagnosis right?",

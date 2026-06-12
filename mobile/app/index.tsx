@@ -20,6 +20,7 @@ import { dateStatus, daysUntil, formatTrDate } from '@/lib/dateReminders';
 import { ensureDemoSession } from '@/lib/demoSession';
 import { t } from '@/lib/i18n';
 import { syncVehicleReminders } from '@/lib/notifications';
+import { shareInvite, shareReport } from '@/lib/share';
 import { useUstaStore } from '@/lib/store';
 import { TASK_ICON } from '@/lib/taskIcons';
 import { theme } from '@/lib/theme';
@@ -258,6 +259,16 @@ export default function HomeScreen() {
         <Text style={styles.greetingName}>{t('home.welcome')}</Text>
       </View>
       <View style={styles.headerActions}>
+        {currentVehicle != null && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('home.shareReport')}
+            onPress={() => void shareReport(currentVehicle, summary)}
+            style={({ pressed }) => [styles.headerIcon, pressed && styles.pressed]}
+          >
+            <Ionicons name="share-social-outline" size={22} color={theme.colors.textSecondary} />
+          </Pressable>
+        )}
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={t('privacy.title')}
@@ -487,6 +498,17 @@ export default function HomeScreen() {
               : t('home.savingsTeaser')}
           </Text>
         </View>
+
+        {/* Büyüme: arkadaşını davet et */}
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => void shareInvite()}
+          style={({ pressed }) => [styles.inviteRow, pressed && styles.pressed]}
+        >
+          <Ionicons name="gift-outline" size={20} color={theme.colors.ink} />
+          <Text style={styles.inviteText}>{t('home.invite')}</Text>
+          <Ionicons name="share-outline" size={18} color={theme.colors.textSecondary} />
+        </Pressable>
       </ScrollView>
 
       {/* Km hızlı güncelleme */}
@@ -922,6 +944,25 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 19,
     color: theme.colors.savingsText,
+  },
+  inviteRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.md,
+    marginHorizontal: theme.spacing.lg,
+    marginTop: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+  },
+  inviteText: {
+    flex: 1,
+    fontFamily: theme.fonts.body,
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.textPrimary,
   },
   cta: {
     flexDirection: 'row',

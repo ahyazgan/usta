@@ -15,6 +15,8 @@
     "tasksTitle": "Yapılacaklar",
     "tasksEmpty": "Bakım kaydı ekledikçe yapılacaklar burada belirir.",
     "allMaintenance": "Tümü →",
+    "shareReport": "Usta Raporu'nu paylaş",
+    "invite": "Arkadaşını davet et",
     "signingIn": "Giriş yapılıyor…",
     "connectError": "Sunucuya bağlanılamadı. İnternetini kontrol edip tekrar dene.",
     "savingsTeaser": "Düzenli bakımla araç ömrünü uzat ve sürpriz masraflardan kaçın.",
@@ -65,6 +67,7 @@
       "title": "Eline sağlık! 🔧",
       "desc": "{{task}} tamamlandı ve bakım geçmişine kaydedildi.",
       "savings": "+₺{{amount}} cebinde kaldı",
+      "share": "Paylaş",
       "cta": "Garaja dön"
     }
   },
@@ -340,6 +343,16 @@
       "aiUnavailable": "Yapay zekâ servisi şu an kullanılamıyor. Lütfen sonra tekrar dene.",
       "busy": "Servis şu an yoğun. Lütfen biraz sonra tekrar dene."
     }
+  },
+  "share": {
+    "report": {
+      "title": "🔧 Usta Raporu",
+      "km": "📍 {{km}} km",
+      "maintenance": "✅ {{count}} bakımı kendim yaptım, ~₺{{savings}} tasarruf",
+      "cta": "Cebindeki usta — sen de aracının ustası ol: {{link}}"
+    },
+    "invite": "🔧 Usta'yı dene — araç bakımını adım adım kendin yap, AI ile doğrula, paradan tasarruf et: {{link}}",
+    "achievement": "🔧 {{task}} işini kendim yaptım, ~₺{{savings}} tasarruf — Usta ile!"
   },
   "feedback": {
     "question": "Bu teşhis doğru çıktı mı?",

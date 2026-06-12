@@ -21,6 +21,8 @@ import {
 } from '@/lib/api';
 import { i18n, t } from '@/lib/i18n';
 import { goBack } from '@/lib/nav';
+import { maybeRequestReview } from '@/lib/review';
+import { shareAchievement } from '@/lib/share';
 import { useUstaStore } from '@/lib/store';
 import { theme } from '@/lib/theme';
 import { useVehicles } from '@/lib/useVehicles';
@@ -152,6 +154,8 @@ export default function GuideScreen() {
     clearGuideProgress(guide.task_id); // bitti — sonraki sefer baştan
     void capture('guide_finished', { task: guide.task_id, saving: guide.diy_saving_try });
     setCelebrating(true);
+    // Pozitif an: mağaza değerlendirmesi iste (kurulum başına bir kez, native).
+    void maybeRequestReview();
   }
 
   function backToGarage() {
@@ -299,6 +303,14 @@ export default function GuideScreen() {
                     </Text>
                   </View>
                 )}
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() => void shareAchievement(title, guide.diy_saving_try)}
+                  style={({ pressed }) => [styles.celebrateShare, pressed && styles.pressed]}
+                >
+                  <Ionicons name="share-social" size={18} color={theme.colors.ink} />
+                  <Text style={styles.celebrateShareText}>{t('guide.done.share')}</Text>
+                </Pressable>
                 <Pressable
                   accessibilityRole="button"
                   onPress={backToGarage}
@@ -625,6 +637,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     color: theme.colors.savingsText,
+  },
+  celebrateShare: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.sm,
+    minHeight: 48,
+    alignSelf: 'stretch',
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.ink,
+    marginTop: theme.spacing.sm,
+  },
+  celebrateShareText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.ink,
   },
   celebrateCta: {
     flexDirection: 'row',

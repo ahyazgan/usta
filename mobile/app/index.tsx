@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BottomTabBar } from '@/components/BottomTabBar';
 import { type Reminder, type Vehicle } from '@/lib/api';
 import { dateStatus, daysUntil, formatTrDate } from '@/lib/dateReminders';
+import { capture } from '@/lib/analytics';
 import { ensureDemoSession } from '@/lib/demoSession';
 import { t } from '@/lib/i18n';
 import { syncVehicleReminders } from '@/lib/notifications';
@@ -149,6 +150,41 @@ function TaskRow({ reminder, onPress }: { reminder: Reminder; onPress: () => voi
       </View>
       <Ionicons name="chevron-forward" size={18} color={theme.colors.border} />
     </Pressable>
+  );
+}
+
+/** Triyaj girişi — "Neyin var?": sorun → teşhis, planlı → bakım. */
+function TriageHero({
+  onProblem,
+  onMaintenance,
+}: {
+  onProblem: () => void;
+  onMaintenance: () => void;
+}) {
+  return (
+    <View style={styles.triage}>
+      <Text style={styles.triageTitle}>{t('home.triage.title')}</Text>
+      <View style={styles.triageRow}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={onProblem}
+          style={({ pressed }) => [styles.triageCard, styles.triageProblem, pressed && styles.pressed]}
+        >
+          <Ionicons name="pulse" size={26} color={theme.colors.onInk} />
+          <Text style={styles.triageProblemTitle}>{t('home.triage.problem.title')}</Text>
+          <Text style={styles.triageProblemDesc}>{t('home.triage.problem.desc')}</Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          onPress={onMaintenance}
+          style={({ pressed }) => [styles.triageCard, styles.triageMaint, pressed && styles.pressed]}
+        >
+          <Ionicons name="construct" size={26} color={theme.colors.ink} />
+          <Text style={styles.triageMaintTitle}>{t('home.triage.maintenance.title')}</Text>
+          <Text style={styles.triageMaintDesc}>{t('home.triage.maintenance.desc')}</Text>
+        </Pressable>
+      </View>
+    </View>
   );
 }
 
@@ -346,6 +382,18 @@ export default function HomeScreen() {
     <View style={[styles.container, { paddingTop: insets.top + theme.spacing.md }]}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {header}
+
+        {/* Triyaj: derde göre giriş */}
+        <TriageHero
+          onProblem={() => {
+            void capture('triage_problem');
+            router.push('/sound');
+          }}
+          onMaintenance={() => {
+            void capture('triage_maintenance');
+            router.replace('/maintenance');
+          }}
+        />
 
         {vehicles.length > 1 && (
           <ScrollView
@@ -637,6 +685,65 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     textAlign: 'center',
     marginBottom: theme.spacing.sm,
+  },
+  triage: {
+    paddingHorizontal: theme.spacing.lg,
+    marginBottom: theme.spacing.lg,
+  },
+  triageTitle: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: theme.spacing.md,
+  },
+  triageRow: {
+    flexDirection: 'row',
+    gap: theme.spacing.md,
+  },
+  triageCard: {
+    flex: 1,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.lg,
+    gap: 4,
+    minHeight: 120,
+    justifyContent: 'center',
+  },
+  triageProblem: {
+    backgroundColor: theme.colors.ink,
+  },
+  triageProblemTitle: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 17,
+    fontWeight: '700',
+    color: theme.colors.onInk,
+    marginTop: theme.spacing.sm,
+  },
+  triageProblemDesc: {
+    fontFamily: theme.fonts.body,
+    fontSize: 12,
+    color: theme.colors.onInkMuted,
+    lineHeight: 16,
+  },
+  triageMaint: {
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1.5,
+    borderColor: theme.colors.border,
+  },
+  triageMaintTitle: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 17,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    marginTop: theme.spacing.sm,
+  },
+  triageMaintDesc: {
+    fontFamily: theme.fonts.body,
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    lineHeight: 16,
   },
   switcherRow: {
     gap: theme.spacing.sm,

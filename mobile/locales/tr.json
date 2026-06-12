@@ -12,6 +12,17 @@
   "home": {
     "greeting": "Merhaba 👋",
     "welcome": "Garajın",
+    "triage": {
+      "title": "Bugün ne lazım?",
+      "problem": {
+        "title": "Bir sorun var",
+        "desc": "Sesini dinlet veya göster, teşhis edeyim"
+      },
+      "maintenance": {
+        "title": "Bakım yapacağım",
+        "desc": "Adım adım rehberle kendin yap"
+      }
+    },
     "tasksTitle": "Yapılacaklar",
     "tasksEmpty": "Bakım kaydı ekledikçe yapılacaklar burada belirir.",
     "allMaintenance": "Tümü →",

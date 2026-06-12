@@ -12,6 +12,17 @@
   "home": {
     "greeting": "Hello 👋",
     "welcome": "Your garage",
+    "triage": {
+      "title": "What do you need today?",
+      "problem": {
+        "title": "Something's wrong",
+        "desc": "Describe or show it, I'll diagnose"
+      },
+      "maintenance": {
+        "title": "Doing maintenance",
+        "desc": "Do it yourself with a step-by-step guide"
+      }
+    },
     "tasksTitle": "To-do",
     "tasksEmpty": "Add maintenance entries and your to-dos will appear here.",
     "allMaintenance": "All →",

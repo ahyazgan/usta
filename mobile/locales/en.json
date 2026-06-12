@@ -365,6 +365,34 @@
     "gorus": "Visibility",
     "diger": "Other"
   },
+  "privacy": {
+    "title": "Privacy",
+    "intro": "You're in control of your data. With consent off, no analytics are sent. Change it anytime below, or delete all your data.",
+    "analytics": {
+      "title": "Usage analytics",
+      "desc": "Anonymous screen/event data to improve the app. When off, no analytics are sent."
+    },
+    "data": {
+      "title": "Anonymous contribution",
+      "desc": "Your diagnoses feed aggregate fault stats without your identity (e.g. 'this fault is common on that model')."
+    },
+    "stats": {
+      "title": "Community stats",
+      "empty": "Not enough anonymous data yet — it builds up as you use the app.",
+      "count": "{{count}} diagnoses",
+      "accuracy": "{{pct}}% correct"
+    },
+    "delete": {
+      "title": "Delete your data",
+      "desc": "Permanently deletes your account and all vehicle/maintenance/diagnosis data. Cannot be undone.",
+      "button": "Delete all my data",
+      "confirmTitle": "Are you sure?",
+      "confirmMsg": "Your account and all your data will be permanently deleted. This cannot be undone.",
+      "confirm": "Delete",
+      "errorTitle": "Couldn't delete",
+      "errorMsg": "Something went wrong, try again."
+    }
+  },
   "notifications": {
     "title": "Usta reminder 🔧",
     "body": "{{name}} {{label}} is coming up: {{date}} ({{days}} days left)."

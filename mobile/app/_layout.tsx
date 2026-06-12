@@ -3,6 +3,8 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { capture } from '@/lib/analytics';
+import { createApiClient } from '@/lib/api';
 import { loadTokens } from '@/lib/auth';
 import { ensureDemoSession } from '@/lib/demoSession';
 // Side-effect import: initializes i18n locale before any screen renders.
@@ -13,6 +15,7 @@ import { theme } from '@/lib/theme';
 export default function RootLayout() {
   const setTokens = useUstaStore((s) => s.setTokens);
   const setAuthBootstrapped = useUstaStore((s) => s.setAuthBootstrapped);
+  const setAnalyticsConsent = useUstaStore((s) => s.setAnalyticsConsent);
 
   // On launch: reuse a persisted session if any, otherwise auto-login a demo
   // account (login screen removed). `authBootstrapped` flips true either way so
@@ -38,11 +41,23 @@ export default function RootLayout() {
         }
       }
       if (active) setAuthBootstrapped(true);
+
+      // KVKK rızasını senkronla (analytics bunu okur) ve oturum açılışını yakala.
+      const token = useUstaStore.getState().authToken;
+      if (token != null) {
+        try {
+          const consent = await createApiClient(undefined, () => token).getConsent();
+          if (active) setAnalyticsConsent(consent.analytics);
+        } catch {
+          /* sessiz — rıza varsayılan kapalı kalır */
+        }
+        void capture('app_open');
+      }
     })();
     return () => {
       active = false;
     };
-  }, [setTokens, setAuthBootstrapped]);
+  }, [setTokens, setAuthBootstrapped, setAnalyticsConsent]);
 
   return (
     <SafeAreaProvider>
@@ -64,6 +79,7 @@ export default function RootLayout() {
         <Stack.Screen name="sound" />
         <Stack.Screen name="history" />
         <Stack.Screen name="vehicle-new" />
+        <Stack.Screen name="privacy" />
       </Stack>
     </SafeAreaProvider>
   );

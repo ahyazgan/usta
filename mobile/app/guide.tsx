@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { capture } from '@/lib/analytics';
 import {
   ApiError,
   createApiClient,
@@ -149,6 +150,7 @@ export default function GuideScreen() {
     }
     setFinishing(false);
     clearGuideProgress(guide.task_id); // bitti — sonraki sefer baştan
+    void capture('guide_finished', { task: guide.task_id, saving: guide.diy_saving_try });
     setCelebrating(true);
   }
 

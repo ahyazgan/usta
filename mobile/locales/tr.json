@@ -365,6 +365,34 @@
     "gorus": "Görüş",
     "diger": "Diğer"
   },
+  "privacy": {
+    "title": "Gizlilik",
+    "intro": "Verilerini sen yönetirsin. Rıza vermezsen hiçbir analitik gönderilmez. Aşağıdan dilediğin zaman değiştirebilir ya da tüm verini silebilirsin.",
+    "analytics": {
+      "title": "Kullanım analitiği",
+      "desc": "Uygulamayı geliştirmek için anonim ekran/olay verisi. Kapalıyken hiçbir analitik gönderilmez."
+    },
+    "data": {
+      "title": "Anonim katkı",
+      "desc": "Teşhislerin kimliğin olmadan toplu arıza istatistiklerine katkı sağlar (örn. 'şu modelde şu arıza sık')."
+    },
+    "stats": {
+      "title": "Topluluk istatistikleri",
+      "empty": "Henüz yeterli anonim veri yok — kullandıkça birikir.",
+      "count": "{{count}} teşhis",
+      "accuracy": "%{{pct}} doğru"
+    },
+    "delete": {
+      "title": "Verini sil",
+      "desc": "Hesabını ve tüm araç/bakım/teşhis verini kalıcı olarak siler. Geri alınamaz.",
+      "button": "Tüm verimi sil",
+      "confirmTitle": "Emin misin?",
+      "confirmMsg": "Hesabın ve tüm verin kalıcı olarak silinecek. Bu işlem geri alınamaz.",
+      "confirm": "Sil",
+      "errorTitle": "Silinemedi",
+      "errorMsg": "Bir şeyler ters gitti, tekrar dene."
+    }
+  },
   "notifications": {
     "title": "Usta hatırlatıyor 🔧",
     "body": "{{name}} {{label}} tarihi yaklaşıyor: {{date}} ({{days}} gün kaldı)."

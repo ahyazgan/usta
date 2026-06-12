@@ -4,6 +4,7 @@
  */
 import { useCallback, useMemo, useState } from 'react';
 
+import { capture } from '@/lib/analytics';
 import { ApiError, createApiClient, type DiagnoseResult } from '@/lib/api';
 import { captureAndEncode } from '@/lib/capture';
 import { selectCurrentVehicle, useUstaStore } from '@/lib/store';
@@ -71,6 +72,7 @@ export function useDiagnose(): UseDiagnose {
           media_type: mediaType,
         });
         setLastResult(result);
+        void capture('diagnosis_image', { task: selectedTask.id, guven: result.guven });
       } catch (err) {
         setError(errorKey(err));
       } finally {

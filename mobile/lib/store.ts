@@ -17,6 +17,8 @@ export interface UstaState {
   refreshToken: string | null;
   /** False until the initial token hydrate / auto-login attempt finishes. */
   authBootstrapped: boolean;
+  /** KVKK analitik rızası (backend'den senkronlanır; analytics bunu okur). */
+  analyticsConsent: boolean;
   selectedTask: Task | null;
   lastResult: DiagnoseResult | null;
   /** Kaldığın adım (görev id → adım index'i) — rehbere dönünce devam et. */
@@ -24,6 +26,7 @@ export interface UstaState {
   setVehicles: (vehicles: Vehicle[]) => void;
   selectVehicle: (id: number | null) => void;
   setAuthBootstrapped: (done: boolean) => void;
+  setAnalyticsConsent: (granted: boolean) => void;
   setGuideProgress: (taskId: string, step: number) => void;
   clearGuideProgress: (taskId: string) => void;
   setAuthToken: (token: string | null) => void;
@@ -55,12 +58,14 @@ export const useUstaStore = create<UstaState>((set) => ({
   authToken: null,
   refreshToken: null,
   authBootstrapped: false,
+  analyticsConsent: false,
   selectedTask: null,
   lastResult: null,
   guideProgress: {},
   setVehicles: (vehicles) => set({ vehicles }),
   selectVehicle: (id) => set({ currentVehicleId: id }),
   setAuthBootstrapped: (authBootstrapped) => set({ authBootstrapped }),
+  setAnalyticsConsent: (analyticsConsent) => set({ analyticsConsent }),
   setGuideProgress: (taskId, step) =>
     set((s) => ({ guideProgress: { ...s.guideProgress, [taskId]: step } })),
   clearGuideProgress: (taskId) =>

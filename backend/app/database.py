@@ -46,6 +46,10 @@ _COLUMN_MIGRATIONS: tuple[tuple[str, str, str], ...] = (
     # Arıza taksonomisi + kapanış sinyali (toplama katmanını tamamlar).
     ("ai_sessions", "ariza_sistem", "VARCHAR(20)"),
     ("ai_sessions", "resolution", "VARCHAR(20)"),
+    # KVKK açık rızası.
+    ("users", "consent_analytics", "BOOLEAN"),
+    ("users", "consent_data", "BOOLEAN"),
+    ("users", "consent_at", "TIMESTAMP"),
 )
 
 

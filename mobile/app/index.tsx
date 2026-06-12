@@ -257,13 +257,23 @@ export default function HomeScreen() {
         <Text style={styles.greeting}>{t('home.greeting')}</Text>
         <Text style={styles.greetingName}>{t('home.welcome')}</Text>
       </View>
-      <Pressable
-        accessibilityRole="button"
-        onPress={() => void logout()}
-        style={({ pressed }) => [styles.logoutButton, pressed && styles.pressed]}
-      >
-        <Ionicons name="log-out-outline" size={22} color={theme.colors.textSecondary} />
-      </Pressable>
+      <View style={styles.headerActions}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t('privacy.title')}
+          onPress={() => router.push('/privacy')}
+          style={({ pressed }) => [styles.headerIcon, pressed && styles.pressed]}
+        >
+          <Ionicons name="shield-checkmark-outline" size={22} color={theme.colors.textSecondary} />
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => void logout()}
+          style={({ pressed }) => [styles.headerIcon, pressed && styles.pressed]}
+        >
+          <Ionicons name="log-out-outline" size={22} color={theme.colors.textSecondary} />
+        </Pressable>
+      </View>
     </View>
   );
 
@@ -564,10 +574,14 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary,
     letterSpacing: -0.3,
   },
-  logoutButton: {
-    width: theme.touchTarget,
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerIcon: {
+    width: 44,
     height: theme.touchTarget,
-    alignItems: 'flex-end',
+    alignItems: 'center',
     justifyContent: 'center',
   },
   title: {

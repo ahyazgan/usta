@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { capture } from '@/lib/analytics';
 import { createApiClient } from '@/lib/api';
 import { t } from '@/lib/i18n';
 import { useUstaStore } from '@/lib/store';
@@ -38,6 +39,7 @@ export function FeedbackRow({
     try {
       await client.sendDiagnosisFeedback(vehicleId, sessionId, dogru);
       setVote(dogru);
+      void capture('feedback_given', { dogru });
     } catch {
       /* ağ hatası — sessiz; kullanıcı tekrar dokunabilir */
     } finally {

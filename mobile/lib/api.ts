@@ -271,6 +271,20 @@ export interface VehicleCreateInput {
   sigorta_date?: string | null;
 }
 
+/** KVKK açık rıza durumu. */
+export interface Consent {
+  analytics: boolean;
+  data: boolean;
+}
+
+/** Anonim küme istatistiği — bir araç sistemi için (kişi-bağımsız). */
+export interface SystemStat {
+  sistem: ArizaSistem;
+  count: number;
+  dogrulanan: number;
+  dogruluk_orani: number | null;
+}
+
 export type GetToken = () => string | null | Promise<string | null>;
 
 export interface ApiClient {
@@ -300,6 +314,13 @@ export interface ApiClient {
     sessionId: number,
     resolution: ResolutionDurum,
   ): Promise<DiagnosisHistory>;
+  /** KVKK consent: read + partial update. */
+  getConsent(): Promise<Consent>;
+  updateConsent(patch: Partial<Consent>): Promise<Consent>;
+  /** Anonymous aggregate stats (k-anonymity, consent-gated server-side). */
+  getSystemStats(): Promise<SystemStat[]>;
+  /** Right to erasure: delete the account and all its data (204). */
+  deleteAccount(): Promise<void>;
   listVehicles(): Promise<Vehicle[]>;
   createVehicle(input: VehicleCreateInput): Promise<Vehicle>;
   getVehicle(id: number): Promise<Vehicle>;
@@ -490,6 +511,21 @@ export function createApiClient(
         `/v1/vehicles/${vehicleId}/diagnoses/${sessionId}/resolution`,
         { resolution },
       );
+    },
+    async getConsent() {
+      const headers = await authHeaders();
+      return request<Consent>('/v1/me/consent', { method: 'GET', headers });
+    },
+    updateConsent(body) {
+      return patch<Consent, Partial<Consent>>('/v1/me/consent', body);
+    },
+    async getSystemStats() {
+      const headers = await authHeaders();
+      return request<SystemStat[]>('/v1/stats/systems', { method: 'GET', headers });
+    },
+    async deleteAccount() {
+      const headers = await authHeaders();
+      await requestVoid('/v1/me', { method: 'DELETE', headers });
     },
     async listVehicles() {
       const headers = await authHeaders();

@@ -180,6 +180,38 @@ class DiagnosisResolutionIn(BaseModel):
 
 
 # --------------------------------------------------------------------------- #
+# KVKK — açık rıza + istatistik (anonim küme)
+# --------------------------------------------------------------------------- #
+
+
+class ConsentOut(BaseModel):
+    """Kullanıcının açık rıza durumu (null → False olarak sunulur)."""
+
+    analytics: bool
+    data: bool
+
+
+class ConsentUpdate(BaseModel):
+    """Rıza güncelleme — yalnızca verilen alan değişir."""
+
+    analytics: bool | None = None
+    data: bool | None = None
+
+
+class SystemStatOut(BaseModel):
+    """Anonim küme istatistiği — bir araç sistemi için (kişi-bağımsız).
+
+    Yalnızca veri rızası veren kullanıcıların teşhisleri üzerinden hesaplanır;
+    k-anonimlik için küçük kovalar gizlenir.
+    """
+
+    sistem: ArizaSistem
+    count: int
+    dogrulanan: int            # 👍/👎 verilmiş teşhis sayısı
+    dogruluk_orani: float | None  # doğru oranı (oylanan varsa)
+
+
+# --------------------------------------------------------------------------- #
 # AI — Görüntü teşhisi
 # --------------------------------------------------------------------------- #
 

@@ -31,6 +31,11 @@ class User(Base):
     subscription_tier: Mapped[SubscriptionTier] = mapped_column(
         SAEnum(SubscriptionTier), default=SubscriptionTier.free, nullable=False
     )
+    # KVKK açık rızası (null = henüz seçim yapılmadı; varsayılan KAPALI).
+    # consent_analytics: davranış analitiği; consent_data: anonim küme kullanımı.
+    consent_analytics: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    consent_data: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    consent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
 
     vehicles: Mapped[list["Vehicle"]] = relationship(

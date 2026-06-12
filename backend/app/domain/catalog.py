@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from .enums import FuelType
+from .enums import FuelType, VehicleType
 from .schemas import VehicleSpecIn
 
 
@@ -25,6 +25,7 @@ class CatalogEntry:
     spec: VehicleSpecIn
     fuels: tuple[FuelType, ...] = field(default=())
     engine_codes: tuple[str, ...] = field(default=())
+    vehicle_type: VehicleType = VehicleType.araba
 
 
 # Not: LPG'li benzinli araçlarda LPG sistemine müdahale TARİFİ verilmez;
@@ -156,6 +157,92 @@ CATALOG: tuple[CatalogEntry, ...] = (
             transmission_type="manuel",
         ),
     ),
+    # --- MOTOSİKLETLER (TR'de yaygın; değerler ÖRNEK, el kitabına karşı doğrula) ---
+    CatalogEntry(
+        make="Honda",
+        model="CB125",
+        year_min=2015,
+        year_max=2024,
+        fuels=(FuelType.benzin,),
+        engine_codes=("JC64",),
+        vehicle_type=VehicleType.motosiklet,
+        spec=VehicleSpecIn(
+            oil_spec="10W-30",
+            oil_capacity_l=1.1,
+            oil_drain_bolt_size="12mm",
+            oil_drain_location="motor karteri altı tahliye cıvatası",
+            oil_filter_part="örnek: elek tip / 15412-KGA-900",
+            air_filter_part="örnek: 17211-K0G-900",
+            cabin_filter_part=None,  # motosiklette kabin filtresi yok
+            spark_plug_part="örnek: NGK CPR6EA-9",
+            battery_spec="12V 3.5Ah (YTZ4V)",
+            battery_location="sele altı",
+            transmission_type="manuel",
+        ),
+    ),
+    CatalogEntry(
+        make="Yamaha",
+        model="YBR125",
+        year_min=2008,
+        year_max=2022,
+        fuels=(FuelType.benzin,),
+        vehicle_type=VehicleType.motosiklet,
+        spec=VehicleSpecIn(
+            oil_spec="10W-40",
+            oil_capacity_l=1.0,
+            oil_drain_bolt_size="17mm",
+            oil_drain_location="motor karteri altı tahliye cıvatası",
+            oil_filter_part="örnek: elek tip (yıkanabilir)",
+            air_filter_part="örnek: 3D9-E4450-00",
+            cabin_filter_part=None,
+            spark_plug_part="örnek: NGK CR6HSA",
+            battery_spec="12V 5Ah (YB5L-B)",
+            battery_location="sele altı / yan kapak",
+            transmission_type="manuel",
+        ),
+    ),
+    CatalogEntry(
+        make="Honda",
+        model="PCX125",
+        year_min=2014,
+        year_max=2024,
+        fuels=(FuelType.benzin,),
+        vehicle_type=VehicleType.motosiklet,
+        spec=VehicleSpecIn(
+            oil_spec="10W-30",
+            oil_capacity_l=0.8,
+            oil_drain_bolt_size="12mm",
+            oil_drain_location="motor karteri altı tahliye cıvatası",
+            oil_filter_part="örnek: elek tip",
+            air_filter_part="örnek: 17210-K35-V00",
+            cabin_filter_part=None,
+            spark_plug_part="örnek: NGK CPR7EA-9",
+            battery_spec="12V (GTZ6V)",
+            battery_location="ayak tabanı / sele altı",
+            transmission_type="otomatik (CVT)",
+        ),
+    ),
+    CatalogEntry(
+        make="Yamaha",
+        model="MT-25",
+        year_min=2015,
+        year_max=2024,
+        fuels=(FuelType.benzin,),
+        vehicle_type=VehicleType.motosiklet,
+        spec=VehicleSpecIn(
+            oil_spec="10W-40",
+            oil_capacity_l=2.4,
+            oil_drain_bolt_size="14mm",
+            oil_drain_location="motor karteri altı tahliye cıvatası",
+            oil_filter_part="örnek: 1WD-E3440-00",
+            air_filter_part="örnek: 1WD-14451-00",
+            cabin_filter_part=None,
+            spark_plug_part="örnek: NGK CPR8EA-9",
+            battery_spec="12V 7Ah (YTZ7S)",
+            battery_location="sele altı",
+            transmission_type="manuel",
+        ),
+    ),
 )
 
 
@@ -166,13 +253,17 @@ def find_spec(
     *,
     fuel_type: FuelType | None = None,
     engine_code: str | None = None,
+    vehicle_type: VehicleType | None = None,
 ) -> VehicleSpecIn | None:
     """Katalogda eşleşen aracın spec'ini döndürür; yoksa None.
 
     Eşleşme önceliği: motor kodu > yakıt türü > yıl aralığı.
+    vehicle_type verilirse (None=eski çağrı) yalnızca o türdeki kayıtlar dikkate
+    alınır (araba/motosiklet karışmasını önler).
     """
     make_n, model_n = make.strip().casefold(), model.strip().casefold()
     engine_n = engine_code.strip().casefold() if engine_code else None
+    vtype = vehicle_type or VehicleType.araba
 
     candidates = [
         e
@@ -180,6 +271,7 @@ def find_spec(
         if e.make.casefold() == make_n
         and e.model.casefold() == model_n
         and e.year_min <= year <= e.year_max
+        and e.vehicle_type == vtype
     ]
     if not candidates:
         return None

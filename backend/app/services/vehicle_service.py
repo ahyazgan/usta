@@ -54,6 +54,7 @@ async def create_vehicle(db: AsyncSession, user_id: int, payload: VehicleCreate)
         payload.year,
         fuel_type=payload.fuel_type,
         engine_code=payload.engine_code,
+        vehicle_type=payload.vehicle_type,
     )
     if spec_in is not None:
         vehicle.spec = VehicleSpec(**spec_in.model_dump())

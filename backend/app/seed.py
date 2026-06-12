@@ -75,6 +75,7 @@ async def seed() -> None:
             spec_in = find_spec(
                 data["make"], data["model"], data["year"],
                 fuel_type=data["fuel_type"], engine_code=data["engine_code"],
+                vehicle_type=data.get("vehicle_type"),
             )
             if spec_in is not None:
                 vehicle.spec = VehicleSpec(**spec_in.model_dump())

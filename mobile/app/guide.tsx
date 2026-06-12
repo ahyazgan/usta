@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Linking,
   Modal,
   Pressable,
   ScrollView,
@@ -250,7 +251,22 @@ export default function GuideScreen() {
                     {guide.parts.map((p) => (
                       <View key={p.label_tr} style={styles.prepRow}>
                         <Text style={styles.prepLabel}>{TR() ? p.label_tr : p.label_en}</Text>
-                        <Text style={styles.prepValue}>{p.value}</Text>
+                        <View style={styles.prepRight}>
+                          <Text style={styles.prepValue}>{p.value}</Text>
+                          {p.buy_url != null && (
+                            <Pressable
+                              accessibilityRole="link"
+                              onPress={() => {
+                                void capture('buy_link_tap', { part: p.label_tr });
+                                void Linking.openURL(p.buy_url!);
+                              }}
+                              style={({ pressed }) => [styles.buyLink, pressed && styles.pressed]}
+                            >
+                              <Ionicons name="cart-outline" size={13} color={theme.colors.success} />
+                              <Text style={styles.buyText}>{t('guide.prep.buy')}</Text>
+                            </Pressable>
+                          )}
+                        </View>
                       </View>
                     ))}
                   </>
@@ -534,13 +550,29 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: theme.colors.textSecondary,
   },
-  prepValue: {
+  prepRight: {
     flexShrink: 1,
+    alignItems: 'flex-end',
+    gap: 2,
+  },
+  prepValue: {
     textAlign: 'right',
     fontFamily: theme.fonts.body,
     fontSize: 13,
     fontWeight: '700',
     color: theme.colors.textPrimary,
+  },
+  buyLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    minHeight: 24,
+  },
+  buyText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 11,
+    fontWeight: '700',
+    color: theme.colors.success,
   },
   prepTools: {
     fontFamily: theme.fonts.body,

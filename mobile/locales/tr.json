@@ -91,7 +91,8 @@
     "prep": {
       "title": "Başlamadan önce hazırla",
       "parts": "Parçalar",
-      "tools": "Aletler"
+      "tools": "Aletler",
+      "buy": "Satın Al"
     },
     "next": "Yaptım, devam ▸",
     "finish": "Bitir ve kaydet",

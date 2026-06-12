@@ -145,11 +145,13 @@ class GuideStepOut(BaseModel):
 
 
 class PrepPartOut(BaseModel):
-    """Hazırlık listesi satırı: araca özel parça/sarf (etiket + değer)."""
+    """Hazırlık listesi satırı: araca özel parça/sarf (etiket + değer + satın-al)."""
 
     label_tr: str
     label_en: str
     value: str
+    # Affiliate iskeleti: parçayı satın al linki (yapılandırılabilir; yoksa null).
+    buy_url: str | None = None
 
 
 class TaskGuideOut(BaseModel):

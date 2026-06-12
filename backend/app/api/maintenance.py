@@ -5,6 +5,7 @@ from dataclasses import asdict
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ..config import get_settings
 from ..core.deps import get_current_user
 from ..core.rate_limit import enforce_rate_limit
 from ..database import get_db
@@ -129,7 +130,12 @@ async def task_guide(
         )
         for i, s in enumerate(guide.steps, start=1)
     ]
-    parts = [PrepPartOut(**p) for p in prep_parts_for_task(task_id, spec_values)]
+    parts = [
+        PrepPartOut(**p)
+        for p in prep_parts_for_task(
+            task_id, spec_values, get_settings().parts_buy_url_template
+        )
+    ]
     return TaskGuideOut(
         task_id=task.id,
         title_tr=task.title_tr,

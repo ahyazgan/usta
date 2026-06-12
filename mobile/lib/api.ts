@@ -169,6 +169,8 @@ export interface PrepPart {
   label_tr: string;
   label_en: string;
   value: string;
+  /** Affiliate skeleton: tappable buy link for this part (null = disabled). */
+  buy_url?: string | null;
 }
 
 /** Step-by-step guide for a maintenance task, tailored to a vehicle. */

@@ -91,7 +91,8 @@
     "prep": {
       "title": "Prep before you start",
       "parts": "Parts",
-      "tools": "Tools"
+      "tools": "Tools",
+      "buy": "Buy"
     },
     "next": "Done, next ▸",
     "finish": "Finish & log it",

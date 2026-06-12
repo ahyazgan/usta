@@ -73,7 +73,10 @@ async def test_guide_includes_prep_parts(client):
     values = {p["value"] for p in parts}
     assert "55256470" in values and "5W-30" in values  # yağ filtresi + motor yağı
     assert "Yağ filtresi" in {p["label_tr"] for p in parts}
-    assert {"label_tr", "label_en", "value"} <= parts[0].keys()
+    assert {"label_tr", "label_en", "value", "buy_url"} <= parts[0].keys()
+    # Affiliate iskeleti: varsayılan şablonla her parçada "Satın Al" linki var.
+    filt = next(p for p in parts if p["value"] == "55256470")
+    assert filt["buy_url"] is not None and "55256470" in filt["buy_url"]
 
     # Parça eşlemesi olmayan görevde liste boş.
     fren = (await client.get(f"/v1/vehicles/{vid}/tasks/brake_check/guide", headers=headers)).json()

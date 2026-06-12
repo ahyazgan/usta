@@ -38,6 +38,12 @@ class Settings(BaseSettings):
     # Kullanıcı-bazlı rate limit (dakikada istek)
     rate_limit_per_minute: int = 30
 
+    # Parça "Satın Al" linki (affiliate iskeleti). {q} = arama sorgusu.
+    # Şimdilik jenerik arama; affiliate anlaşması gelince env ile değiştir:
+    #   USTA_PARTS_BUY_URL_TEMPLATE="https://ORTAK.com/ara?q={q}&aff=USTA"
+    # Boş string → "Satın Al" linki gösterilmez.
+    parts_buy_url_template: str = "https://www.google.com/search?q={q}"
+
     @property
     def cors_origins(self) -> list[str]:
         return ["*"] if self.debug else [self.prod_cors_origin]

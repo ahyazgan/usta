@@ -158,9 +158,22 @@ export interface TaskGuide {
   title_en: string;
   risk: TaskRisk;
   est_minutes: number;
+  /** Estimated labour saved by doing it yourself (TRY) — celebration screen. */
+  diy_saving_try: number;
   steps: GuideStep[];
   mechanic_note_tr: string;
   mechanic_note_en: string;
+}
+
+/** A past AI diagnosis (image or sound), newest first. */
+export interface DiagnosisHistory {
+  id: number;
+  kind: 'image' | 'sound';
+  task: string | null;
+  tespit: string | null;
+  guven: Guven | null;
+  tamirciye_git: boolean | null;
+  created_at: string;
 }
 
 /** A maintenance reminder derived from logs + intervals. */
@@ -230,6 +243,8 @@ export interface ApiClient {
   getSummary(vehicleId: number): Promise<VehicleSummary>;
   /** Step-by-step guide for a task, filled with this vehicle's spec. */
   getGuide(vehicleId: number, taskId: string): Promise<TaskGuide>;
+  /** Recent AI diagnoses for this vehicle (image + sound), newest first. */
+  getDiagnoses(vehicleId: number): Promise<DiagnosisHistory[]>;
   listVehicles(): Promise<Vehicle[]>;
   createVehicle(input: VehicleCreateInput): Promise<Vehicle>;
   getVehicle(id: number): Promise<Vehicle>;
@@ -401,6 +416,13 @@ export function createApiClient(
         `/v1/vehicles/${vehicleId}/tasks/${taskId}/guide`,
         { method: 'GET', headers },
       );
+    },
+    async getDiagnoses(vehicleId) {
+      const headers = await authHeaders();
+      return request<DiagnosisHistory[]>(`/v1/vehicles/${vehicleId}/diagnoses`, {
+        method: 'GET',
+        headers,
+      });
     },
     async listVehicles() {
       const headers = await authHeaders();

@@ -98,7 +98,12 @@ class MaintenanceLog(Base):
 
 
 class AISession(Base):
-    """Her AI çağrısı için token kullanımını loglar (maliyet denetimi)."""
+    """Her AI çağrısı için token kullanımını + teşhis özetini loglar.
+
+    Token alanları maliyet denetimi içindir; özet alanlar (task/tespit/guven/
+    tamirciye_git) mobil "Teşhis Geçmişi" listesini besler. Özet, güvenlik
+    kuralları ZORLANDIKTAN SONRAKİ metinden yazılır.
+    """
 
     __tablename__ = "ai_sessions"
 
@@ -111,6 +116,11 @@ class AISession(Base):
     model: Mapped[str] = mapped_column(String(60), nullable=False)
     tokens_in: Mapped[int] = mapped_column(Integer, default=0)
     tokens_out: Mapped[int] = mapped_column(Integer, default=0)
+    # Teşhis özeti (geçmiş listesi için; eski kayıtlarda null olabilir).
+    task: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    tespit: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    guven: Mapped[str | None] = mapped_column(String(10), nullable=True)
+    tamirciye_git: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
 
 

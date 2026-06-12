@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -12,10 +12,12 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomTabBar } from '@/components/BottomTabBar';
-import type {
-  MaintenanceLog,
-  Reminder,
-  ReminderStatus,
+import {
+  createApiClient,
+  type DiagnosisHistory,
+  type MaintenanceLog,
+  type Reminder,
+  type ReminderStatus,
 } from '@/lib/api';
 import { i18n, t } from '@/lib/i18n';
 import { selectCurrentVehicle, useUstaStore } from '@/lib/store';
@@ -84,6 +86,33 @@ function ReminderRow({ reminder }: { reminder: Reminder }) {
   );
 }
 
+function DiagnosisRow({ item }: { item: DiagnosisHistory }) {
+  const icon = item.kind === 'image' ? 'camera' : 'pulse';
+  const metaParts = [
+    formatDate(item.created_at),
+    item.guven != null ? t(`camera.guven.${item.guven}`) : null,
+    item.task != null ? taskTitle(item.task) : null,
+  ].filter(Boolean);
+  return (
+    <View style={styles.diagRow}>
+      <View style={styles.diagIcon}>
+        <Ionicons name={icon} size={16} color={theme.colors.textSecondary} />
+      </View>
+      <View style={styles.diagBody}>
+        <Text style={styles.diagText} numberOfLines={2}>
+          {item.tespit}
+        </Text>
+        <Text style={styles.diagMeta}>{metaParts.join(' · ')}</Text>
+      </View>
+      {item.tamirciye_git === true && (
+        <View style={styles.diagPill}>
+          <Text style={styles.diagPillText}>{t('history.diagnoses.mechanic')}</Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
 function LogRow({ log }: { log: MaintenanceLog }) {
   const km =
     log.km != null
@@ -125,6 +154,28 @@ export default function HistoryScreen() {
   const [task, setTask] = useState<string>(FALLBACK_TASK_IDS[0]);
   const [km, setKm] = useState('');
   const [note, setNote] = useState('');
+
+  // Teşhis geçmişi (görüntü + ses) — hata sessizce boş listeye düşer.
+  const authToken = useUstaStore((s) => s.authToken);
+  const diagClient = useMemo(
+    () => createApiClient(undefined, () => authToken),
+    [authToken],
+  );
+  const [diagnoses, setDiagnoses] = useState<DiagnosisHistory[]>([]);
+  const loadDiagnoses = useCallback(async () => {
+    if (vehicle == null) {
+      setDiagnoses([]);
+      return;
+    }
+    try {
+      setDiagnoses(await diagClient.getDiagnoses(vehicle.id));
+    } catch {
+      setDiagnoses([]);
+    }
+  }, [diagClient, vehicle]);
+  useEffect(() => {
+    void loadDiagnoses();
+  }, [loadDiagnoses]);
 
   async function handleAdd() {
     if (submitting) return;
@@ -205,6 +256,21 @@ export default function HistoryScreen() {
               <View style={styles.card}>
                 {logs.map((log) => (
                   <LogRow key={log.id} log={log} />
+                ))}
+              </View>
+            )}
+
+            <Text style={styles.sectionTitle}>{t('history.diagnoses.title')}</Text>
+            {diagnoses.length === 0 ? (
+              <View style={styles.emptyBox}>
+                <Ionicons name="scan-outline" size={28} color={theme.colors.textSecondary} />
+                <Text style={styles.empty}>{t('history.diagnoses.empty')}</Text>
+                <Text style={styles.emptyHint}>{t('history.diagnoses.emptyHint')}</Text>
+              </View>
+            ) : (
+              <View style={styles.card}>
+                {diagnoses.map((item) => (
+                  <DiagnosisRow key={item.id} item={item} />
                 ))}
               </View>
             )}
@@ -390,6 +456,47 @@ const styles = StyleSheet.create({
   },
   statusMuted: {
     opacity: 0.6,
+  },
+  diagRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: theme.spacing.md,
+    paddingVertical: theme.spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: theme.colors.border,
+  },
+  diagIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: theme.radius.sm,
+    backgroundColor: theme.colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  diagBody: { flex: 1 },
+  diagText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    lineHeight: 19,
+    color: theme.colors.textPrimary,
+  },
+  diagMeta: {
+    fontFamily: theme.fonts.body,
+    fontSize: 11,
+    color: theme.colors.textSecondary,
+    marginTop: 2,
+  },
+  diagPill: {
+    backgroundColor: theme.colors.urgentSoftBg,
+    borderRadius: theme.radius.pill,
+    paddingVertical: 2,
+    paddingHorizontal: theme.spacing.sm,
+  },
+  diagPillText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 10,
+    fontWeight: '700',
+    color: theme.colors.urgentSoftText,
   },
   logRow: {
     paddingVertical: theme.spacing.md,

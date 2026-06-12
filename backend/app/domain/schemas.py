@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 from .enums import (
     Aciliyet,
+    AIKind,
     FuelType,
     Guven,
     KayitKosulu,
@@ -138,10 +139,26 @@ class TaskGuideOut(BaseModel):
     title_en: str
     risk: Aciliyet
     est_minutes: int
+    # Bu işi kendin yapınca tahmini işçilik tasarrufu (TL) — bitiş ekranında gösterilir.
+    diy_saving_try: int
     steps: list[GuideStepOut]
     # Zorunlu "vazgeç, tamirciye git" çıkışı.
     mechanic_note_tr: str
     mechanic_note_en: str
+
+
+class DiagnosisHistoryOut(BaseModel):
+    """Geçmiş AI teşhisi özeti (görüntü veya ses)."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    kind: AIKind
+    task: str | None
+    tespit: str | None
+    guven: Guven | None
+    tamirciye_git: bool | None
+    created_at: datetime
 
 
 # --------------------------------------------------------------------------- #

@@ -52,7 +52,13 @@
     "torqueLabel": "Tork:",
     "verifyCta": "Doğru yeri buldun mu? Kamerayı tut, kontrol edeyim.",
     "next": "Yaptım, devam ▸",
-    "finish": "Bitir ve kaydet"
+    "finish": "Bitir ve kaydet",
+    "done": {
+      "title": "Eline sağlık! 🔧",
+      "desc": "{{task}} tamamlandı ve bakım geçmişine kaydedildi.",
+      "savings": "+₺{{amount}} cebinde kaldı",
+      "cta": "Garaja dön"
+    }
   },
   "diagnosis": {
     "title": "Neyin var?",
@@ -250,6 +256,12 @@
       "emptyHint": "Bir bakım rehberini tamamla ya da aşağıdan elle kayıt ekle.",
       "kmValue": "{{km}} km",
       "noKm": "Km yok"
+    },
+    "diagnoses": {
+      "title": "Teşhis Geçmişi",
+      "empty": "Henüz AI teşhisi yok",
+      "emptyHint": "Kamerayla doğrulama ya da ses teşhisi yaptıkça burada listelenir.",
+      "mechanic": "Tamirci"
     },
     "addLog": {
       "title": "Kayıt Ekle",

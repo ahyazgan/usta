@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -85,6 +86,8 @@ export default function GuideScreen() {
     selectedTask != null ? (guideProgress[selectedTask.id] ?? 0) : 0,
   );
   const [finishing, setFinishing] = useState(false);
+  // Bitiş kutlaması: bakım kaydedildi, tasarruf göster, garaja dön.
+  const [celebrating, setCelebrating] = useState(false);
 
   // Adım değiştikçe ilerlemeyi hatırla.
   useEffect(() => {
@@ -129,7 +132,7 @@ export default function GuideScreen() {
       setCurrent((c) => c + 1);
       return;
     }
-    // Son adım: bakımı geçmişe işle (tasarruf bandını besler) ve eve dön.
+    // Son adım: bakımı geçmişe işle (tasarruf bandını besler) ve kutla.
     if (finishing) return;
     setFinishing(true);
     try {
@@ -142,6 +145,12 @@ export default function GuideScreen() {
     }
     setFinishing(false);
     clearGuideProgress(guide.task_id); // bitti — sonraki sefer baştan
+    setCelebrating(true);
+  }
+
+  function backToGarage() {
+    setCelebrating(false);
+    // Ana sayfa yeniden mount olur -> hatırlatıcı/tasarruf/sağlık tazelenir.
     router.replace('/');
   }
 
@@ -257,6 +266,44 @@ export default function GuideScreen() {
               </Text>
             </View>
           </ScrollView>
+
+          {/* Bitiş kutlaması */}
+          <Modal
+            visible={celebrating}
+            transparent
+            animationType="fade"
+            onRequestClose={backToGarage}
+          >
+            <View style={styles.celebrateBackdrop}>
+              <View style={styles.celebrateCard}>
+                <View style={styles.celebrateIcon}>
+                  <Ionicons name="trophy" size={36} color={theme.colors.warningBright} />
+                </View>
+                <Text style={styles.celebrateTitle}>{t('guide.done.title')}</Text>
+                <Text style={styles.celebrateDesc}>
+                  {t('guide.done.desc', { task: title })}
+                </Text>
+                {guide.diy_saving_try > 0 && (
+                  <View style={styles.celebrateSavings}>
+                    <Ionicons name="trending-up" size={18} color={theme.colors.savingsText} />
+                    <Text style={styles.celebrateSavingsText}>
+                      {t('guide.done.savings', {
+                        amount: guide.diy_saving_try.toLocaleString('tr-TR'),
+                      })}
+                    </Text>
+                  </View>
+                )}
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={backToGarage}
+                  style={({ pressed }) => [styles.celebrateCta, pressed && styles.pressed]}
+                >
+                  <Ionicons name="home" size={18} color={theme.colors.onInk} />
+                  <Text style={styles.celebrateCtaText}>{t('guide.done.cta')}</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
 
           {/* Alt eylemler */}
           <View style={[styles.footer, { paddingBottom: insets.bottom + theme.spacing.md }]}>
@@ -519,4 +566,75 @@ const styles = StyleSheet.create({
   },
   btnDisabled: { opacity: 0.4 },
   pressed: { opacity: 0.85 },
+  celebrateBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: theme.spacing.xl,
+  },
+  celebrateCard: {
+    width: '100%',
+    maxWidth: 360,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.xl,
+    alignItems: 'center',
+    gap: theme.spacing.md,
+  },
+  celebrateIcon: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: theme.colors.warnSoftBg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  celebrateTitle: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 22,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  celebrateDesc: {
+    fontFamily: theme.fonts.body,
+    fontSize: 14,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 21,
+  },
+  celebrateSavings: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    backgroundColor: theme.colors.savingsBg,
+    borderWidth: 1,
+    borderColor: theme.colors.savingsBorder,
+    borderRadius: theme.radius.md,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.lg,
+  },
+  celebrateSavingsText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 14,
+    fontWeight: '700',
+    color: theme.colors.savingsText,
+  },
+  celebrateCta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.sm,
+    minHeight: theme.touchTarget,
+    alignSelf: 'stretch',
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.ink,
+    marginTop: theme.spacing.sm,
+  },
+  celebrateCtaText: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.onInk,
+  },
 });

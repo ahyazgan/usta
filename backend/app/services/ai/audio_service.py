@@ -38,20 +38,29 @@ async def diagnose_sound(
 
     result = await claude.complete_json(model=model, system=system, content=user_text)
 
-    db.add(
-        AISession(
-            user_id=user.id,
-            vehicle_id=vehicle.id,
-            kind=AIKind.sound,
-            model=model,
-            tokens_in=result.tokens_in,
-            tokens_out=result.tokens_out,
-        )
+    # Token + teşhis özeti loglama (maliyet denetimi + "Teşhis Geçmişi").
+    session = AISession(
+        user_id=user.id,
+        vehicle_id=vehicle.id,
+        kind=AIKind.sound,
+        model=model,
+        tokens_in=result.tokens_in,
+        tokens_out=result.tokens_out,
     )
-    await db.commit()
 
     try:
         parsed = SoundDiagnoseResponse(**result.data)
     except ValidationError as exc:
+        # Şema bozuk olsa da token maliyetini kaybetme.
+        db.add(session)
+        await db.commit()
         raise AIUpstreamError("AI yanıtı beklenen şemada değil.") from exc
-    return enforce_sound_safety(parsed, context=payload.user_description)
+
+    final = enforce_sound_safety(parsed, context=payload.user_description)
+    # Özet, güvenlik kuralları zorlandıktan SONRAKİ metinden yazılır.
+    session.tespit = final.tespit[:500]
+    session.guven = final.guven.value
+    session.tamirciye_git = final.tamirciye_git_onerisi
+    db.add(session)
+    await db.commit()
+    return final

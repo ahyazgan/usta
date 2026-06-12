@@ -9,8 +9,12 @@ from ..core.deps import get_current_user
 from ..core.rate_limit import enforce_rate_limit
 from ..database import get_db
 from ..domain.models import User
+from sqlalchemy import select
+
 from ..domain.guides import fill_template, get_guide
+from ..domain.models import AISession
 from ..domain.schemas import (
+    DiagnosisHistoryOut,
     GuideStepOut,
     MaintenanceLogCreate,
     MaintenanceLogOut,
@@ -122,10 +126,35 @@ async def task_guide(
         title_en=task.title_en,
         risk=task.risk,
         est_minutes=guide.est_minutes,
+        diy_saving_try=task.diy_saving_try,
         steps=steps,
         mechanic_note_tr=guide.mechanic_note_tr,
         mechanic_note_en=guide.mechanic_note_en,
     )
+
+
+@router.get("/diagnoses", response_model=list[DiagnosisHistoryOut])
+async def diagnosis_history(
+    vehicle_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> list[DiagnosisHistoryOut]:
+    """Bu aracın son AI teşhisleri (görüntü + ses), yeniden eskiye, en çok 20.
+
+    Eski kayıtlarda özet alanlar boş olabilir; içeriksiz satırlar listelenmez.
+    """
+    await vehicle_service.get_owned(db, user.id, vehicle_id)
+    rows = await db.scalars(
+        select(AISession)
+        .where(
+            AISession.vehicle_id == vehicle_id,
+            AISession.user_id == user.id,
+            AISession.tespit.is_not(None),
+        )
+        .order_by(AISession.created_at.desc(), AISession.id.desc())
+        .limit(20)
+    )
+    return [DiagnosisHistoryOut.model_validate(r) for r in rows]
 
 
 @router.get("/summary", response_model=VehicleSummaryOut)

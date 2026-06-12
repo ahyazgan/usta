@@ -52,7 +52,13 @@
     "torqueLabel": "Torque:",
     "verifyCta": "Found the right spot? Point the camera, I'll check.",
     "next": "Done, next ▸",
-    "finish": "Finish & log it"
+    "finish": "Finish & log it",
+    "done": {
+      "title": "Nice work! 🔧",
+      "desc": "{{task}} is done and saved to your history.",
+      "savings": "+₺{{amount}} kept in your pocket",
+      "cta": "Back to garage"
+    }
   },
   "diagnosis": {
     "title": "What's wrong?",
@@ -250,6 +256,12 @@
       "emptyHint": "Finish a maintenance guide or add an entry manually below.",
       "kmValue": "{{km}} km",
       "noKm": "No km"
+    },
+    "diagnoses": {
+      "title": "Diagnosis History",
+      "empty": "No AI diagnoses yet",
+      "emptyHint": "Camera verifications and sound diagnoses will be listed here.",
+      "mechanic": "Mechanic"
     },
     "addLog": {
       "title": "Add Entry",

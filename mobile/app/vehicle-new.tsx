@@ -13,6 +13,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { FuelType } from '@/lib/api';
+import { formatTrDate, parseTrDate } from '@/lib/dateReminders';
 import { t } from '@/lib/i18n';
 import { goBack } from '@/lib/nav';
 import { useUstaStore } from '@/lib/store';
@@ -54,6 +55,8 @@ export default function VehicleNewScreen() {
   const [km, setKm] = useState(
     editVehicle?.current_km != null ? String(editVehicle.current_km) : '',
   );
+  const [muayene, setMuayene] = useState(formatTrDate(editVehicle?.muayene_date ?? null));
+  const [sigorta, setSigorta] = useState(formatTrDate(editVehicle?.sigorta_date ?? null));
 
   const [submitting, setSubmitting] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -74,6 +77,16 @@ export default function VehicleNewScreen() {
       setValidationError('vehicle.form.validation');
       return;
     }
+    // Tarihler: boş = temizle (null); doluysa geçerli GG.AA.YYYY olmalı.
+    const muayene_date = muayene.trim().length > 0 ? parseTrDate(muayene) : null;
+    const sigorta_date = sigorta.trim().length > 0 ? parseTrDate(sigorta) : null;
+    if (
+      (muayene.trim().length > 0 && muayene_date == null) ||
+      (sigorta.trim().length > 0 && sigorta_date == null)
+    ) {
+      setValidationError('vehicle.form.dateValidation');
+      return;
+    }
     setValidationError(null);
 
     const parsedKm = km.trim().length > 0 ? Number(km.trim()) : undefined;
@@ -91,6 +104,8 @@ export default function VehicleNewScreen() {
       engine_code:
         engineCode.trim().length > 0 ? engineCode.trim() : undefined,
       current_km,
+      muayene_date,
+      sigorta_date,
     };
 
     setSubmitting(true);
@@ -242,6 +257,33 @@ export default function VehicleNewScreen() {
           keyboardType="number-pad"
         />
 
+        <View style={styles.dateRow}>
+          <View style={styles.dateCol}>
+            <Text style={styles.label}>{t('vehicle.form.muayene')}</Text>
+            <TextInput
+              style={styles.input}
+              value={muayene}
+              onChangeText={setMuayene}
+              placeholder={t('vehicle.form.datePlaceholder')}
+              placeholderTextColor={theme.colors.textSecondary}
+              keyboardType="numbers-and-punctuation"
+              maxLength={10}
+            />
+          </View>
+          <View style={styles.dateCol}>
+            <Text style={styles.label}>{t('vehicle.form.sigorta')}</Text>
+            <TextInput
+              style={styles.input}
+              value={sigorta}
+              onChangeText={setSigorta}
+              placeholder={t('vehicle.form.datePlaceholder')}
+              placeholderTextColor={theme.colors.textSecondary}
+              keyboardType="numbers-and-punctuation"
+              maxLength={10}
+            />
+          </View>
+        </View>
+
         {errorKey && (
           <View style={styles.errorBox}>
             <Ionicons
@@ -357,6 +399,13 @@ const styles = StyleSheet.create({
     fontFamily: theme.fonts.body,
     fontSize: 16,
     color: theme.colors.textPrimary,
+  },
+  dateRow: {
+    flexDirection: 'row',
+    gap: theme.spacing.md,
+  },
+  dateCol: {
+    flex: 1,
   },
   fuelRow: {
     flexDirection: 'row',

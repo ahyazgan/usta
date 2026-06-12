@@ -1,9 +1,10 @@
 """ORM modelleri (SQLAlchemy 2.0 tipli)."""
 
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 from sqlalchemy import (
     Boolean,
+    Date,
     DateTime,
     Enum as SAEnum,
     Float,
@@ -47,6 +48,9 @@ class Vehicle(Base):
     year: Mapped[int] = mapped_column(Integer, nullable=False)
     plate: Mapped[str | None] = mapped_column(String(15), nullable=True)
     engine_code: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    # Tarih-bazlı hatırlatıcılar (ISO YYYY-MM-DD; km değil takvim).
+    muayene_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    sigorta_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     fuel_type: Mapped[FuelType] = mapped_column(SAEnum(FuelType), nullable=False)
     current_km: Mapped[int | None] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)

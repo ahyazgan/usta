@@ -227,6 +227,9 @@ export interface Vehicle {
   fuel_type: FuelType;
   engine_code: string | null;
   current_km: number | null;
+  /** ISO YYYY-MM-DD — date-based reminders (inspection / insurance). */
+  muayene_date: string | null;
+  sigorta_date: string | null;
   spec: VehicleSpec | null;
 }
 
@@ -239,6 +242,9 @@ export interface VehicleCreateInput {
   fuel_type: FuelType;
   engine_code?: string;
   current_km?: number;
+  /** ISO YYYY-MM-DD, or null to clear. */
+  muayene_date?: string | null;
+  sigorta_date?: string | null;
 }
 
 export type GetToken = () => string | null | Promise<string | null>;

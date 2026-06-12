@@ -34,6 +34,14 @@
     "kmModal": {
       "title": "Update mileage",
       "placeholder": "e.g. 85200"
+    },
+    "dates": {
+      "title": "Calendar",
+      "muayene": "Inspection",
+      "sigorta": "Insurance",
+      "remaining": "{{days}} days left",
+      "today": "Today!",
+      "overdue": "{{days}} days overdue"
     }
   },
   "maintenance": {
@@ -151,10 +159,14 @@
       "engineCodePlaceholder": "e.g. K9K",
       "km": "Mileage (optional)",
       "kmPlaceholder": "e.g. 138420",
+      "muayene": "Inspection (opt.)",
+      "sigorta": "Insurance (opt.)",
+      "datePlaceholder": "DD.MM.YYYY",
       "fuel": "Fuel",
       "save": "Save",
       "specAutoHint": "Specs are auto-filled for known TR vehicles.",
-      "validation": "Please enter make, model, year (1950–2100) and fuel type."
+      "validation": "Please enter make, model, year (1950–2100) and fuel type.",
+      "dateValidation": "Enter dates as DD.MM.YYYY (e.g. 15.03.2027)."
     },
     "error": {
       "network": "No connection — check your internet",
@@ -332,6 +344,10 @@
   "feedback": {
     "question": "Was this diagnosis right?",
     "thanks": "Thanks — recorded 🙌"
+  },
+  "notifications": {
+    "title": "Usta reminder 🔧",
+    "body": "{{name}} {{label}} is coming up: {{date}} ({{days}} days left)."
   },
   "common": {
     "loading": "Loading…",

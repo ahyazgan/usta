@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -16,8 +16,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomTabBar } from '@/components/BottomTabBar';
 import { type Reminder, type Vehicle } from '@/lib/api';
+import { dateStatus, daysUntil, formatTrDate } from '@/lib/dateReminders';
 import { ensureDemoSession } from '@/lib/demoSession';
 import { t } from '@/lib/i18n';
+import { syncVehicleReminders } from '@/lib/notifications';
 import { useUstaStore } from '@/lib/store';
 import { TASK_ICON } from '@/lib/taskIcons';
 import { theme } from '@/lib/theme';
@@ -74,6 +76,50 @@ const STATUS_PRIORITY: Record<GarageChipState, number> = {
   ok: 3,
 };
 
+/** Takvim (tarih) hatırlatıcı satırı — muayene / sigorta. */
+function DateRow({
+  icon,
+  label,
+  iso,
+  onPress,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  label: string;
+  iso: string;
+  onPress: () => void;
+}) {
+  const status = dateStatus(iso);
+  const days = daysUntil(iso);
+  const badge = badgeStyle(status as GarageChipState);
+  const meta =
+    days < 0
+      ? t('home.dates.overdue', { days: Math.abs(days) })
+      : days === 0
+        ? t('home.dates.today')
+        : t('home.dates.remaining', { days });
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => [styles.taskRow, pressed && styles.pressed]}
+    >
+      <View style={[styles.taskIcon, { backgroundColor: badge.bg }]}>
+        <Ionicons name={icon} size={18} color={badge.fg} />
+      </View>
+      <View style={styles.taskBody}>
+        <View style={styles.taskTitleRow}>
+          <Text style={styles.taskTitle}>{label}</Text>
+          <View style={[styles.badge, { backgroundColor: badge.bg }]}>
+            <Text style={[styles.badgeText, { color: badge.fg }]}>{formatTrDate(iso)}</Text>
+          </View>
+        </View>
+        <Text style={styles.taskMeta}>{meta}</Text>
+      </View>
+      <Ionicons name="chevron-forward" size={18} color={theme.colors.border} />
+    </Pressable>
+  );
+}
+
 function TaskRow({ reminder, onPress }: { reminder: Reminder; onPress: () => void }) {
   const badge = badgeStyle(reminder.status);
   return (
@@ -124,10 +170,20 @@ export default function HomeScreen() {
   const { chips, reminders } = useGarageStatus(currentVehicle?.id ?? null);
   const summary = useSummary(currentVehicle?.id ?? null);
 
+  // Araç tarihleri değiştikçe yerel bildirimleri yeniden planla (web'de no-op).
+  useEffect(() => {
+    if (vehicles.length > 0) void syncVehicleReminders(vehicles);
+  }, [vehicles]);
+
   // Km hızlı güncelleme modalı (km rozetine dokun → yaz → kaydet).
   const [kmModalOpen, setKmModalOpen] = useState(false);
   const [kmInput, setKmInput] = useState('');
   const [kmSaving, setKmSaving] = useState(false);
+
+  function handleEditCurrent() {
+    if (currentVehicle == null) return;
+    router.push({ pathname: '/vehicle-new', params: { id: String(currentVehicle.id) } });
+  }
 
   function openKmModal() {
     if (currentVehicle == null) return;
@@ -384,6 +440,29 @@ export default function HomeScreen() {
               onPress={() => router.replace('/maintenance')}
             />
           ))
+        )}
+
+        {/* Takvim — muayene / sigorta (tarih bazlı) */}
+        {(currentVehicle.muayene_date != null || currentVehicle.sigorta_date != null) && (
+          <>
+            <Text style={styles.sectionTitle}>{t('home.dates.title')}</Text>
+            {currentVehicle.muayene_date != null && (
+              <DateRow
+                icon="clipboard"
+                label={t('home.dates.muayene')}
+                iso={currentVehicle.muayene_date}
+                onPress={() => handleEditCurrent()}
+              />
+            )}
+            {currentVehicle.sigorta_date != null && (
+              <DateRow
+                icon="shield-checkmark"
+                label={t('home.dates.sigorta')}
+                iso={currentVehicle.sigorta_date}
+                onPress={() => handleEditCurrent()}
+              />
+            )}
+          </>
         )}
 
         {/* Tasarruf bandı — gerçek loglardan tahmini DIY tasarrufu */}

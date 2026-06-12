@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import sys
+from datetime import date, timedelta
 
 from sqlalchemy import select
 
@@ -25,9 +26,13 @@ from .domain.models import User, Vehicle, VehicleSpec
 DEMO_EMAIL = "demo@usta.app"
 DEMO_PASSWORD = "demoparola1234"
 
+# Demo tarihleri bugüne göreli — biri yaklaşan (sigorta), biri ileride (muayene).
+_TODAY = date.today()
 DEMO_VEHICLES = [
-    {"make": "Fiat", "model": "Egea", "year": 2019, "plate": "34 ABC 123", "fuel_type": FuelType.lpg, "engine_code": "843A1000", "current_km": 84210},
-    {"make": "Renault", "model": "Clio", "year": 2018, "plate": "06 XYZ 45", "fuel_type": FuelType.dizel, "engine_code": "K9K", "current_km": 138420},
+    {"make": "Fiat", "model": "Egea", "year": 2019, "plate": "34 ABC 123", "fuel_type": FuelType.lpg, "engine_code": "843A1000", "current_km": 84210,
+     "muayene_date": _TODAY + timedelta(days=120), "sigorta_date": _TODAY + timedelta(days=18)},
+    {"make": "Renault", "model": "Clio", "year": 2018, "plate": "06 XYZ 45", "fuel_type": FuelType.dizel, "engine_code": "K9K", "current_km": 138420,
+     "muayene_date": _TODAY + timedelta(days=45), "sigorta_date": _TODAY + timedelta(days=200)},
     {"make": "Toyota", "model": "Corolla", "year": 2016, "plate": "35 KL 1234", "fuel_type": FuelType.benzin, "engine_code": "1ZR-FAE", "current_km": 96000},
 ]
 

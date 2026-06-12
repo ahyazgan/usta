@@ -34,6 +34,14 @@
     "kmModal": {
       "title": "Kilometreyi güncelle",
       "placeholder": "Örn: 85200"
+    },
+    "dates": {
+      "title": "Takvim",
+      "muayene": "Muayene",
+      "sigorta": "Sigorta",
+      "remaining": "{{days}} gün kaldı",
+      "today": "Bugün!",
+      "overdue": "{{days}} gün geçti"
     }
   },
   "maintenance": {
@@ -151,10 +159,14 @@
       "engineCodePlaceholder": "Örn: K9K",
       "km": "Kilometre (isteğe bağlı)",
       "kmPlaceholder": "Örn: 138420",
+      "muayene": "Muayene (ist.)",
+      "sigorta": "Sigorta (ist.)",
+      "datePlaceholder": "GG.AA.YYYY",
       "fuel": "Yakıt",
       "save": "Kaydet",
       "specAutoHint": "Bilinen TR araçları için teknik özellikler otomatik doldurulur.",
-      "validation": "Lütfen marka, model, yıl (1950–2100) ve yakıt türünü gir."
+      "validation": "Lütfen marka, model, yıl (1950–2100) ve yakıt türünü gir.",
+      "dateValidation": "Tarihleri GG.AA.YYYY biçiminde gir (örn. 15.03.2027)."
     },
     "error": {
       "network": "Bağlantı yok — internetini kontrol et",
@@ -332,6 +344,10 @@
   "feedback": {
     "question": "Bu teşhis doğru çıktı mı?",
     "thanks": "Teşekkürler — kaydedildi 🙌"
+  },
+  "notifications": {
+    "title": "Usta hatırlatıyor 🔧",
+    "body": "{{name}} {{label}} tarihi yaklaşıyor: {{date}} ({{days}} gün kaldı)."
   },
   "common": {
     "loading": "Yükleniyor…",

@@ -30,6 +30,9 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 # idempotent ADD COLUMN ifadeleriyle kapatıyoruz. (tablo, kolon, tip)
 _COLUMN_MIGRATIONS: tuple[tuple[str, str, str], ...] = (
     ("vehicles", "plate", "VARCHAR(15)"),
+    # Tarih-bazlı hatırlatıcılar (muayene / sigorta).
+    ("vehicles", "muayene_date", "DATE"),
+    ("vehicles", "sigorta_date", "DATE"),
     # Teşhis geçmişi özeti (AISession).
     ("ai_sessions", "task", "VARCHAR(60)"),
     ("ai_sessions", "tespit", "VARCHAR(500)"),

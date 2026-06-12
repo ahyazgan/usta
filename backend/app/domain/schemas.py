@@ -3,7 +3,7 @@
 AI yanıt şemaları ürün spesifikasyonuyla bire bir eşleşir.
 """
 
-from datetime import datetime
+from datetime import date, datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
@@ -84,6 +84,8 @@ class VehicleCreate(BaseModel):
     fuel_type: FuelType
     engine_code: str | None = Field(default=None, max_length=40)
     current_km: int | None = Field(default=None, ge=0)
+    muayene_date: date | None = None
+    sigorta_date: date | None = None
     spec: VehicleSpecIn | None = None
 
 
@@ -95,6 +97,8 @@ class VehicleUpdate(BaseModel):
     fuel_type: FuelType | None = None
     engine_code: str | None = Field(default=None, max_length=40)
     current_km: int | None = Field(default=None, ge=0)
+    muayene_date: date | None = None
+    sigorta_date: date | None = None
 
 
 class VehicleOut(BaseModel):
@@ -108,6 +112,8 @@ class VehicleOut(BaseModel):
     fuel_type: FuelType
     engine_code: str | None
     current_km: int | None
+    muayene_date: date | None
+    sigorta_date: date | None
     spec: VehicleSpecOut | None = None
 
 

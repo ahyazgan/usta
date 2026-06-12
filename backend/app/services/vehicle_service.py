@@ -43,6 +43,8 @@ async def create_vehicle(db: AsyncSession, user_id: int, payload: VehicleCreate)
         fuel_type=payload.fuel_type,
         engine_code=payload.engine_code,
         current_km=payload.current_km,
+        muayene_date=payload.muayene_date,
+        sigorta_date=payload.sigorta_date,
     )
     # Spec verilmediyse TR araç parkı kataloğundan otomatik doldurmayı dene.
     spec_in = payload.spec or find_spec(

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from .enums import Aciliyet, FuelType
+from .enums import Aciliyet, FuelType, VehicleType
 
 
 @dataclass(slots=True, frozen=True)
@@ -21,12 +21,16 @@ class MaintenanceTask:
     prompt_file: str  # backend/prompts/ altına görelidir
     # Boş demet = tüm yakıtlara uygulanır.
     applies_to_fuels: tuple[FuelType, ...] = field(default=())
+    # Boş demet = tüm araç türlerine uygulanır (araba + motosiklet).
+    applies_to_types: tuple[VehicleType, ...] = field(default=())
     # Bu işi kendin yapınca tasarruf edilen yaklaşık işçilik (TL) — tahmini.
     diy_saving_try: int = 0
 
 
 _ALL_COMBUSTION = (FuelType.benzin, FuelType.dizel, FuelType.lpg, FuelType.hibrit)
 _SPARK = (FuelType.benzin, FuelType.lpg, FuelType.hibrit)  # bujili motorlar
+_CAR_ONLY = (VehicleType.araba,)
+_MOTO_ONLY = (VehicleType.motosiklet,)
 
 TASKS: tuple[MaintenanceTask, ...] = (
     MaintenanceTask(
@@ -56,7 +60,7 @@ TASKS: tuple[MaintenanceTask, ...] = (
     ),
     MaintenanceTask(
         "cabin_filter", "Polen Filtresi", "Cabin Filter", Aciliyet.dusuk,
-        "vision/cabin_filter.md",  # tüm yakıtlar
+        "vision/cabin_filter.md", applies_to_types=_CAR_ONLY,  # motosiklette kabin yok
         diy_saving_try=200,
     ),
     MaintenanceTask(
@@ -71,13 +75,18 @@ TASKS: tuple[MaintenanceTask, ...] = (
     ),
     MaintenanceTask(
         "wiper", "Silecek", "Wiper Blades", Aciliyet.dusuk,
-        "vision/wiper.md",  # tüm yakıtlar
+        "vision/wiper.md", applies_to_types=_CAR_ONLY,  # motosiklette silecek yok
         diy_saving_try=100,
     ),
     MaintenanceTask(
         "headlight", "Far / Ampul", "Headlight", Aciliyet.orta,
-        "vision/headlight.md",  # tüm yakıtlar
+        "vision/headlight.md",  # tüm araçlar
         diy_saving_try=200,
+    ),
+    MaintenanceTask(
+        "chain", "Zincir Bakımı", "Chain Maintenance", Aciliyet.orta,
+        "vision/chain.md", applies_to_types=_MOTO_ONLY,  # yalnızca motosiklet
+        diy_saving_try=150,
     ),
 )
 
@@ -93,5 +102,21 @@ def get_task(task_id: str) -> MaintenanceTask | None:
 
 
 def tasks_for_fuel(fuel: FuelType) -> tuple[MaintenanceTask, ...]:
-    """Bir yakıt türüne uygulanabilir görevleri döndürür."""
+    """Bir yakıt türüne uygulanabilir görevleri döndürür (geriye dönük)."""
     return tuple(t for t in TASKS if not t.applies_to_fuels or fuel in t.applies_to_fuels)
+
+
+def tasks_for_vehicle(
+    fuel: FuelType, vehicle_type: VehicleType | None
+) -> tuple[MaintenanceTask, ...]:
+    """Bir aracın yakıtına VE türüne uygulanabilir görevler.
+
+    vehicle_type None ise (eski kayıtlar) araba kabul edilir.
+    """
+    vtype = vehicle_type or VehicleType.araba
+    return tuple(
+        t
+        for t in TASKS
+        if (not t.applies_to_fuels or fuel in t.applies_to_fuels)
+        and (not t.applies_to_types or vtype in t.applies_to_types)
+    )

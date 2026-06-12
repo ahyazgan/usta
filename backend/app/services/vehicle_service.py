@@ -41,6 +41,7 @@ async def create_vehicle(db: AsyncSession, user_id: int, payload: VehicleCreate)
         year=payload.year,
         plate=payload.plate,
         fuel_type=payload.fuel_type,
+        vehicle_type=payload.vehicle_type,
         engine_code=payload.engine_code,
         current_km=payload.current_km,
         muayene_date=payload.muayene_date,

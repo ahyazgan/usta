@@ -16,6 +16,14 @@ class FuelType(str, Enum):
     elektrik = "elektrik"
 
 
+class VehicleType(str, Enum):
+    """Araç türü — görev uygunluğunu etkiler (motosiklette polen filtresi/silecek
+    yok; zincir bakımı yalnızca motosiklette)."""
+
+    araba = "araba"
+    motosiklet = "motosiklet"
+
+
 class Guven(str, Enum):
     """AI güven seviyesi — kesin teşhis dili yerine kademeli."""
 

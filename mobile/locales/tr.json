@@ -130,7 +130,8 @@
       "coolant": "Soğutma Sıvısı",
       "tire": "Lastik Kontrolü",
       "wiper": "Silecek",
-      "headlight": "Far / Ampul"
+      "headlight": "Far / Ampul",
+      "chain": "Zincir Bakımı"
     },
     "cta": "Ustaya Göster"
   },
@@ -159,6 +160,10 @@
       "hibrit": "Hibrit",
       "elektrik": "Elektrik"
     },
+    "type": {
+      "araba": "Araba",
+      "motosiklet": "Motosiklet"
+    },
     "form": {
       "title": "Araç Ekle",
       "make": "Marka",
@@ -171,6 +176,7 @@
       "platePlaceholder": "Örn: 34 ABC 123",
       "engineCode": "Motor kodu (isteğe bağlı)",
       "engineCodePlaceholder": "Örn: K9K",
+      "type": "Tür",
       "km": "Kilometre (isteğe bağlı)",
       "kmPlaceholder": "Örn: 138420",
       "muayene": "Muayene (ist.)",

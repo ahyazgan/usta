@@ -130,7 +130,8 @@
       "coolant": "Coolant",
       "tire": "Tire Check",
       "wiper": "Wiper Blades",
-      "headlight": "Headlight"
+      "headlight": "Headlight",
+      "chain": "Chain Maintenance"
     },
     "cta": "Show the Master"
   },
@@ -159,6 +160,10 @@
       "hibrit": "Hybrid",
       "elektrik": "Electric"
     },
+    "type": {
+      "araba": "Car",
+      "motosiklet": "Motorcycle"
+    },
     "form": {
       "title": "Add Vehicle",
       "make": "Make",
@@ -171,6 +176,7 @@
       "platePlaceholder": "e.g. 34 ABC 123",
       "engineCode": "Engine code (optional)",
       "engineCodePlaceholder": "e.g. K9K",
+      "type": "Type",
       "km": "Mileage (optional)",
       "kmPlaceholder": "e.g. 138420",
       "muayene": "Inspection (opt.)",

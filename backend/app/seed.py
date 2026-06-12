@@ -20,7 +20,7 @@ if hasattr(sys.stdout, "reconfigure"):
 from .core.security import hash_password
 from .database import SessionLocal, create_all
 from .domain.catalog import find_spec
-from .domain.enums import FuelType
+from .domain.enums import FuelType, VehicleType
 from .domain.models import Mechanic, User, Vehicle, VehicleSpec
 
 DEMO_EMAIL = "demo@usta.app"
@@ -34,6 +34,7 @@ DEMO_VEHICLES = [
     {"make": "Renault", "model": "Clio", "year": 2018, "plate": "06 XYZ 45", "fuel_type": FuelType.dizel, "engine_code": "K9K", "current_km": 138420,
      "muayene_date": _TODAY + timedelta(days=45), "sigorta_date": _TODAY + timedelta(days=200)},
     {"make": "Toyota", "model": "Corolla", "year": 2016, "plate": "35 KL 1234", "fuel_type": FuelType.benzin, "engine_code": "1ZR-FAE", "current_km": 96000},
+    {"make": "Honda", "model": "CB125", "year": 2021, "plate": "34 MT 567", "fuel_type": FuelType.benzin, "vehicle_type": VehicleType.motosiklet, "engine_code": "JC64", "current_km": 18250},
 ]
 
 # Küratörlü demo tamirciler (gerçek tedarik iş-geliştirme adımıdır; bunlar örnek).

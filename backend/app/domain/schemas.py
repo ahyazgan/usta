@@ -13,6 +13,7 @@ from .enums import (
     ArizaSistem,
     FuelType,
     ResolutionDurum,
+    VehicleType,
     Guven,
     KayitKosulu,
     Konum,
@@ -84,6 +85,7 @@ class VehicleCreate(BaseModel):
     year: int = Field(ge=1950, le=2100)
     plate: str | None = Field(default=None, max_length=15)
     fuel_type: FuelType
+    vehicle_type: VehicleType = VehicleType.araba
     engine_code: str | None = Field(default=None, max_length=40)
     current_km: int | None = Field(default=None, ge=0)
     muayene_date: date | None = None
@@ -97,6 +99,7 @@ class VehicleUpdate(BaseModel):
     year: int | None = Field(default=None, ge=1950, le=2100)
     plate: str | None = Field(default=None, max_length=15)
     fuel_type: FuelType | None = None
+    vehicle_type: VehicleType | None = None
     engine_code: str | None = Field(default=None, max_length=40)
     current_km: int | None = Field(default=None, ge=0)
     muayene_date: date | None = None
@@ -112,6 +115,7 @@ class VehicleOut(BaseModel):
     year: int
     plate: str | None
     fuel_type: FuelType
+    vehicle_type: VehicleType | None
     engine_code: str | None
     current_km: int | None
     muayene_date: date | None

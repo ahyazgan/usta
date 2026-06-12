@@ -25,7 +25,7 @@ from ..domain.schemas import (
     TaskOut,
     VehicleSummaryOut,
 )
-from ..domain.tasks import get_task, tasks_for_fuel
+from ..domain.tasks import get_task, tasks_for_vehicle
 from ..services import maintenance_service, vehicle_service
 
 router = APIRouter(
@@ -62,11 +62,12 @@ async def vehicle_tasks(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> list[TaskOut]:
-    """Bu aracın yakıt türüne uygulanabilir bakım görevleri (örn. dizelde buji yok)."""
+    """Bu aracın yakıt + türüne uygulanabilir görevler (dizelde buji yok;
+    motosiklette polen/silecek yok, zincir var)."""
     vehicle = await vehicle_service.get_owned(db, user.id, vehicle_id)
     return [
         TaskOut(id=t.id, title_tr=t.title_tr, title_en=t.title_en, risk=t.risk)
-        for t in tasks_for_fuel(vehicle.fuel_type)
+        for t in tasks_for_vehicle(vehicle.fuel_type, vehicle.vehicle_type)
     ]
 
 
@@ -97,7 +98,8 @@ async def task_guide(
     guide = get_guide(task_id)
     if task is None or guide is None:
         raise HTTPException(status_code=404, detail="Görev bulunamadı")
-    if task.applies_to_fuels and vehicle.fuel_type not in task.applies_to_fuels:
+    applicable = {t.id for t in tasks_for_vehicle(vehicle.fuel_type, vehicle.vehicle_type)}
+    if task_id not in applicable:
         raise HTTPException(status_code=404, detail="Görev bu araca uygulanamaz")
 
     spec_values: dict[str, object] = {}

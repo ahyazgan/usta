@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import type { FuelType } from '@/lib/api';
+import type { FuelType, VehicleType } from '@/lib/api';
 import { formatTrDate, parseTrDate } from '@/lib/dateReminders';
 import { t } from '@/lib/i18n';
 import { goBack } from '@/lib/nav';
@@ -21,6 +21,7 @@ import { theme } from '@/lib/theme';
 import { useVehicles } from '@/lib/useVehicles';
 
 const FUEL_TYPES: FuelType[] = ['benzin', 'dizel', 'lpg', 'hibrit', 'elektrik'];
+const VEHICLE_TYPES: VehicleType[] = ['araba', 'motosiklet'];
 
 const MIN_YEAR = 1950;
 const MAX_YEAR = 2100;
@@ -48,6 +49,9 @@ export default function VehicleNewScreen() {
     editVehicle != null ? String(editVehicle.year) : '',
   );
   const [plate, setPlate] = useState(editVehicle?.plate ?? '');
+  const [vehicleType, setVehicleType] = useState<VehicleType>(
+    editVehicle?.vehicle_type ?? 'araba',
+  );
   const [fuelType, setFuelType] = useState<FuelType | null>(
     editVehicle?.fuel_type ?? null,
   );
@@ -101,6 +105,7 @@ export default function VehicleNewScreen() {
       year: parsedYear,
       plate: plate.trim().length > 0 ? plate.trim().toUpperCase() : undefined,
       fuel_type: fuelType,
+      vehicle_type: vehicleType,
       engine_code:
         engineCode.trim().length > 0 ? engineCode.trim() : undefined,
       current_km,
@@ -163,6 +168,40 @@ export default function VehicleNewScreen() {
             </Text>
           </View>
         )}
+
+        <Text style={styles.label}>{t('vehicle.form.type')}</Text>
+        <View style={styles.fuelRow}>
+          {VEHICLE_TYPES.map((vt) => {
+            const selected = vehicleType === vt;
+            return (
+              <Pressable
+                key={vt}
+                accessibilityRole="button"
+                accessibilityState={{ selected }}
+                onPress={() => setVehicleType(vt)}
+                style={({ pressed }) => [
+                  styles.fuelChip,
+                  selected && styles.fuelChipSelected,
+                  pressed && styles.pressed,
+                ]}
+              >
+                <Ionicons
+                  name={vt === 'motosiklet' ? 'bicycle' : 'car-sport'}
+                  size={15}
+                  color={selected ? theme.colors.onInk : theme.colors.textSecondary}
+                />
+                <Text
+                  style={[
+                    styles.fuelLabel,
+                    selected ? styles.fuelLabelSelected : styles.fuelLabelUnselected,
+                  ]}
+                >
+                  {t(`vehicle.type.${vt}`)}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
 
         <Text style={styles.label}>{t('vehicle.form.make')}</Text>
         <TextInput
@@ -414,7 +453,10 @@ const styles = StyleSheet.create({
   },
   fuelChip: {
     minHeight: theme.touchTarget,
+    flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'center',
+    gap: theme.spacing.xs,
     borderWidth: 1,
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.surface,

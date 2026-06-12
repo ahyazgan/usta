@@ -15,7 +15,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..database import Base
-from .enums import AIKind, FuelType, SubscriptionTier
+from .enums import AIKind, FuelType, SubscriptionTier, VehicleType
 
 
 def _utcnow() -> datetime:
@@ -57,6 +57,10 @@ class Vehicle(Base):
     muayene_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     sigorta_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     fuel_type: Mapped[FuelType] = mapped_column(SAEnum(FuelType), nullable=False)
+    # Araç türü (görev uygunluğunu etkiler). Eski kayıtlarda null = araba.
+    vehicle_type: Mapped[VehicleType | None] = mapped_column(
+        SAEnum(VehicleType), nullable=True
+    )
     current_km: Mapped[int | None] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
 

@@ -318,6 +318,40 @@ GUIDES: dict[str, TaskGuide] = {
             ),
         ),
     ),
+    "chain": TaskGuide(
+        task_id="chain",
+        est_minutes=20,
+        steps=(
+            GuideStep(
+                instruction_tr="Motoru KAPAT ve motosikleti merkez sehpaya al (yoksa paddock sehpası). Vites boşta olsun ki arka teker elle dönsün.",
+                instruction_en="Turn the engine OFF and put the bike on its centre/paddock stand. Neutral gear so the rear wheel spins by hand.",
+                warning_tr="Motor çalışırken zincire/dişliye asla dokunma — parmak kaptırma ağır yaralanmadır.",
+                warning_en="Never touch the chain/sprocket with the engine running — it can take a finger.",
+            ),
+            GuideStep(
+                instruction_tr="Tekerleği elle yavaşça çevirerek zincirin tamamını gözden geçir: kuru/paslı baklalar, donmuş (sıkışmış) halka, sivrilmiş dişli dişi var mı?",
+                instruction_en="Slowly turn the wheel by hand and inspect the whole chain: dry/rusty links, stiff (seized) links, hooked sprocket teeth?",
+            ),
+            GuideStep(
+                instruction_tr="Gerginliği kontrol et: alt yolda zinciri parmakla yukarı-aşağı oynat. Genelde ~2-4 cm serbest hareket olmalı (kesin değer için el kitabı).",
+                instruction_en="Check tension: push the lower run up/down by finger. Usually ~2-4 cm free play (see your manual for the exact figure).",
+                tool_tr="Cetvel / el kitabı",
+                tool_en="Ruler / owner's manual",
+            ),
+            GuideStep(
+                instruction_tr="Gerekiyorsa zincir yağını, tekerleği çevirerek baklaların İÇ yüzüne ince ince sür. Fazla yağı sil; lastiğe/frene bulaşmasın.",
+                instruction_en="If needed, apply chain lube to the INNER side of the links while turning the wheel. Wipe off excess; keep it off the tyre/brake.",
+                tool_tr="Zincir yağı, temiz bez",
+                tool_en="Chain lube, clean cloth",
+                warning_tr="Fren ve lastik yağdan uzak tutulmalı; kaygan fren/lastik can güvenliği riskidir.",
+                warning_en="Keep lube off the brake and tyre; a slippery brake/tyre is a safety risk.",
+            ),
+            GuideStep(
+                instruction_tr="Aşırı sarkık/gergin zincir, donmuş bakla veya sivrilmiş dişli gördüysen ayar/değişimi tamirciye bırak — bu rehber yalnızca yağlama ve kontroldür.",
+                instruction_en="If the chain is too loose/tight, has stiff links or hooked sprockets, leave adjustment/replacement to a mechanic — this guide is lube + inspection only.",
+            ),
+        ),
+    ),
     "headlight": TaskGuide(
         task_id="headlight",
         est_minutes=15,

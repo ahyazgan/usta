@@ -226,6 +226,9 @@ export interface Reminder {
 /** Supported fuel types (matches the backend enum). */
 export type FuelType = 'benzin' | 'dizel' | 'lpg' | 'hibrit' | 'elektrik';
 
+/** Vehicle type — affects which maintenance tasks apply. */
+export type VehicleType = 'araba' | 'motosiklet';
+
 /** Per-vehicle technical spec, auto-filled by the backend TR catalog. */
 export interface VehicleSpec {
   oil_spec: string | null;
@@ -249,6 +252,7 @@ export interface Vehicle {
   year: number;
   plate: string | null;
   fuel_type: FuelType;
+  vehicle_type: VehicleType | null;
   engine_code: string | null;
   current_km: number | null;
   /** ISO YYYY-MM-DD — date-based reminders (inspection / insurance). */
@@ -264,6 +268,7 @@ export interface VehicleCreateInput {
   year: number;
   plate?: string;
   fuel_type: FuelType;
+  vehicle_type?: VehicleType;
   engine_code?: string;
   current_km?: number;
   /** ISO YYYY-MM-DD, or null to clear. */

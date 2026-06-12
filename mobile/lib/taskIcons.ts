@@ -12,6 +12,7 @@ export const TASK_ICON: Record<string, keyof typeof Ionicons.glyphMap> = {
   tire: 'ellipse',
   wiper: 'rainy',
   headlight: 'bulb',
+  chain: 'link',
 };
 
 export default TASK_ICON;

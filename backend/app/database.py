@@ -50,6 +50,8 @@ _COLUMN_MIGRATIONS: tuple[tuple[str, str, str], ...] = (
     ("users", "consent_analytics", "BOOLEAN"),
     ("users", "consent_data", "BOOLEAN"),
     ("users", "consent_at", "TIMESTAMP"),
+    # Araç türü (araba/motosiklet).
+    ("vehicles", "vehicle_type", "VARCHAR(12)"),
 )
 
 

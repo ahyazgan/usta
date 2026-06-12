@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..domain.maintenance import Reminder, compute_reminders
 from ..domain.models import AISession, MaintenanceLog
 from ..domain.schemas import MaintenanceLogCreate
-from ..domain.tasks import tasks_for_fuel
+from ..domain.tasks import tasks_for_vehicle
 from . import vehicle_service
 
 
@@ -67,5 +67,5 @@ async def get_reminders(db: AsyncSession, user_id: int, vehicle_id: int) -> list
 
     reminders = compute_reminders(vehicle.current_km, last_km_by_task)
     # Bu aracın yakıtına uygulanamayan görevleri ele (örn. dizelde buji).
-    applicable = {t.id for t in tasks_for_fuel(vehicle.fuel_type)}
+    applicable = {t.id for t in tasks_for_vehicle(vehicle.fuel_type, vehicle.vehicle_type)}
     return [r for r in reminders if r.task in applicable]

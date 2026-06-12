@@ -44,8 +44,9 @@ async def list_mechanics(
     filtered = [m for m in rows if matches_system(m)]
 
     def sort_key(m: Mechanic) -> tuple[int, int, str]:
-        sys_match = 0 if (system and m.systems and system in m.systems) else 1
-        return (0 if m.verified else 1, sys_match, m.name)
+        # matches_system ile aynı token-bazlı mantık (substring tuzağına düşmez).
+        specific = bool(system and m.systems and system in [s.strip() for s in m.systems.split(",")])
+        return (0 if m.verified else 1, 0 if specific else 1, m.name)
 
     filtered.sort(key=sort_key)
     return [MechanicOut.model_validate(m) for m in filtered]

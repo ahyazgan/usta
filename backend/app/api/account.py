@@ -13,7 +13,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..core.deps import get_current_user
 from ..core.rate_limit import enforce_rate_limit
 from ..database import get_db
-from ..domain.models import AISession, MaintenanceLog, RefreshToken, User, Vehicle
+from ..domain.models import (
+    AISession,
+    MaintenanceLog,
+    MechanicLead,
+    RefreshToken,
+    User,
+    Vehicle,
+)
 from ..domain.schemas import ConsentOut, ConsentUpdate
 
 router = APIRouter(prefix="/v1/me", tags=["account"], dependencies=[Depends(enforce_rate_limit)])
@@ -64,6 +71,9 @@ async def delete_account(
         await db.execute(
             delete(MaintenanceLog).where(MaintenanceLog.vehicle_id.in_(vehicle_ids))
         )
+    # Lead'ler AISession'a (SET NULL) ve User'a (CASCADE) bağlı; SQLite cascade
+    # uygulamadığından açıkça silinir, yoksa unutulma hakkı sonrası yetim kalır.
+    await db.execute(delete(MechanicLead).where(MechanicLead.user_id == user.id))
     await db.execute(delete(AISession).where(AISession.user_id == user.id))
     await db.execute(delete(RefreshToken).where(RefreshToken.user_id == user.id))
     await db.execute(delete(Vehicle).where(Vehicle.user_id == user.id))

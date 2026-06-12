@@ -54,21 +54,29 @@ _COLUMN_MIGRATIONS: tuple[tuple[str, str, str], ...] = (
 
 
 async def _add_missing_columns() -> None:
-    async with engine.begin() as conn:
-        dialect = conn.dialect.name
-        for table, column, ddl_type in _COLUMN_MIGRATIONS:
-            if dialect == "postgresql":
-                await conn.execute(
-                    text(f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {column} {ddl_type}")
-                )
-            else:
-                # SQLite: IF NOT EXISTS yok — kolon zaten varsa hatayı yut.
-                try:
+    """Eksik kolonları idempotent ekler.
+
+    Her ALTER KENDİ transaction'ında çalışır: bir kolonun hatası diğerlerini
+    etkilemez (tek transaction'da bir hata sonraki ifadeleri bozabilirdi).
+    SQLite'da IF NOT EXISTS yoktur; yalnızca "kolon zaten var" hatası yutulur,
+    beklenmedik hatalar yüzeye çıkar (sessiz migration kaybını önler).
+    """
+    dialect = engine.dialect.name
+    for table, column, ddl_type in _COLUMN_MIGRATIONS:
+        try:
+            async with engine.begin() as conn:
+                if dialect == "postgresql":
+                    await conn.execute(
+                        text(f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {column} {ddl_type}")
+                    )
+                else:
                     await conn.execute(
                         text(f"ALTER TABLE {table} ADD COLUMN {column} {ddl_type}")
                     )
-                except Exception:  # noqa: BLE001 — duplicate column
-                    pass
+        except Exception as exc:  # noqa: BLE001
+            # "duplicate column name" (SQLite) dışındaki hatalar yeniden fırlatılır.
+            if "duplicate column" not in str(exc).lower():
+                raise
 
 
 async def create_all() -> None:

@@ -3,8 +3,11 @@
 import base64
 
 import pytest
+from sqlalchemy import func, select
 
-from .conftest import create_vehicle, register_and_login
+from app.domain.models import Mechanic, MechanicLead
+
+from .conftest import TestSession, create_vehicle, register_and_login
 
 _FRAME = base64.b64encode(b"sahte-jpeg-1234").decode()
 
@@ -79,6 +82,25 @@ async def test_account_deletion_erases_all_data(client):
         "/v1/auth/register", json={"email": "del@usta.app", "password": "parola1234"}
     )
     assert r.status_code == 201
+
+
+@pytest.mark.asyncio
+async def test_account_deletion_removes_mechanic_leads(client):
+    """Unutulma hakkı: tamirci lead'leri de silinir (SQLite cascade uygulamaz)."""
+    headers = await register_and_login(client, "del-lead@usta.app")
+    await create_vehicle(client, headers)
+    async with TestSession() as db:
+        db.add(Mechanic(name="L Tamirci", city="İstanbul", phone="+9000"))
+        await db.commit()
+    mid = (await client.get("/v1/mechanics", headers=headers)).json()[0]["id"]
+    r = await client.post(f"/v1/mechanics/{mid}/lead", json={"channel": "call"}, headers=headers)
+    assert r.status_code == 201
+
+    assert (await client.delete("/v1/me", headers=headers)).status_code == 204
+
+    async with TestSession() as db:
+        remaining = await db.scalar(select(func.count()).select_from(MechanicLead))
+        assert remaining == 0  # kullanıcının tek lead'i de silinmiş
 
 
 @pytest.mark.asyncio

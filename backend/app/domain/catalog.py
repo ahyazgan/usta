@@ -196,8 +196,9 @@ CATALOG: tuple[CatalogEntry, ...] = (
         year_max=2021,
         fuels=(FuelType.benzin, FuelType.dizel),
         spec=VehicleSpecIn(
+            # 1.2/1.4 TSI: yağ ~3.9L (web-doğrulandı).
             oil_spec="5W-30",
-            oil_capacity_l=3.6,
+            oil_capacity_l=3.9,
             oil_drain_bolt_size="19mm",
             oil_drain_location="yağ karteri alt orta",
             oil_filter_part="örnek: 03C115561H",
@@ -277,8 +278,9 @@ CATALOG: tuple[CatalogEntry, ...] = (
         year_max=2022,
         fuels=(FuelType.benzin, FuelType.dizel),
         spec=VehicleSpecIn(
+            # 1.6 VTi EC5 (Citroen C-Elysee ile aynı): yağ ~3.25L (web-doğrulandı).
             oil_spec="5W-30",
-            oil_capacity_l=3.7,
+            oil_capacity_l=3.25,
             oil_drain_bolt_size="13mm iç altıgen (allen)",
             oil_drain_location="yağ karteri alt orta",
             oil_filter_part="örnek: 1109AY",
@@ -418,8 +420,9 @@ CATALOG: tuple[CatalogEntry, ...] = (
         year_max=2022,
         fuels=(FuelType.benzin, FuelType.dizel),
         spec=VehicleSpecIn(
+            # 1.6 VTi EC5 (Peugeot 301 ile aynı): yağ ~3.25L (web-doğrulandı).
             oil_spec="5W-30",
-            oil_capacity_l=3.7,
+            oil_capacity_l=3.25,
             oil_drain_bolt_size="13mm iç altıgen (allen)",
             oil_drain_location="yağ karteri alt orta",
             oil_filter_part="örnek: 1109AY",

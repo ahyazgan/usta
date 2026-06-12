@@ -14,6 +14,7 @@ from sqlalchemy import select
 from ..domain.guides import fill_template, get_guide
 from ..domain.models import AISession
 from ..domain.schemas import (
+    DiagnosisFeedbackIn,
     DiagnosisHistoryOut,
     GuideStepOut,
     MaintenanceLogCreate,
@@ -155,6 +156,35 @@ async def diagnosis_history(
         .limit(20)
     )
     return [DiagnosisHistoryOut.model_validate(r) for r in rows]
+
+
+@router.post("/diagnoses/{session_id}/feedback", response_model=DiagnosisHistoryOut)
+async def diagnosis_feedback(
+    vehicle_id: int,
+    session_id: int,
+    payload: DiagnosisFeedbackIn,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> DiagnosisHistoryOut:
+    """Teşhise 👍/👎 geri bildirimi — veri setini doğrulanmış etikete çevirir.
+
+    Yalnızca kendi aracındaki kendi teşhisin oylanabilir; tekrar oylama
+    son değeri yazar (fikir değiştirme serbest).
+    """
+    await vehicle_service.get_owned(db, user.id, vehicle_id)
+    session = await db.scalar(
+        select(AISession).where(
+            AISession.id == session_id,
+            AISession.user_id == user.id,
+            AISession.vehicle_id == vehicle_id,
+        )
+    )
+    if session is None:
+        raise HTTPException(status_code=404, detail="Teşhis bulunamadı")
+    session.feedback_dogru = payload.dogru
+    await db.commit()
+    await db.refresh(session)
+    return DiagnosisHistoryOut.model_validate(session)
 
 
 @router.get("/summary", response_model=VehicleSummaryOut)

@@ -35,6 +35,11 @@ _COLUMN_MIGRATIONS: tuple[tuple[str, str, str], ...] = (
     ("ai_sessions", "tespit", "VARCHAR(500)"),
     ("ai_sessions", "guven", "VARCHAR(10)"),
     ("ai_sessions", "tamirciye_git", "BOOLEAN"),
+    # Veri çarkı: kategori + kullanıcı geri bildirimi; log'da teşhis bağı + maliyet.
+    ("ai_sessions", "kategori", "VARCHAR(30)"),
+    ("ai_sessions", "feedback_dogru", "BOOLEAN"),
+    ("maintenance_logs", "ai_session_id", "INTEGER"),
+    ("maintenance_logs", "cost_try", "INTEGER"),
 )
 
 

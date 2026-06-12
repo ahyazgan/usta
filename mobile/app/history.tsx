@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomTabBar } from '@/components/BottomTabBar';
+import { FeedbackRow } from '@/components/FeedbackRow';
 import {
   createApiClient,
   type DiagnosisHistory,
@@ -86,7 +87,13 @@ function ReminderRow({ reminder }: { reminder: Reminder }) {
   );
 }
 
-function DiagnosisRow({ item }: { item: DiagnosisHistory }) {
+function DiagnosisRow({
+  item,
+  vehicleId,
+}: {
+  item: DiagnosisHistory;
+  vehicleId: number | null;
+}) {
   const icon = item.kind === 'image' ? 'camera' : 'pulse';
   const metaParts = [
     formatDate(item.created_at),
@@ -99,16 +106,27 @@ function DiagnosisRow({ item }: { item: DiagnosisHistory }) {
         <Ionicons name={icon} size={16} color={theme.colors.textSecondary} />
       </View>
       <View style={styles.diagBody}>
-        <Text style={styles.diagText} numberOfLines={2}>
-          {item.tespit}
-        </Text>
-        <Text style={styles.diagMeta}>{metaParts.join(' · ')}</Text>
-      </View>
-      {item.tamirciye_git === true && (
-        <View style={styles.diagPill}>
-          <Text style={styles.diagPillText}>{t('history.diagnoses.mechanic')}</Text>
+        <View style={styles.diagTopRow}>
+          <Text style={[styles.diagText, styles.diagTextFlex]} numberOfLines={2}>
+            {item.tespit}
+          </Text>
+          {item.tamirciye_git === true && (
+            <View style={styles.diagPill}>
+              <Text style={styles.diagPillText}>{t('history.diagnoses.mechanic')}</Text>
+            </View>
+          )}
         </View>
-      )}
+        <Text style={styles.diagMeta}>{metaParts.join(' · ')}</Text>
+        {vehicleId != null && (
+          <View style={styles.diagFeedback}>
+            <FeedbackRow
+              vehicleId={vehicleId}
+              sessionId={item.id}
+              initial={item.feedback_dogru}
+            />
+          </View>
+        )}
+      </View>
     </View>
   );
 }
@@ -118,13 +136,17 @@ function LogRow({ log }: { log: MaintenanceLog }) {
     log.km != null
       ? t('history.logs.kmValue', { km: log.km.toLocaleString() })
       : t('history.logs.noKm');
+  const metaParts = [km];
+  if (log.cost_try != null) {
+    metaParts.push(`₺${log.cost_try.toLocaleString('tr-TR')}`);
+  }
   return (
     <View style={styles.logRow}>
       <View style={styles.logHeader}>
         <Text style={styles.logTask}>{taskTitle(log.task)}</Text>
         <Text style={styles.logDate}>{formatDate(log.created_at)}</Text>
       </View>
-      <Text style={styles.logMeta}>{km}</Text>
+      <Text style={styles.logMeta}>{metaParts.join(' · ')}</Text>
       {log.note != null && log.note.length > 0 && (
         <Text style={styles.logNote}>{log.note}</Text>
       )}
@@ -154,6 +176,7 @@ export default function HistoryScreen() {
   const [task, setTask] = useState<string>(FALLBACK_TASK_IDS[0]);
   const [km, setKm] = useState('');
   const [note, setNote] = useState('');
+  const [cost, setCost] = useState('');
 
   // Teşhis geçmişi (görüntü + ses) — hata sessizce boş listeye düşer.
   const authToken = useUstaStore((s) => s.authToken);
@@ -180,14 +203,20 @@ export default function HistoryScreen() {
   async function handleAdd() {
     if (submitting) return;
     const parsedKm = km.trim().length > 0 ? Number(km.trim()) : undefined;
+    const parsedCost = cost.trim().length > 0 ? Number(cost.trim()) : undefined;
     const ok = await addLog({
       task,
       km: Number.isFinite(parsedKm) ? parsedKm : undefined,
       note: note.trim().length > 0 ? note.trim() : undefined,
+      cost_try:
+        parsedCost != null && Number.isFinite(parsedCost) && parsedCost >= 0
+          ? Math.round(parsedCost)
+          : undefined,
     });
     if (ok) {
       setKm('');
       setNote('');
+      setCost('');
     }
   }
 
@@ -270,7 +299,7 @@ export default function HistoryScreen() {
             ) : (
               <View style={styles.card}>
                 {diagnoses.map((item) => (
-                  <DiagnosisRow key={item.id} item={item} />
+                  <DiagnosisRow key={item.id} item={item} vehicleId={vehicle?.id ?? null} />
                 ))}
               </View>
             )}
@@ -313,6 +342,16 @@ export default function HistoryScreen() {
             value={km}
             onChangeText={setKm}
             placeholder={t('history.addLog.kmPlaceholder')}
+            placeholderTextColor={theme.colors.textSecondary}
+            keyboardType="number-pad"
+          />
+
+          <Text style={styles.label}>{t('history.addLog.costLabel')}</Text>
+          <TextInput
+            style={styles.input}
+            value={cost}
+            onChangeText={setCost}
+            placeholder={t('history.addLog.costPlaceholder')}
             placeholderTextColor={theme.colors.textSecondary}
             keyboardType="number-pad"
           />
@@ -474,11 +513,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   diagBody: { flex: 1 },
+  diagTopRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: theme.spacing.sm,
+  },
   diagText: {
     fontFamily: theme.fonts.body,
     fontSize: 13,
     lineHeight: 19,
     color: theme.colors.textPrimary,
+  },
+  diagTextFlex: { flex: 1 },
+  diagFeedback: {
+    marginTop: theme.spacing.sm,
   },
   diagMeta: {
     fontFamily: theme.fonts.body,

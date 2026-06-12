@@ -13,6 +13,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomTabBar } from '@/components/BottomTabBar';
+import { FeedbackRow } from '@/components/FeedbackRow';
 import type { Guven, KayitKosulu } from '@/lib/api';
 import { t } from '@/lib/i18n';
 import { theme } from '@/lib/theme';
@@ -201,6 +202,16 @@ export default function DiagnosisScreen() {
           <View style={styles.errorRow}>
             <Ionicons name="alert-circle" size={16} color={theme.colors.dangerBright} />
             <Text style={styles.errorText}>{t(error)}</Text>
+          </View>
+        )}
+        {/* Veri çarkı: son teşhis doğru çıktı mı? */}
+        {result?.session_id != null && currentVehicle != null && !loading && (
+          <View style={styles.feedbackWrap}>
+            <FeedbackRow
+              key={result.session_id}
+              vehicleId={currentVehicle.id}
+              sessionId={result.session_id}
+            />
           </View>
         )}
         {showMechanic && (
@@ -440,6 +451,15 @@ const styles = StyleSheet.create({
     fontFamily: theme.fonts.body,
     fontSize: 13,
     color: theme.colors.dangerBright,
+  },
+  feedbackWrap: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    padding: theme.spacing.md,
+    marginTop: theme.spacing.xs,
+    marginBottom: theme.spacing.sm,
   },
   mechanicButton: {
     flexDirection: 'row',

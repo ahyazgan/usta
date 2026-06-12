@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..domain.maintenance import Reminder, compute_reminders
-from ..domain.models import MaintenanceLog
+from ..domain.models import AISession, MaintenanceLog
 from ..domain.schemas import MaintenanceLogCreate
 from ..domain.tasks import tasks_for_fuel
 from . import vehicle_service
@@ -16,7 +16,29 @@ async def add_log(
     db: AsyncSession, user_id: int, vehicle_id: int, payload: MaintenanceLogCreate
 ) -> MaintenanceLog:
     await vehicle_service.get_owned(db, user_id, vehicle_id)  # 403/404 garanti
-    log = MaintenanceLog(vehicle_id=vehicle_id, task=payload.task, km=payload.km, note=payload.note)
+
+    # Teşhis bağı: yalnızca bu kullanıcının BU araçtaki oturumu kabul edilir;
+    # eşleşmiyorsa bağ sessizce düşülür (log kaydı engellenmez).
+    ai_session_id = payload.ai_session_id
+    if ai_session_id is not None:
+        owned = await db.scalar(
+            select(AISession.id).where(
+                AISession.id == ai_session_id,
+                AISession.user_id == user_id,
+                AISession.vehicle_id == vehicle_id,
+            )
+        )
+        if owned is None:
+            ai_session_id = None
+
+    log = MaintenanceLog(
+        vehicle_id=vehicle_id,
+        task=payload.task,
+        km=payload.km,
+        note=payload.note,
+        ai_session_id=ai_session_id,
+        cost_try=payload.cost_try,
+    )
     db.add(log)
     await db.commit()
     await db.refresh(log)

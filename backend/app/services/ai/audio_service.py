@@ -61,6 +61,9 @@ async def diagnose_sound(
     session.tespit = final.tespit[:500]
     session.guven = final.guven.value
     session.tamirciye_git = final.tamirciye_git_onerisi
+    session.kategori = final.ses_kategorisi.value  # seste kategori = ses türü
     db.add(session)
     await db.commit()
-    return final
+    await db.refresh(session)
+    # 👍/👎 geri bildirimi bu id'ye bağlanır.
+    return final.model_copy(update={"session_id": session.id})

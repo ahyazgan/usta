@@ -82,7 +82,9 @@ export const useUstaStore = create<UstaState>((set) => ({
             currentVehicleId: null,
           },
     ),
-  setSelectedTask: (selectedTask) => set({ selectedTask }),
+  // Görev değişince eski kamera sonucu geçersizdir — bayat teşhis↔log
+  // bağlantısını önlemek için birlikte temizlenir.
+  setSelectedTask: (selectedTask) => set({ selectedTask, lastResult: null }),
   setLastResult: (lastResult) => set({ lastResult }),
 }));
 

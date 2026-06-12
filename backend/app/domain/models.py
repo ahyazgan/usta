@@ -92,6 +92,12 @@ class MaintenanceLog(Base):
     task: Mapped[str] = mapped_column(String(60), nullable=False)
     km: Mapped[int | None] = mapped_column(Integer, nullable=True)
     note: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    # Bu bakımı tetikleyen AI teşhisi (rehber kamera doğrulamasıyla bitince bağlanır).
+    ai_session_id: Mapped[int | None] = mapped_column(
+        ForeignKey("ai_sessions.id", ondelete="SET NULL"), nullable=True
+    )
+    # Kullanıcının beyan ettiği gerçek maliyet (TL; opsiyonel) — maliyet endeksi.
+    cost_try: Mapped[int | None] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
 
     vehicle: Mapped["Vehicle"] = relationship(back_populates="logs")
@@ -121,6 +127,11 @@ class AISession(Base):
     tespit: Mapped[str | None] = mapped_column(String(500), nullable=True)
     guven: Mapped[str | None] = mapped_column(String(10), nullable=True)
     tamirciye_git: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
+    # Yapılandırılmış kategori: görüntüde görev id'si, seste ses_kategorisi.
+    kategori: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    # Kullanıcı geri bildirimi: teşhis doğru çıktı mı? (👍/👎; null = oylanmadı)
+    # Bu etiket, veri setini doğrulanmış arıza-örüntü verisine çevirir.
+    feedback_dogru: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
 
 

@@ -98,3 +98,118 @@ async def test_guide_includes_diy_saving(client):
     )
     assert r.status_code == 200
     assert r.json()["diy_saving_try"] == 400
+
+
+# --------------------------------------------------------------------------- #
+# Veri çarkı: session_id + 👍/👎 geri bildirimi + teşhis↔log bağı + maliyet
+# --------------------------------------------------------------------------- #
+
+
+async def _diagnose_and_get_session_id(client, headers, vid: int) -> int:
+    r = await client.post(
+        "/v1/ai/diagnose/image",
+        json={
+            "vehicle_id": vid,
+            "task": "battery",
+            "frame_base64": _FRAME,
+            "media_type": "image/jpeg",
+        },
+        headers=headers,
+    )
+    assert r.status_code == 200
+    session_id = r.json()["session_id"]
+    assert isinstance(session_id, int) and session_id >= 1
+    return session_id
+
+
+@pytest.mark.asyncio
+async def test_diagnose_returns_session_id_and_kategori_logged(client):
+    headers = await register_and_login(client, "fb0@usta.app")
+    vehicle = await create_vehicle(client, headers)
+    vid = vehicle["id"]
+    await _diagnose_and_get_session_id(client, headers, vid)
+    await _run_sound_diagnose(client, headers, vid)
+
+    r = await client.get(f"/v1/vehicles/{vid}/diagnoses", headers=headers)
+    body = r.json()
+    image = next(x for x in body if x["kind"] == "image")
+    sound = next(x for x in body if x["kind"] == "sound")
+    assert image["kategori"] == "battery"  # görüntüde kategori = görev
+    assert sound["kategori"] == "kayis_sesi"  # seste kategori = ses türü (mock)
+    assert image["feedback_dogru"] is None  # henüz oylanmadı
+
+
+@pytest.mark.asyncio
+async def test_feedback_roundtrip_and_revote(client):
+    headers = await register_and_login(client, "fb1@usta.app")
+    vehicle = await create_vehicle(client, headers)
+    vid = vehicle["id"]
+    sid = await _diagnose_and_get_session_id(client, headers, vid)
+
+    r = await client.post(
+        f"/v1/vehicles/{vid}/diagnoses/{sid}/feedback",
+        json={"dogru": True},
+        headers=headers,
+    )
+    assert r.status_code == 200
+    assert r.json()["feedback_dogru"] is True
+
+    # Fikir değiştirme: son oy yazılır.
+    r = await client.post(
+        f"/v1/vehicles/{vid}/diagnoses/{sid}/feedback",
+        json={"dogru": False},
+        headers=headers,
+    )
+    assert r.json()["feedback_dogru"] is False
+
+    # Liste de güncel değeri yansıtır.
+    r = await client.get(f"/v1/vehicles/{vid}/diagnoses", headers=headers)
+    assert r.json()[0]["feedback_dogru"] is False
+
+
+@pytest.mark.asyncio
+async def test_feedback_requires_auth_401(client):
+    r = await client.post("/v1/vehicles/1/diagnoses/1/feedback", json={"dogru": True})
+    assert r.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_feedback_foreign_session_404(client):
+    owner = await register_and_login(client, "fb-own@usta.app")
+    vehicle = await create_vehicle(client, owner)
+    vid = vehicle["id"]
+    sid = await _diagnose_and_get_session_id(client, owner, vid)
+
+    intruder = await register_and_login(client, "fb-intruder@usta.app")
+    their_vehicle = await create_vehicle(client, intruder)
+    # Başkasının teşhisini kendi aracın üzerinden oylayamazsın.
+    r = await client.post(
+        f"/v1/vehicles/{their_vehicle['id']}/diagnoses/{sid}/feedback",
+        json={"dogru": True},
+        headers=intruder,
+    )
+    assert r.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_log_links_session_and_stores_cost(client):
+    headers = await register_and_login(client, "fb-link@usta.app")
+    vehicle = await create_vehicle(client, headers)
+    vid = vehicle["id"]
+    sid = await _diagnose_and_get_session_id(client, headers, vid)
+
+    r = await client.post(
+        f"/v1/vehicles/{vid}/logs",
+        json={"task": "battery", "km": 85000, "ai_session_id": sid, "cost_try": 750},
+        headers=headers,
+    )
+    assert r.status_code == 201
+    assert r.json()["cost_try"] == 750
+
+    # Sahte/yabancı session id bağı sessizce düşülür ama log yine 201'dir.
+    r = await client.post(
+        f"/v1/vehicles/{vid}/logs",
+        json={"task": "oil_change", "km": 85100, "ai_session_id": 999_999},
+        headers=headers,
+    )
+    assert r.status_code == 201

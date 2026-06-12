@@ -52,6 +52,8 @@ export interface DiagnoseResult {
   sonraki_adim: string;
   guvenlik_uyarisi: string | null;
   tamirciye_git_onerisi: boolean;
+  /** AISession id — 👍/👎 feedback attaches to this. */
+  session_id: number | null;
 }
 
 export interface DiagnoseImageInput {
@@ -91,6 +93,8 @@ export interface SoundDiagnoseResult {
   guvenlik_uyarisi: string | null;
   sonraki_adim: string;
   tamirciye_git_onerisi: boolean;
+  /** AISession id — 👍/👎 feedback attaches to this. */
+  session_id: number | null;
 }
 
 /** Auth token bundle returned by login/register-then-login/refresh. */
@@ -120,6 +124,7 @@ export interface MaintenanceLog {
   task: string;
   km: number | null;
   note: string | null;
+  cost_try: number | null;
   created_at: string;
 }
 
@@ -128,6 +133,10 @@ export interface MaintenanceLogInput {
   task: string;
   km?: number;
   note?: string;
+  /** Diagnosis session that led to this job (data-flywheel link). */
+  ai_session_id?: number;
+  /** Actual cost the user paid (TRY, optional). */
+  cost_try?: number;
 }
 
 /** Reminder status returned by the backend. */
@@ -173,6 +182,10 @@ export interface DiagnosisHistory {
   tespit: string | null;
   guven: Guven | null;
   tamirciye_git: boolean | null;
+  /** Structured category: task id (image) or sound type (sound). */
+  kategori: string | null;
+  /** User feedback: was the diagnosis right? (null = not voted yet) */
+  feedback_dogru: boolean | null;
   created_at: string;
 }
 
@@ -245,6 +258,12 @@ export interface ApiClient {
   getGuide(vehicleId: number, taskId: string): Promise<TaskGuide>;
   /** Recent AI diagnoses for this vehicle (image + sound), newest first. */
   getDiagnoses(vehicleId: number): Promise<DiagnosisHistory[]>;
+  /** 👍/👎 a past diagnosis; re-voting overwrites. Returns the updated row. */
+  sendDiagnosisFeedback(
+    vehicleId: number,
+    sessionId: number,
+    dogru: boolean,
+  ): Promise<DiagnosisHistory>;
   listVehicles(): Promise<Vehicle[]>;
   createVehicle(input: VehicleCreateInput): Promise<Vehicle>;
   getVehicle(id: number): Promise<Vehicle>;
@@ -423,6 +442,12 @@ export function createApiClient(
         method: 'GET',
         headers,
       });
+    },
+    sendDiagnosisFeedback(vehicleId, sessionId, dogru) {
+      return post<DiagnosisHistory, { dogru: boolean }>(
+        `/v1/vehicles/${vehicleId}/diagnoses/${sessionId}/feedback`,
+        { dogru },
+      );
     },
     async listVehicles() {
       const headers = await authHeaders();

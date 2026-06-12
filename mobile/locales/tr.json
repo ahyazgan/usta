@@ -268,6 +268,8 @@
       "taskLabel": "Görev",
       "kmLabel": "Kilometre",
       "kmPlaceholder": "Örn: 138420",
+      "costLabel": "Maliyet (TL, isteğe bağlı)",
+      "costPlaceholder": "Örn: 750",
       "noteLabel": "Not (isteğe bağlı)",
       "notePlaceholder": "Kısa bir not",
       "submit": "Kaydet"
@@ -326,6 +328,10 @@
       "aiUnavailable": "Yapay zekâ servisi şu an kullanılamıyor. Lütfen sonra tekrar dene.",
       "busy": "Servis şu an yoğun. Lütfen biraz sonra tekrar dene."
     }
+  },
+  "feedback": {
+    "question": "Bu teşhis doğru çıktı mı?",
+    "thanks": "Teşekkürler — kaydedildi 🙌"
   },
   "common": {
     "loading": "Yükleniyor…",

@@ -68,6 +68,7 @@ export default function GuideScreen() {
   const insets = useSafeAreaInsets();
   const authToken = useUstaStore((s) => s.authToken);
   const selectedTask = useUstaStore((s) => s.selectedTask);
+  const lastResult = useUstaStore((s) => s.lastResult);
   const guideProgress = useUstaStore((s) => s.guideProgress);
   const setGuideProgress = useUstaStore((s) => s.setGuideProgress);
   const clearGuideProgress = useUstaStore((s) => s.clearGuideProgress);
@@ -139,6 +140,9 @@ export default function GuideScreen() {
       await client.addLog(currentVehicle.id, {
         task: guide.task_id,
         km: currentVehicle.current_km ?? undefined,
+        // Veri çarkı: bu rehberdeki kamera doğrulamasının teşhisi log'a bağlanır
+        // (görev değişince lastResult temizlendiği için bayat bağ riski yok).
+        ai_session_id: lastResult?.session_id ?? undefined,
       });
     } catch {
       /* kayıt başarısız olsa da kullanıcıyı rehberde kilitleme */

@@ -15,8 +15,9 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { FeedbackRow } from '@/components/FeedbackRow';
 import { i18n, t } from '@/lib/i18n';
-import { useUstaStore } from '@/lib/store';
+import { selectCurrentVehicle, useUstaStore } from '@/lib/store';
 import { theme } from '@/lib/theme';
 import { useDiagnose } from '@/lib/useDiagnose';
 import type { DiagnoseResult, Konum, Task } from '@/lib/api';
@@ -32,7 +33,13 @@ function konumText(konum: Konum): string | null {
   return t(`camera.konum.${konum.replace('-', '_')}`);
 }
 
-function ResultPanel({ result }: { result: DiagnoseResult }) {
+function ResultPanel({
+  result,
+  vehicleId,
+}: {
+  result: DiagnoseResult;
+  vehicleId: number | null;
+}) {
   // Banner color is the ONLY place green may appear: dogru_yer_mi === true.
   let bannerStyle: ViewStyle = styles.bannerNeutral;
   let bannerText = t('camera.result.uncertain');
@@ -84,6 +91,13 @@ function ResultPanel({ result }: { result: DiagnoseResult }) {
           <Text style={styles.warningText}>{result.guvenlik_uyarisi}</Text>
         </View>
       )}
+
+      {/* Veri çarkı: teşhis doğru çıktı mı? */}
+      {vehicleId != null && result.session_id != null && (
+        <View style={styles.feedbackWrap}>
+          <FeedbackRow vehicleId={vehicleId} sessionId={result.session_id} />
+        </View>
+      )}
     </View>
   );
 }
@@ -96,6 +110,7 @@ export default function CameraScreen() {
 
   const selectedTask = useUstaStore((s) => s.selectedTask);
   const guideProgress = useUstaStore((s) => s.guideProgress);
+  const currentVehicle = useUstaStore(selectCurrentVehicle);
   const { loading, error, result, runImageDiagnose } = useDiagnose();
 
   // Rehberden gelindiyse kaldığı adım (1 bazlı) banner'da görünür.
@@ -185,7 +200,7 @@ export default function CameraScreen() {
             <Text style={styles.errorText}>{t(error)}</Text>
           </View>
         ) : result ? (
-          <ResultPanel result={result} />
+          <ResultPanel result={result} vehicleId={currentVehicle?.id ?? null} />
         ) : granted ? (
           <Text style={styles.feedbackHint}>{t('camera.hint')}</Text>
         ) : null}
@@ -449,6 +464,12 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.md,
     marginTop: theme.spacing.lg,
+  },
+  feedbackWrap: {
+    marginTop: theme.spacing.md,
+    paddingTop: theme.spacing.md,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: theme.colors.border,
   },
   warningText: {
     flex: 1,

@@ -158,6 +158,8 @@ class DiagnosisHistoryOut(BaseModel):
     tespit: str | None
     guven: Guven | None
     tamirciye_git: bool | None
+    kategori: str | None = None
+    feedback_dogru: bool | None = None
     created_at: datetime
 
 
@@ -185,6 +187,8 @@ class ImageDiagnoseResponse(BaseModel):
     sonraki_adim: str
     guvenlik_uyarisi: str | None
     tamirciye_git_onerisi: bool
+    # Bu teşhisin AISession id'si — mobil 👍/👎 geri bildirimi buna bağlanır.
+    session_id: int | None = None
 
 
 # --------------------------------------------------------------------------- #
@@ -206,6 +210,8 @@ class SoundDiagnoseResponse(BaseModel):
     guvenlik_uyarisi: str | None
     sonraki_adim: str
     tamirciye_git_onerisi: bool
+    # Bu teşhisin AISession id'si — mobil 👍/👎 geri bildirimi buna bağlanır.
+    session_id: int | None = None
 
 
 class TaskOut(BaseModel):
@@ -224,6 +230,10 @@ class MaintenanceLogCreate(BaseModel):
     task: str = Field(min_length=1, max_length=60)
     km: int | None = Field(default=None, ge=0)
     note: str | None = Field(default=None, max_length=500)
+    # Bu bakımı tetikleyen teşhis (varsa) — veri çarkı bağlantısı.
+    ai_session_id: int | None = Field(default=None, ge=1)
+    # Kullanıcının beyan ettiği gerçek maliyet (TL; opsiyonel).
+    cost_try: int | None = Field(default=None, ge=0, le=1_000_000)
 
 
 class MaintenanceLogOut(BaseModel):
@@ -233,7 +243,14 @@ class MaintenanceLogOut(BaseModel):
     task: str
     km: int | None
     note: str | None
+    cost_try: int | None = None
     created_at: datetime
+
+
+class DiagnosisFeedbackIn(BaseModel):
+    """Kullanıcı geri bildirimi: teşhis doğru çıktı mı? (👍/👎)"""
+
+    dogru: bool
 
 
 class ReminderOut(BaseModel):

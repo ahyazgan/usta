@@ -268,6 +268,8 @@
       "taskLabel": "Task",
       "kmLabel": "Mileage",
       "kmPlaceholder": "e.g. 138420",
+      "costLabel": "Cost (TRY, optional)",
+      "costPlaceholder": "e.g. 750",
       "noteLabel": "Note (optional)",
       "notePlaceholder": "A short note",
       "submit": "Save"
@@ -326,6 +328,10 @@
       "aiUnavailable": "The AI service is currently unavailable. Please try again later.",
       "busy": "The service is busy right now. Please try again shortly."
     }
+  },
+  "feedback": {
+    "question": "Was this diagnosis right?",
+    "thanks": "Thanks — recorded 🙌"
   },
   "common": {
     "loading": "Loading…",

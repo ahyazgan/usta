@@ -354,6 +354,27 @@
     "invite": "🔧 Try Usta — do car maintenance yourself step by step, verify with AI, save money: {{link}}",
     "achievement": "🔧 Did the {{task}} job myself, saved ~₺{{savings}} — with Usta!"
   },
+  "brief": {
+    "cta": "Show a Mechanic",
+    "sheetTitle": "Show a Mechanic",
+    "sheetHint": "Show this summary to your mechanic or share it.",
+    "share": "Share",
+    "title": "🔧 USTA PRE-ASSESSMENT",
+    "vehicle": "Vehicle",
+    "engine": "Engine",
+    "task": "Task",
+    "complaint": "Complaint/Finding",
+    "system": "System",
+    "soundType": "Sound type",
+    "confidence": "Confidence",
+    "urgency": "Urgency",
+    "nextStep": "Suggestion",
+    "date": "Date",
+    "kindImage": "Image diagnosis",
+    "kindSound": "Sound diagnosis",
+    "disclaimer": "⚠️ This is an AI PRE-assessment, not a definitive diagnosis. Please do your own check.",
+    "footer": "— Usta app"
+  },
   "feedback": {
     "question": "Was this diagnosis right?",
     "thanks": "Thanks — recorded 🙌"

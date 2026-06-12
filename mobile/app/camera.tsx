@@ -3,7 +3,7 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
 
 import { goBack } from '@/lib/nav';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -16,7 +16,9 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FeedbackRow } from '@/components/FeedbackRow';
+import { MechanicBriefSheet } from '@/components/MechanicBriefSheet';
 import { i18n, t } from '@/lib/i18n';
+import { type BriefDiag } from '@/lib/mechanicBrief';
 import { selectCurrentVehicle, useUstaStore } from '@/lib/store';
 import { theme } from '@/lib/theme';
 import { useDiagnose } from '@/lib/useDiagnose';
@@ -36,9 +38,11 @@ function konumText(konum: Konum): string | null {
 function ResultPanel({
   result,
   vehicleId,
+  onShowMechanic,
 }: {
   result: DiagnoseResult;
   vehicleId: number | null;
+  onShowMechanic: () => void;
 }) {
   // Banner color is the ONLY place green may appear: dogru_yer_mi === true.
   let bannerStyle: ViewStyle = styles.bannerNeutral;
@@ -92,6 +96,17 @@ function ResultPanel({
         </View>
       )}
 
+      {/* Triyaj köprüsü: kendin yapmayacaksan tamirciye göster */}
+      <Pressable
+        accessibilityRole="button"
+        onPress={onShowMechanic}
+        style={({ pressed }) => [styles.mechanicBrief, pressed && styles.pressed]}
+      >
+        <Ionicons name="construct-outline" size={18} color={theme.colors.ink} />
+        <Text style={styles.mechanicBriefText}>{t('brief.cta')}</Text>
+        <Ionicons name="chevron-forward" size={16} color={theme.colors.textSecondary} />
+      </Pressable>
+
       {/* Veri çarkı: teşhis doğru çıktı mı? */}
       {vehicleId != null && result.session_id != null && (
         <View style={styles.feedbackWrap}>
@@ -112,6 +127,18 @@ export default function CameraScreen() {
   const guideProgress = useUstaStore((s) => s.guideProgress);
   const currentVehicle = useUstaStore(selectCurrentVehicle);
   const { loading, error, result, runImageDiagnose } = useDiagnose();
+  const [briefOpen, setBriefOpen] = useState(false);
+
+  const briefDiag: BriefDiag | null = result
+    ? {
+        kindLabel: t('brief.kindImage'),
+        tespit: result.tespit,
+        taskLabel: selectedTask ? taskTitle(selectedTask) : undefined,
+        guven: result.guven,
+        sonrakiAdim: result.sonraki_adim,
+        guvenlikUyarisi: result.guvenlik_uyarisi,
+      }
+    : null;
 
   // Rehberden gelindiyse kaldığı adım (1 bazlı) banner'da görünür.
   const guideStep =
@@ -200,7 +227,11 @@ export default function CameraScreen() {
             <Text style={styles.errorText}>{t(error)}</Text>
           </View>
         ) : result ? (
-          <ResultPanel result={result} vehicleId={currentVehicle?.id ?? null} />
+          <ResultPanel
+            result={result}
+            vehicleId={currentVehicle?.id ?? null}
+            onShowMechanic={() => setBriefOpen(true)}
+          />
         ) : granted ? (
           <Text style={styles.feedbackHint}>{t('camera.hint')}</Text>
         ) : null}
@@ -244,7 +275,7 @@ export default function CameraScreen() {
             <Pressable
               accessibilityRole="button"
               style={({ pressed }) => [styles.mechanicButton, pressed && styles.pressed]}
-              onPress={() => goBack(router)}
+              onPress={() => setBriefOpen(true)}
             >
               <Ionicons name="construct" size={18} color={theme.colors.background} />
               <Text style={styles.mechanicText}>{t('common.goToMechanic')}</Text>
@@ -252,6 +283,13 @@ export default function CameraScreen() {
           )}
         </View>
       </View>
+
+      <MechanicBriefSheet
+        visible={briefOpen}
+        vehicle={currentVehicle}
+        diag={briefDiag}
+        onClose={() => setBriefOpen(false)}
+      />
     </View>
   );
 }
@@ -470,6 +508,24 @@ const styles = StyleSheet.create({
     paddingTop: theme.spacing.md,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: theme.colors.border,
+  },
+  mechanicBrief: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    marginTop: theme.spacing.md,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.ink,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.md,
+  },
+  mechanicBriefText: {
+    flex: 1,
+    fontFamily: theme.fonts.body,
+    fontSize: 14,
+    fontWeight: '700',
+    color: theme.colors.ink,
   },
   warningText: {
     flex: 1,

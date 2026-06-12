@@ -14,8 +14,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomTabBar } from '@/components/BottomTabBar';
 import { FeedbackRow } from '@/components/FeedbackRow';
+import { MechanicBriefSheet } from '@/components/MechanicBriefSheet';
 import type { Guven, KayitKosulu } from '@/lib/api';
 import { t } from '@/lib/i18n';
+import { type BriefDiag } from '@/lib/mechanicBrief';
 import { theme } from '@/lib/theme';
 import { useSoundDiagnose } from '@/lib/useSoundDiagnose';
 import { useVehicles } from '@/lib/useVehicles';
@@ -103,7 +105,20 @@ export default function DiagnosisScreen() {
     { id: 0, kind: 'usta', text: t('diagnosis.intro') },
   ]);
   const [showMechanic, setShowMechanic] = useState(false);
+  const [briefOpen, setBriefOpen] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
+
+  const briefDiag: BriefDiag | null = result
+    ? {
+        kindLabel: t('brief.kindSound'),
+        tespit: result.tespit,
+        sesKategoriLabel: t(`sound.kategori.${result.ses_kategorisi}`),
+        guven: result.guven,
+        aciliyet: result.aciliyet,
+        sonrakiAdim: result.sonraki_adim,
+        guvenlikUyarisi: result.guvenlik_uyarisi,
+      }
+    : null;
 
   // Yeni teşhis sonucu geldiğinde usta balonları olarak akışa ekle.
   useEffect(() => {
@@ -214,10 +229,20 @@ export default function DiagnosisScreen() {
             />
           </View>
         )}
+        {result != null && currentVehicle != null && !loading && (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setBriefOpen(true)}
+            style={({ pressed }) => [styles.briefButton, pressed && styles.pressed]}
+          >
+            <Ionicons name="construct-outline" size={16} color={theme.colors.ink} />
+            <Text style={styles.briefButtonText}>{t('brief.cta')}</Text>
+          </Pressable>
+        )}
         {showMechanic && (
           <Pressable
             accessibilityRole="button"
-            onPress={() => router.replace('/maintenance')}
+            onPress={() => setBriefOpen(true)}
             style={({ pressed }) => [styles.mechanicButton, pressed && styles.pressed]}
           >
             <Ionicons name="construct" size={16} color={theme.colors.onInk} />
@@ -279,6 +304,13 @@ export default function DiagnosisScreen() {
           </Pressable>
         </View>
       </View>
+
+      <MechanicBriefSheet
+        visible={briefOpen}
+        vehicle={currentVehicle}
+        diag={briefDiag}
+        onClose={() => setBriefOpen(false)}
+      />
 
       <BottomTabBar active="diagnosis" />
     </View>
@@ -460,6 +492,23 @@ const styles = StyleSheet.create({
     padding: theme.spacing.md,
     marginTop: theme.spacing.xs,
     marginBottom: theme.spacing.sm,
+  },
+  briefButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.sm,
+    minHeight: 48,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.ink,
+    marginTop: theme.spacing.sm,
+  },
+  briefButtonText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.ink,
   },
   mechanicButton: {
     flexDirection: 'row',

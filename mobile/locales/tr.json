@@ -354,6 +354,27 @@
     "invite": "🔧 Usta'yı dene — araç bakımını adım adım kendin yap, AI ile doğrula, paradan tasarruf et: {{link}}",
     "achievement": "🔧 {{task}} işini kendim yaptım, ~₺{{savings}} tasarruf — Usta ile!"
   },
+  "brief": {
+    "cta": "Mekaniğe Göster",
+    "sheetTitle": "Mekaniğe Göster",
+    "sheetHint": "Bu özeti tamirciye gösterebilir ya da paylaşabilirsin.",
+    "share": "Paylaş",
+    "title": "🔧 USTA ÖN DEĞERLENDİRME",
+    "vehicle": "Araç",
+    "engine": "Motor",
+    "task": "İşlem",
+    "complaint": "Şikâyet/Bulgu",
+    "system": "İlgili sistem",
+    "soundType": "Ses türü",
+    "confidence": "Güven",
+    "urgency": "Aciliyet",
+    "nextStep": "Öneri",
+    "date": "Tarih",
+    "kindImage": "Görüntü teşhisi",
+    "kindSound": "Ses teşhisi",
+    "disclaimer": "⚠️ Bu bir yapay zekâ ÖN değerlendirmesidir, kesin teşhis değildir. Lütfen kendi kontrolünüzü yapın.",
+    "footer": "— Usta uygulaması"
+  },
   "feedback": {
     "question": "Bu teşhis doğru çıktı mı?",
     "thanks": "Teşekkürler — kaydedildi 🙌"

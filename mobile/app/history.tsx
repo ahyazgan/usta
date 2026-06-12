@@ -13,7 +13,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomTabBar } from '@/components/BottomTabBar';
 import { FeedbackRow } from '@/components/FeedbackRow';
+import { MechanicBriefSheet } from '@/components/MechanicBriefSheet';
 import { ResolutionRow } from '@/components/ResolutionRow';
+import { type BriefDiag } from '@/lib/mechanicBrief';
 import {
   createApiClient,
   type DiagnosisHistory,
@@ -91,9 +93,11 @@ function ReminderRow({ reminder }: { reminder: Reminder }) {
 function DiagnosisRow({
   item,
   vehicleId,
+  onShowMechanic,
 }: {
   item: DiagnosisHistory;
   vehicleId: number | null;
+  onShowMechanic: (item: DiagnosisHistory) => void;
 }) {
   const icon = item.kind === 'image' ? 'camera' : 'pulse';
   const metaParts = [
@@ -141,6 +145,14 @@ function DiagnosisRow({
             />
           </View>
         )}
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => onShowMechanic(item)}
+          style={({ pressed }) => [styles.diagBrief, pressed && styles.pressed]}
+        >
+          <Ionicons name="construct-outline" size={14} color={theme.colors.ink} />
+          <Text style={styles.diagBriefText}>{t('brief.cta')}</Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -192,6 +204,19 @@ export default function HistoryScreen() {
   const [km, setKm] = useState('');
   const [note, setNote] = useState('');
   const [cost, setCost] = useState('');
+
+  // "Mekaniğe Göster" — geçmiş teşhisten özet üret.
+  const [briefDiag, setBriefDiag] = useState<BriefDiag | null>(null);
+  function openBrief(item: DiagnosisHistory) {
+    setBriefDiag({
+      kindLabel: item.kind === 'image' ? t('brief.kindImage') : t('brief.kindSound'),
+      tespit: item.tespit ?? '',
+      taskLabel: item.task ? taskTitle(item.task) : undefined,
+      sistemLabel: item.ariza_sistem ? t(`sistem.${item.ariza_sistem}`) : undefined,
+      guven: item.guven,
+      dateLabel: formatDate(item.created_at),
+    });
+  }
 
   // Teşhis geçmişi (görüntü + ses) — hata sessizce boş listeye düşer.
   const authToken = useUstaStore((s) => s.authToken);
@@ -314,7 +339,12 @@ export default function HistoryScreen() {
             ) : (
               <View style={styles.card}>
                 {diagnoses.map((item) => (
-                  <DiagnosisRow key={item.id} item={item} vehicleId={vehicle?.id ?? null} />
+                  <DiagnosisRow
+                    key={item.id}
+                    item={item}
+                    vehicleId={vehicle?.id ?? null}
+                    onShowMechanic={openBrief}
+                  />
                 ))}
               </View>
             )}
@@ -410,6 +440,13 @@ export default function HistoryScreen() {
           </Pressable>
         </View>
       </ScrollView>
+
+      <MechanicBriefSheet
+        visible={briefDiag != null}
+        vehicle={vehicle}
+        diag={briefDiag}
+        onClose={() => setBriefDiag(null)}
+      />
 
       <BottomTabBar active="history" />
     </View>
@@ -542,6 +579,24 @@ const styles = StyleSheet.create({
   diagTextFlex: { flex: 1 },
   diagFeedback: {
     marginTop: theme.spacing.sm,
+  },
+  diagBrief: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.xs,
+    alignSelf: 'flex-start',
+    marginTop: theme.spacing.sm,
+    paddingVertical: 4,
+    paddingHorizontal: theme.spacing.sm,
+    borderRadius: theme.radius.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  diagBriefText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 11,
+    fontWeight: '700',
+    color: theme.colors.ink,
   },
   diagResolution: {
     marginTop: theme.spacing.sm,

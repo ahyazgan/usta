@@ -69,6 +69,12 @@ export async function shareInvite(): Promise<void> {
   if (ok) void capture('invite_shared');
 }
 
+/** "Mekaniğe Göster" özetini paylaş (WhatsApp/SMS vb.). */
+export async function shareMechanicBrief(text: string): Promise<void> {
+  const ok = await shareText(text);
+  if (ok) void capture('mechanic_brief_shared');
+}
+
 /** Bir başarı anını (rehber bitişi) paylaş. */
 export async function shareAchievement(taskTitle: string, savingTry: number): Promise<void> {
   const msg = [

@@ -131,7 +131,9 @@
       "tire": "Lastik Kontrolü",
       "wiper": "Silecek",
       "headlight": "Far / Ampul",
-      "chain": "Zincir Bakımı"
+      "chain": "Zincir Bakımı",
+      "tire_pressure": "Lastik Basıncı",
+      "clutch_cable": "Debriyaj Teli"
     },
     "cta": "Ustaya Göster"
   },

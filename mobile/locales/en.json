@@ -131,7 +131,9 @@
       "tire": "Tire Check",
       "wiper": "Wiper Blades",
       "headlight": "Headlight",
-      "chain": "Chain Maintenance"
+      "chain": "Chain Maintenance",
+      "tire_pressure": "Tire Pressure",
+      "clutch_cable": "Clutch Cable"
     },
     "cta": "Show the Master"
   },

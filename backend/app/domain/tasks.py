@@ -88,6 +88,16 @@ TASKS: tuple[MaintenanceTask, ...] = (
         "vision/chain.md", applies_to_types=_MOTO_ONLY,  # yalnızca motosiklet
         diy_saving_try=150,
     ),
+    MaintenanceTask(
+        "tire_pressure", "Lastik Basıncı", "Tire Pressure", Aciliyet.orta,
+        "vision/tire_pressure.md", applies_to_types=_MOTO_ONLY,
+        diy_saving_try=50,
+    ),
+    MaintenanceTask(
+        "clutch_cable", "Debriyaj Teli", "Clutch Cable", Aciliyet.orta,
+        "vision/clutch_cable.md", applies_to_types=_MOTO_ONLY,
+        diy_saving_try=150,
+    ),
 )
 
 _BY_ID = {t.id: t for t in TASKS}

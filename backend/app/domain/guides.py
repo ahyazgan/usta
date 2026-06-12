@@ -352,6 +352,66 @@ GUIDES: dict[str, TaskGuide] = {
             ),
         ),
     ),
+    "tire_pressure": TaskGuide(
+        task_id="tire_pressure",
+        est_minutes=10,
+        steps=(
+            GuideStep(
+                instruction_tr="Lastikler SOĞUKKEN ölç (sürüşten önce ya da en az 2-3 saat sonra). Doğru basınç değerini el kitabından veya sele altı/zincir muhafazası etiketinden öğren.",
+                instruction_en="Measure when tyres are COLD (before riding or 2-3 h after). Get the correct pressure from the manual or the under-seat/swingarm label.",
+                warning_tr="Sıcak lastikte ölçüm yanıltıcı yüksek çıkar; daima soğukken ölç.",
+                warning_en="Hot tyres read falsely high; always measure cold.",
+            ),
+            GuideStep(
+                instruction_tr="Supap kapağını çıkar, basınç saatini supaba sıkıca bastır ve değeri oku. Ön ve arka için ayrı ölç (değerler farklı olabilir).",
+                instruction_en="Remove the valve cap, press the gauge firmly onto the valve and read. Measure front and rear separately (values may differ).",
+                tool_tr="Lastik basınç saati",
+                tool_en="Tyre pressure gauge",
+            ),
+            GuideStep(
+                instruction_tr="Düşükse hava ekle, yüksekse supap iğnesine kısa basarak hava boşalt; sonra tekrar ölç. Üretici değerine getir.",
+                instruction_en="If low, add air; if high, briefly press the valve pin to release; re-measure. Match the maker's value.",
+            ),
+            GuideStep(
+                instruction_tr="Supap kapağını tak. Yan duvarda çatlak/balon veya supap dibinde kaçak görürsen o lastikle sürme, tamirciye git.",
+                instruction_en="Refit the valve cap. If you see sidewall cracks/bulges or a leak at the valve base, don't ride on it — see a mechanic.",
+                warning_tr="Yan duvarda balon/derin çatlak patlama riskidir.",
+                warning_en="A sidewall bulge/deep crack is a blowout risk.",
+            ),
+        ),
+    ),
+    "clutch_cable": TaskGuide(
+        task_id="clutch_cable",
+        est_minutes=15,
+        steps=(
+            GuideStep(
+                instruction_tr="Motoru KAPAT, motosikleti sehpaya/desteğe al. Sol gidondaki debriyaj kolunu ve ona bağlı teli bul (sağdaki fren koluyla karıştırma).",
+                instruction_en="Turn the engine OFF, put the bike on its stand. Find the clutch lever on the LEFT bar and its cable (don't confuse it with the right brake lever).",
+                warning_tr="Fren ve debriyaj kolunu karıştırma; yanlış kol can güvenliği riskidir.",
+                warning_en="Don't confuse the brake and clutch levers; the wrong one is a safety risk.",
+            ),
+            GuideStep(
+                instruction_tr="Kol boşluğunu kontrol et: kolun ucunu hafifçe çek; direnç başlamadan önce ~2-3 mm serbest boşluk olmalı (kesin değer el kitabı).",
+                instruction_en="Check lever free-play: pull the lever tip lightly; there should be ~2-3 mm free play before resistance (manual for the exact figure).",
+            ),
+            GuideStep(
+                instruction_tr="Teli incele: kılıf çatlak/bükük mü, lifler açılmış/kopmuş mu? Açılmış lif görürsen tele dokunma, sürme ve doğrudan tamirciye git.",
+                instruction_en="Inspect the cable: cracked/kinked sheath, frayed/broken strands? If you see fraying, don't touch it, don't ride — go straight to a mechanic.",
+                warning_tr="Sürüşte kopan debriyaj teli kontrol kaybına yol açar.",
+                warning_en="A clutch cable snapping while riding causes loss of control.",
+            ),
+            GuideStep(
+                instruction_tr="Tel kuruysa ayar parçasından / üst uçtan ince makine yağı damlat ve kolu birkaç kez çekerek dağıt. Fazla yağı sil.",
+                instruction_en="If dry, drip light machine oil at the adjuster/top end and work the lever to spread it. Wipe off excess.",
+                tool_tr="İnce yağ, temiz bez",
+                tool_en="Light oil, clean cloth",
+            ),
+            GuideStep(
+                instruction_tr="Boşluk yanlışsa (debriyaj kavramıyor ya da sürtüyor) ayarı tamirciye bırak; bu rehber yağlama + kontrol içindir.",
+                instruction_en="If free-play is off (clutch slips or drags), leave adjustment to a mechanic; this guide is lube + inspection.",
+            ),
+        ),
+    ),
     "headlight": TaskGuide(
         task_id="headlight",
         est_minutes=15,

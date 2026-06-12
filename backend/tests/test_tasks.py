@@ -44,13 +44,13 @@ def test_tasks_by_vehicle_type():
     moto = {t.id for t in tasks_for_vehicle(FuelType.benzin, VehicleType.motosiklet)}
     car = {t.id for t in tasks_for_vehicle(FuelType.benzin, VehicleType.araba)}
 
-    assert "chain" in moto
+    assert {"chain", "tire_pressure", "clutch_cable"} <= moto  # moto-özel görevler
     assert "cabin_filter" not in moto
     assert "wiper" not in moto
     # Ortak görevler motosiklette de var.
     assert {"oil_change", "brake_check", "tire", "battery"} <= moto
 
-    assert "chain" not in car
+    assert {"chain", "tire_pressure", "clutch_cable"} & car == set()  # arabada yok
     assert {"cabin_filter", "wiper"} <= car
 
     # None (eski kayıt) = araba kabul edilir.

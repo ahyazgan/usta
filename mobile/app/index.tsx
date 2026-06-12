@@ -1,12 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -91,9 +94,33 @@ export default function HomeScreen() {
     loading: vehiclesLoading,
     selectVehicle,
     removeVehicle,
+    updateVehicle,
   } = useVehicles();
   const { chips } = useGarageStatus(currentVehicle?.id ?? null);
   const summary = useSummary(currentVehicle?.id ?? null);
+
+  // Km hızlı güncelleme modalı (km rozetine dokun → yaz → kaydet).
+  const [kmModalOpen, setKmModalOpen] = useState(false);
+  const [kmInput, setKmInput] = useState('');
+  const [kmSaving, setKmSaving] = useState(false);
+
+  function openKmModal() {
+    if (currentVehicle == null) return;
+    setKmInput(
+      currentVehicle.current_km != null ? String(currentVehicle.current_km) : '',
+    );
+    setKmModalOpen(true);
+  }
+
+  async function saveKm() {
+    if (currentVehicle == null || kmSaving) return;
+    const parsed = Number(kmInput.trim());
+    if (!Number.isFinite(parsed) || parsed < 0) return;
+    setKmSaving(true);
+    await updateVehicle(currentVehicle.id, { current_km: Math.round(parsed) });
+    setKmSaving(false);
+    setKmModalOpen(false);
+  }
 
   const isAuthenticated = authToken != null;
 
@@ -242,14 +269,21 @@ export default function HomeScreen() {
 
         {/* Araç kartı (koyu) */}
         <View style={styles.carCard}>
-          <View style={styles.kmBadge}>
+          <Pressable
+            accessibilityRole="button"
+            onPress={openKmModal}
+            style={({ pressed }) => [styles.kmBadge, pressed && styles.pressed]}
+          >
             <Text style={styles.kmNum}>
               {currentVehicle.current_km != null
                 ? currentVehicle.current_km.toLocaleString('tr-TR')
                 : '—'}
             </Text>
-            <Text style={styles.kmLabel}>km</Text>
-          </View>
+            <View style={styles.kmLabelRow}>
+              <Text style={styles.kmLabel}>km</Text>
+              <Ionicons name="pencil" size={9} color={theme.colors.onInkMuted} />
+            </View>
+          </Pressable>
           {currentVehicle.plate != null && currentVehicle.plate.length > 0 && (
             <View style={styles.plateBadge}>
               <Text style={styles.plateText}>{currentVehicle.plate}</Text>
@@ -326,6 +360,51 @@ export default function HomeScreen() {
           </Text>
         </View>
       </ScrollView>
+
+      {/* Km hızlı güncelleme */}
+      <Modal
+        visible={kmModalOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setKmModalOpen(false)}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>{t('home.kmModal.title')}</Text>
+            <TextInput
+              style={styles.modalInput}
+              value={kmInput}
+              onChangeText={setKmInput}
+              placeholder={t('home.kmModal.placeholder')}
+              placeholderTextColor={theme.colors.textSecondary}
+              keyboardType="number-pad"
+              autoFocus
+            />
+            <View style={styles.modalRow}>
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => setKmModalOpen(false)}
+                style={({ pressed }) => [styles.modalCancel, pressed && styles.pressed]}
+              >
+                <Text style={styles.modalCancelText}>{t('common.cancel')}</Text>
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityState={{ disabled: kmSaving }}
+                disabled={kmSaving}
+                onPress={() => void saveKm()}
+                style={({ pressed }) => [styles.modalSave, pressed && styles.pressed]}
+              >
+                {kmSaving ? (
+                  <ActivityIndicator color={theme.colors.onInk} />
+                ) : (
+                  <Text style={styles.modalSaveText}>{t('common.save')}</Text>
+                )}
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       <BottomTabBar active="home" />
     </View>
@@ -455,10 +534,80 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: theme.colors.onInk,
   },
+  kmLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
   kmLabel: {
     fontFamily: theme.fonts.body,
     fontSize: 9,
     color: theme.colors.onInkMuted,
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: theme.spacing.xl,
+  },
+  modalCard: {
+    width: '100%',
+    maxWidth: 360,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.xl,
+    gap: theme.spacing.md,
+  },
+  modalTitle: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 18,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  modalInput: {
+    minHeight: theme.touchTarget,
+    backgroundColor: theme.colors.background,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    paddingHorizontal: theme.spacing.lg,
+    fontFamily: theme.fonts.body,
+    fontSize: 16,
+    color: theme.colors.textPrimary,
+  },
+  modalRow: {
+    flexDirection: 'row',
+    gap: theme.spacing.md,
+  },
+  modalCancel: {
+    flex: 1,
+    minHeight: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  modalCancelText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.textSecondary,
+  },
+  modalSave: {
+    flex: 1,
+    minHeight: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.ink,
+  },
+  modalSaveText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 14,
+    fontWeight: '700',
+    color: theme.colors.onInk,
   },
   plateBadge: {
     alignSelf: 'flex-start',

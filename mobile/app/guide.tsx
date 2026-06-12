@@ -67,6 +67,9 @@ export default function GuideScreen() {
   const insets = useSafeAreaInsets();
   const authToken = useUstaStore((s) => s.authToken);
   const selectedTask = useUstaStore((s) => s.selectedTask);
+  const guideProgress = useUstaStore((s) => s.guideProgress);
+  const setGuideProgress = useUstaStore((s) => s.setGuideProgress);
+  const clearGuideProgress = useUstaStore((s) => s.clearGuideProgress);
   const { currentVehicle } = useVehicles();
 
   const client = useMemo(
@@ -77,8 +80,16 @@ export default function GuideScreen() {
   const [guide, setGuide] = useState<TaskGuide | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [current, setCurrent] = useState(0);
+  // Kaldığın adımdan devam et (kameraya gidip dönünce sıfırlanmasın).
+  const [current, setCurrent] = useState(
+    selectedTask != null ? (guideProgress[selectedTask.id] ?? 0) : 0,
+  );
   const [finishing, setFinishing] = useState(false);
+
+  // Adım değiştikçe ilerlemeyi hatırla.
+  useEffect(() => {
+    if (selectedTask != null) setGuideProgress(selectedTask.id, current);
+  }, [current, selectedTask, setGuideProgress]);
 
   const load = useCallback(async () => {
     if (currentVehicle == null || selectedTask == null) {
@@ -89,7 +100,10 @@ export default function GuideScreen() {
     setLoading(true);
     setError(null);
     try {
-      setGuide(await client.getGuide(currentVehicle.id, selectedTask.id));
+      const g = await client.getGuide(currentVehicle.id, selectedTask.id);
+      setGuide(g);
+      // Hatırlanan adım rehber sınırını aşıyorsa (içerik değişmiş olabilir) kırp.
+      setCurrent((c) => Math.min(c, Math.max(0, g.steps.length - 1)));
     } catch (err) {
       setError(
         err instanceof ApiError && err.status === 0
@@ -127,6 +141,7 @@ export default function GuideScreen() {
       /* kayıt başarısız olsa da kullanıcıyı rehberde kilitleme */
     }
     setFinishing(false);
+    clearGuideProgress(guide.task_id); // bitti — sonraki sefer baştan
     router.replace('/');
   }
 

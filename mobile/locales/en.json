@@ -29,6 +29,10 @@
       "soon": "Coming up",
       "due": "It's time",
       "unknown": "No record"
+    },
+    "kmModal": {
+      "title": "Update mileage",
+      "placeholder": "e.g. 85200"
     }
   },
   "maintenance": {
@@ -51,6 +55,8 @@
   },
   "diagnosis": {
     "title": "What's wrong?",
+    "chatLabel": "Usta says",
+    "intro": "Welcome! Describe the noise — when does it happen, what does it sound like? I'll tell you what it most likely is.",
     "show": {
       "title": "Show",
       "desc": "Point the camera at the part"
@@ -226,6 +232,7 @@
     "reminders": {
       "title": "Reminders",
       "empty": "No reminders yet",
+      "emptyHint": "Add maintenance entries and km-based reminders will appear here.",
       "remaining": "{{km}} km remaining",
       "dueAt": "at {{km}} km",
       "unknownKm": "Unknown",
@@ -239,6 +246,7 @@
     "logs": {
       "title": "Past Entries",
       "empty": "No entries yet",
+      "emptyHint": "Finish a maintenance guide or add an entry manually below.",
       "kmValue": "{{km}} km",
       "noKm": "No km"
     },

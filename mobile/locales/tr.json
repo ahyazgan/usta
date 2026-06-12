@@ -29,6 +29,10 @@
       "soon": "Zamanı yaklaşıyor",
       "due": "Zamanı geldi",
       "unknown": "Kayıt yok"
+    },
+    "kmModal": {
+      "title": "Kilometreyi güncelle",
+      "placeholder": "Örn: 85200"
     }
   },
   "maintenance": {
@@ -51,6 +55,8 @@
   },
   "diagnosis": {
     "title": "Neyin var?",
+    "chatLabel": "Usta diyor ki",
+    "intro": "Hoş geldin! Sesi bana tarif et — ne zaman çıkıyor, neye benziyor? Ben de büyük ihtimalle neyin olduğunu söyleyeyim.",
     "show": {
       "title": "Göster",
       "desc": "Motoru veya parçayı kameraya tut"
@@ -226,6 +232,7 @@
     "reminders": {
       "title": "Hatırlatıcılar",
       "empty": "Henüz hatırlatıcı yok",
+      "emptyHint": "Bakım kaydı ekledikçe km bazlı hatırlatıcılar burada belirir.",
       "remaining": "{{km}} km kaldı",
       "dueAt": "{{km}} km'de",
       "unknownKm": "Bilinmiyor",
@@ -239,6 +246,7 @@
     "logs": {
       "title": "Geçmiş Kayıtlar",
       "empty": "Henüz kayıt yok",
+      "emptyHint": "Bir bakım rehberini tamamla ya da aşağıdan elle kayıt ekle.",
       "kmValue": "{{km}} km",
       "noKm": "Km yok"
     },

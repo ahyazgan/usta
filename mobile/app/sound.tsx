@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -13,18 +13,23 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomTabBar } from '@/components/BottomTabBar';
-import type { Aciliyet, KayitKosulu, SoundDiagnoseResult } from '@/lib/api';
+import type { Guven, KayitKosulu } from '@/lib/api';
 import { t } from '@/lib/i18n';
 import { theme } from '@/lib/theme';
 import { useSoundDiagnose } from '@/lib/useSoundDiagnose';
+import { useVehicles } from '@/lib/useVehicles';
 
 const CONDITIONS: KayitKosulu[] = ['rolanti', 'gazda', 'soguk_motor', 'seyirde'];
 
-/** Urgency → soft badge palette. */
-function urgencyMeta(aciliyet: Aciliyet) {
-  if (aciliyet === 'yuksek') return { bg: theme.colors.urgentSoftBg, fg: theme.colors.urgentSoftText };
-  if (aciliyet === 'orta') return { bg: theme.colors.warnSoftBg, fg: theme.colors.warnSoftText };
-  return { bg: theme.colors.okSoftBg, fg: theme.colors.okSoftText };
+/** Sohbet balonu türleri (mockup ekran 3). */
+interface Msg {
+  id: number;
+  kind: 'usta' | 'user' | 'warning';
+  text: string;
+  /** Usta balonunda güven satırı. */
+  conf?: Guven;
+  /** Usta balonunda küçük meta satırı (kategori · aciliyet). */
+  meta?: string;
 }
 
 function ModeCard({
@@ -48,7 +53,7 @@ function ModeCard({
       style={({ pressed }) => [styles.modeCard, active && styles.modeCardActive, pressed && styles.pressed]}
     >
       <View style={[styles.modeIcon, active && styles.modeIconActive]}>
-        <Ionicons name={icon} size={24} color={active ? theme.colors.onInk : theme.colors.ink} />
+        <Ionicons name={icon} size={22} color={active ? theme.colors.onInk : theme.colors.ink} />
       </View>
       <Text style={styles.modeTitle}>{title}</Text>
       <Text style={styles.modeDesc}>{desc}</Text>
@@ -56,104 +61,167 @@ function ModeCard({
   );
 }
 
-function ResultPanel({ result }: { result: SoundDiagnoseResult }) {
-  const urgency = urgencyMeta(result.aciliyet);
+function Bubble({ msg }: { msg: Msg }) {
+  if (msg.kind === 'warning') {
+    return (
+      <View style={styles.warnBubble}>
+        <Ionicons name="warning" size={16} color={theme.colors.urgentSoftText} />
+        <Text style={styles.warnBubbleText}>{msg.text}</Text>
+      </View>
+    );
+  }
+  const isUsta = msg.kind === 'usta';
   return (
-    <View style={styles.resultPanel}>
-      <Text style={styles.resultTitle}>{t('sound.result.title')}</Text>
-
-      <View style={styles.resultRow}>
-        <Text style={styles.resultLabel}>{t('sound.result.kategori')}</Text>
-        <Text style={styles.resultValue}>{t(`sound.kategori.${result.ses_kategorisi}`)}</Text>
-      </View>
-
-      <View style={styles.resultRow}>
-        <Text style={styles.resultLabel}>{t('sound.result.tespit')}</Text>
-        <Text style={styles.resultValue}>{result.tespit}</Text>
-      </View>
-
-      <View style={styles.resultRow}>
-        <Text style={styles.resultLabel}>{t('sound.result.guven')}</Text>
-        <Text style={styles.resultValue}>{t(`camera.guven.${result.guven}`)}</Text>
-      </View>
-
-      <View style={styles.resultRow}>
-        <Text style={styles.resultLabel}>{t('sound.result.aciliyet')}</Text>
-        <View style={[styles.badge, { backgroundColor: urgency.bg }]}>
-          <Text style={[styles.badgeText, { color: urgency.fg }]}>
-            {t(`sound.aciliyet.${result.aciliyet}`)}
+    <View style={[styles.bubble, isUsta ? styles.bubbleUsta : styles.bubbleUser]}>
+      <Text style={isUsta ? styles.bubbleUstaText : styles.bubbleUserText}>{msg.text}</Text>
+      {isUsta && (msg.conf != null || msg.meta != null) && (
+        <View style={styles.confRow}>
+          <View style={styles.confDot} />
+          <Text style={styles.confText}>
+            {[msg.conf != null ? t(`camera.guven.${msg.conf}`) : null, msg.meta]
+              .filter(Boolean)
+              .join(' · ')}
           </Text>
-        </View>
-      </View>
-
-      <View style={styles.resultRow}>
-        <Text style={styles.resultLabel}>{t('sound.result.sonrakiAdim')}</Text>
-        <Text style={styles.resultValue}>{result.sonraki_adim}</Text>
-      </View>
-
-      {result.guvenlik_uyarisi != null && (
-        <View style={styles.warningBox}>
-          <Ionicons name="warning" size={18} color={theme.colors.onInk} />
-          <Text style={styles.warningText}>{result.guvenlik_uyarisi}</Text>
         </View>
       )}
     </View>
   );
 }
 
+let nextId = 1;
+
 export default function DiagnosisScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { currentVehicle } = useVehicles();
   const { loading, error, result, runSoundDiagnose } = useSoundDiagnose();
 
   const [description, setDescription] = useState('');
   const [condition, setCondition] = useState<KayitKosulu>('rolanti');
+  const [messages, setMessages] = useState<Msg[]>([
+    { id: 0, kind: 'usta', text: t('diagnosis.intro') },
+  ]);
+  const [showMechanic, setShowMechanic] = useState(false);
+  const scrollRef = useRef<ScrollView>(null);
+
+  // Yeni teşhis sonucu geldiğinde usta balonları olarak akışa ekle.
+  useEffect(() => {
+    if (result == null) return;
+    const additions: Msg[] = [
+      {
+        id: nextId++,
+        kind: 'usta',
+        text: result.tespit,
+        conf: result.guven,
+        meta: `${t(`sound.kategori.${result.ses_kategorisi}`)} · ${t(
+          `sound.aciliyet.${result.aciliyet}`,
+        )}`,
+      },
+    ];
+    if (result.guvenlik_uyarisi != null && result.guvenlik_uyarisi.length > 0) {
+      additions.push({ id: nextId++, kind: 'warning', text: result.guvenlik_uyarisi });
+    }
+    additions.push({ id: nextId++, kind: 'usta', text: result.sonraki_adim });
+    setMessages((m) => [...m, ...additions]);
+    setShowMechanic(result.tamirciye_git_onerisi === true);
+  }, [result]);
+
+  // Akış uzadıkça en alta kay.
+  useEffect(() => {
+    const id = setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 80);
+    return () => clearTimeout(id);
+  }, [messages, loading]);
+
+  function handleSend() {
+    const text = description.trim();
+    if (text.length === 0 || loading) return;
+    setMessages((m) => [
+      ...m,
+      {
+        id: nextId++,
+        kind: 'user',
+        text: `${text} (${t(`sound.condition.${condition}`)})`,
+      },
+    ]);
+    setDescription('');
+    void runSoundDiagnose(text, condition);
+  }
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + theme.spacing.md }]}>
-      <Text style={styles.title}>{t('diagnosis.title')}</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>{t('diagnosis.title')}</Text>
+        {currentVehicle && (
+          <View style={styles.carTag}>
+            <Ionicons name="car-sport" size={13} color={theme.colors.textSecondary} />
+            <Text style={styles.carTagText}>
+              {currentVehicle.make} {currentVehicle.model}
+            </Text>
+          </View>
+        )}
+      </View>
 
+      {/* Göster / Dinlet modları */}
+      <View style={styles.modeGrid}>
+        <ModeCard
+          icon="camera"
+          title={t('diagnosis.show.title')}
+          desc={t('diagnosis.show.desc')}
+          active={false}
+          onPress={() => router.replace('/maintenance')}
+        />
+        <ModeCard
+          icon="pulse"
+          title={t('diagnosis.listen.title')}
+          desc={t('diagnosis.listen.desc')}
+          active
+          onPress={() => undefined}
+        />
+      </View>
+
+      {/* Sohbet akışı */}
       <ScrollView
-        contentContainerStyle={styles.scroll}
+        ref={scrollRef}
+        style={styles.chat}
+        contentContainerStyle={styles.chatContent}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Göster / Dinlet modları */}
-        <View style={styles.modeGrid}>
-          <ModeCard
-            icon="camera"
-            title={t('diagnosis.show.title')}
-            desc={t('diagnosis.show.desc')}
-            active={false}
+        <Text style={styles.chatLabel}>{t('diagnosis.chatLabel')}</Text>
+        {messages.map((msg) => (
+          <Bubble key={msg.id} msg={msg} />
+        ))}
+        {loading && (
+          <View style={[styles.bubble, styles.bubbleUsta, styles.typing]}>
+            <ActivityIndicator size="small" color={theme.colors.onInk} />
+            <Text style={styles.bubbleUstaText}>{t('sound.analyzing')}</Text>
+          </View>
+        )}
+        {error && (
+          <View style={styles.errorRow}>
+            <Ionicons name="alert-circle" size={16} color={theme.colors.dangerBright} />
+            <Text style={styles.errorText}>{t(error)}</Text>
+          </View>
+        )}
+        {showMechanic && (
+          <Pressable
+            accessibilityRole="button"
             onPress={() => router.replace('/maintenance')}
-          />
-          <ModeCard
-            icon="pulse"
-            title={t('diagnosis.listen.title')}
-            desc={t('diagnosis.listen.desc')}
-            active
-            onPress={() => undefined}
-          />
-        </View>
+            style={({ pressed }) => [styles.mechanicButton, pressed && styles.pressed]}
+          >
+            <Ionicons name="construct" size={16} color={theme.colors.onInk} />
+            <Text style={styles.mechanicText}>{t('common.goToMechanic')}</Text>
+          </Pressable>
+        )}
+      </ScrollView>
 
-        <View style={styles.recordedHint}>
-          <Ionicons name="information-circle" size={18} color={theme.colors.textSecondary} />
-          <Text style={styles.recordedHintText}>{t('sound.recordedHint')}</Text>
-        </View>
-
-        <Text style={styles.label}>{t('sound.descriptionLabel')}</Text>
-        <TextInput
-          style={styles.textArea}
-          value={description}
-          onChangeText={setDescription}
-          placeholder={t('sound.descriptionPlaceholder')}
-          placeholderTextColor={theme.colors.textSecondary}
-          multiline
-          textAlignVertical="top"
-        />
-
-        <Text style={styles.label}>{t('sound.conditionLabel')}</Text>
-        <View style={styles.conditionRow}>
+      {/* Yazma alanı */}
+      <View style={styles.composer}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.conditionRow}
+        >
           {CONDITIONS.map((c) => {
             const selected = condition === c;
             return (
@@ -174,53 +242,31 @@ export default function DiagnosisScreen() {
               </Pressable>
             );
           })}
-        </View>
-
-        {error && (
-          <View style={styles.errorBox}>
-            <Ionicons name="alert-circle" size={18} color={theme.colors.dangerBright} />
-            <Text style={styles.errorText}>{t(error)}</Text>
-          </View>
-        )}
-
-        {result && <ResultPanel result={result} />}
-
-        {result?.tamirciye_git_onerisi === true && (
+        </ScrollView>
+        <View style={styles.inputRow}>
+          <TextInput
+            style={styles.input}
+            value={description}
+            onChangeText={setDescription}
+            placeholder={t('sound.descriptionPlaceholder')}
+            placeholderTextColor={theme.colors.textSecondary}
+            multiline
+            onSubmitEditing={handleSend}
+          />
           <Pressable
             accessibilityRole="button"
-            onPress={() => router.replace('/maintenance')}
-            style={({ pressed }) => [styles.mechanicButton, pressed && styles.pressed]}
+            accessibilityState={{ disabled: loading || description.trim().length === 0 }}
+            disabled={loading || description.trim().length === 0}
+            onPress={handleSend}
+            style={({ pressed }) => [
+              styles.send,
+              (loading || description.trim().length === 0) && styles.sendDisabled,
+              pressed && styles.pressed,
+            ]}
           >
-            <Ionicons name="construct" size={18} color={theme.colors.onInk} />
-            <Text style={styles.mechanicText}>{t('common.goToMechanic')}</Text>
+            <Ionicons name="arrow-up" size={20} color={theme.colors.onInk} />
           </Pressable>
-        )}
-      </ScrollView>
-
-      <View style={styles.footer}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityState={{ disabled: loading }}
-          disabled={loading}
-          onPress={() => void runSoundDiagnose(description, condition)}
-          style={({ pressed }) => [
-            styles.analyzeButton,
-            loading && styles.analyzeDisabled,
-            pressed && styles.pressed,
-          ]}
-        >
-          {loading ? (
-            <>
-              <ActivityIndicator color={theme.colors.onInk} />
-              <Text style={styles.analyzeText}>{t('sound.analyzing')}</Text>
-            </>
-          ) : (
-            <>
-              <Ionicons name="pulse" size={22} color={theme.colors.onInk} />
-              <Text style={styles.analyzeText}>{t('sound.analyze')}</Text>
-            </>
-          )}
-        </Pressable>
+        </View>
       </View>
 
       <BottomTabBar active="diagnosis" />
@@ -229,27 +275,42 @@ export default function DiagnosisScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
+  container: { flex: 1, backgroundColor: theme.colors.background },
+  header: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.sm,
+    gap: theme.spacing.xs,
   },
   title: {
     fontFamily: theme.fonts.heading,
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: '700',
     color: theme.colors.textPrimary,
     letterSpacing: -0.3,
-    paddingHorizontal: theme.spacing.lg,
-    marginBottom: theme.spacing.md,
   },
-  scroll: {
-    paddingHorizontal: theme.spacing.lg,
-    paddingBottom: theme.spacing.lg,
+  carTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: theme.spacing.xs,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.pill,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    paddingVertical: 3,
+    paddingHorizontal: theme.spacing.md,
+  },
+  carTagText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 12,
+    fontWeight: '500',
+    color: theme.colors.textSecondary,
   },
   modeGrid: {
     flexDirection: 'row',
-    gap: theme.spacing.md,
-    marginBottom: theme.spacing.lg,
+    gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.sm,
   },
   modeCard: {
     flex: 1,
@@ -257,85 +318,163 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.lg,
     borderWidth: 1.5,
     borderColor: theme.colors.border,
-    padding: theme.spacing.lg,
+    padding: theme.spacing.md,
     alignItems: 'center',
-    gap: 4,
+    gap: 2,
   },
-  modeCardActive: {
-    borderColor: theme.colors.ink,
-  },
+  modeCardActive: { borderColor: theme.colors.ink },
   modeIcon: {
-    width: 48,
-    height: 48,
+    width: 40,
+    height: 40,
     borderRadius: theme.radius.md,
     backgroundColor: theme.colors.background,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: theme.spacing.xs,
+    marginBottom: 2,
   },
-  modeIconActive: {
-    backgroundColor: theme.colors.ink,
-  },
+  modeIconActive: { backgroundColor: theme.colors.ink },
   modeTitle: {
     fontFamily: theme.fonts.body,
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
     color: theme.colors.textPrimary,
   },
   modeDesc: {
     fontFamily: theme.fonts.body,
-    fontSize: 11,
+    fontSize: 10,
     color: theme.colors.textSecondary,
     textAlign: 'center',
-    lineHeight: 15,
+    lineHeight: 14,
   },
-  recordedHint: {
+  chat: { flex: 1 },
+  chatContent: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.md,
+  },
+  chatLabel: {
+    fontFamily: theme.fonts.body,
+    fontSize: 11,
+    fontWeight: '600',
+    color: theme.colors.textSecondary,
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    marginBottom: theme.spacing.sm,
+  },
+  bubble: {
+    borderRadius: theme.radius.lg,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+    marginBottom: theme.spacing.sm,
+    maxWidth: '90%',
+  },
+  bubbleUsta: {
+    backgroundColor: theme.colors.ink,
+    borderBottomLeftRadius: 4,
+    alignSelf: 'flex-start',
+  },
+  bubbleUser: {
+    backgroundColor: theme.colors.border,
+    borderBottomRightRadius: 4,
+    alignSelf: 'flex-end',
+  },
+  bubbleUstaText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    lineHeight: 20,
+    color: theme.colors.onInk,
+  },
+  bubbleUserText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    lineHeight: 20,
+    color: theme.colors.textPrimary,
+  },
+  confRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.sm,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.sm,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    padding: theme.spacing.md,
-    marginBottom: theme.spacing.md,
+    gap: theme.spacing.xs,
+    marginTop: theme.spacing.sm,
   },
-  recordedHintText: {
+  confDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: theme.colors.successBright,
+  },
+  confText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 10,
+    color: theme.colors.onInkMuted,
+  },
+  warnBubble: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: theme.spacing.sm,
+    backgroundColor: theme.colors.urgentSoftBg,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
+    maxWidth: '95%',
+    alignSelf: 'flex-start',
+  },
+  warnBubbleText: {
     flex: 1,
     fontFamily: theme.fonts.body,
     fontSize: 12,
-    color: theme.colors.textSecondary,
+    lineHeight: 18,
+    color: theme.colors.urgentSoftText,
   },
-  label: {
-    fontFamily: theme.fonts.body,
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-    marginBottom: theme.spacing.sm,
-    marginTop: theme.spacing.md,
-  },
-  textArea: {
-    minHeight: 96,
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    padding: theme.spacing.lg,
-    fontFamily: theme.fonts.body,
-    fontSize: 16,
-    color: theme.colors.textPrimary,
-  },
-  conditionRow: {
+  typing: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    alignItems: 'center',
     gap: theme.spacing.sm,
   },
+  errorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    paddingVertical: theme.spacing.sm,
+  },
+  errorText: {
+    flex: 1,
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    color: theme.colors.dangerBright,
+  },
+  mechanicButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.sm,
+    minHeight: 48,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.ink,
+    marginTop: theme.spacing.sm,
+  },
+  mechanicText: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.onInk,
+  },
+  composer: {
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+    paddingTop: theme.spacing.sm,
+    paddingBottom: theme.spacing.sm,
+    gap: theme.spacing.sm,
+  },
+  conditionRow: {
+    gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.lg,
+  },
   conditionChip: {
-    minHeight: 44,
+    minHeight: 36,
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: theme.colors.border,
     borderRadius: theme.radius.pill,
-    paddingHorizontal: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.md,
     backgroundColor: theme.colors.surface,
   },
   conditionChipSelected: {
@@ -344,123 +483,39 @@ const styles = StyleSheet.create({
   },
   conditionLabel: {
     fontFamily: theme.fonts.body,
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '700',
     color: theme.colors.textSecondary,
   },
-  conditionLabelSelected: {
-    color: theme.colors.onInk,
-  },
-  errorBox: {
+  conditionLabelSelected: { color: theme.colors.onInk },
+  inputRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     gap: theme.spacing.sm,
-    marginTop: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.lg,
   },
-  errorText: {
+  input: {
     flex: 1,
-    fontFamily: theme.fonts.body,
-    fontSize: 14,
-    color: theme.colors.dangerBright,
-  },
-  resultPanel: {
+    minHeight: 44,
+    maxHeight: 110,
     backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.md,
+    borderRadius: theme.radius.lg,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    padding: theme.spacing.lg,
-    marginTop: theme.spacing.lg,
-  },
-  resultTitle: {
-    fontFamily: theme.fonts.heading,
-    fontSize: 18,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
-    marginBottom: theme.spacing.sm,
-  },
-  resultRow: {
-    marginTop: theme.spacing.md,
-  },
-  resultLabel: {
-    fontFamily: theme.fonts.body,
-    fontSize: 12,
-    color: theme.colors.textSecondary,
-  },
-  resultValue: {
-    fontFamily: theme.fonts.body,
-    fontSize: 15,
-    color: theme.colors.textPrimary,
-    marginTop: 2,
-  },
-  badge: {
-    alignSelf: 'flex-start',
-    borderRadius: theme.radius.pill,
-    paddingVertical: 3,
-    paddingHorizontal: theme.spacing.md,
-    marginTop: theme.spacing.xs,
-  },
-  badgeText: {
-    fontFamily: theme.fonts.body,
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  warningBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
-    backgroundColor: theme.colors.warningBright,
-    borderRadius: theme.radius.sm,
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.md,
-    marginTop: theme.spacing.lg,
-  },
-  warningText: {
-    flex: 1,
-    fontFamily: theme.fonts.body,
-    fontSize: 13,
-    fontWeight: '600',
-    color: theme.colors.onInk,
-  },
-  mechanicButton: {
-    minHeight: theme.touchTarget,
-    borderRadius: theme.radius.md,
-    backgroundColor: theme.colors.ink,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: theme.spacing.sm,
-    marginTop: theme.spacing.lg,
-  },
-  mechanicText: {
-    fontFamily: theme.fonts.heading,
-    fontSize: 16,
-    fontWeight: '700',
-    color: theme.colors.onInk,
-  },
-  footer: {
     paddingHorizontal: theme.spacing.lg,
-    paddingTop: theme.spacing.sm,
-    paddingBottom: theme.spacing.sm,
+    paddingVertical: theme.spacing.md,
+    fontFamily: theme.fonts.body,
+    fontSize: 14,
+    color: theme.colors.textPrimary,
   },
-  analyzeButton: {
-    minHeight: theme.touchTarget,
+  send: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: theme.colors.ink,
-    borderRadius: theme.radius.md,
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: theme.spacing.sm,
   },
-  analyzeDisabled: {
-    opacity: 0.5,
-  },
-  analyzeText: {
-    fontFamily: theme.fonts.heading,
-    fontSize: 18,
-    fontWeight: '700',
-    color: theme.colors.onInk,
-  },
-  pressed: {
-    opacity: 0.85,
-  },
+  sendDisabled: { opacity: 0.4 },
+  pressed: { opacity: 0.85 },
 });

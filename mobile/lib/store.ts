@@ -19,9 +19,13 @@ export interface UstaState {
   authBootstrapped: boolean;
   selectedTask: Task | null;
   lastResult: DiagnoseResult | null;
+  /** Kaldığın adım (görev id → adım index'i) — rehbere dönünce devam et. */
+  guideProgress: Record<string, number>;
   setVehicles: (vehicles: Vehicle[]) => void;
   selectVehicle: (id: number | null) => void;
   setAuthBootstrapped: (done: boolean) => void;
+  setGuideProgress: (taskId: string, step: number) => void;
+  clearGuideProgress: (taskId: string) => void;
   setAuthToken: (token: string | null) => void;
   setRefreshToken: (token: string | null) => void;
   /** Set both tokens at once (login/hydrate) or clear both (logout). */
@@ -53,9 +57,17 @@ export const useUstaStore = create<UstaState>((set) => ({
   authBootstrapped: false,
   selectedTask: null,
   lastResult: null,
+  guideProgress: {},
   setVehicles: (vehicles) => set({ vehicles }),
   selectVehicle: (id) => set({ currentVehicleId: id }),
   setAuthBootstrapped: (authBootstrapped) => set({ authBootstrapped }),
+  setGuideProgress: (taskId, step) =>
+    set((s) => ({ guideProgress: { ...s.guideProgress, [taskId]: step } })),
+  clearGuideProgress: (taskId) =>
+    set((s) => {
+      const { [taskId]: _removed, ...rest } = s.guideProgress;
+      return { guideProgress: rest };
+    }),
   setAuthToken: (authToken) => set({ authToken }),
   setRefreshToken: (refreshToken) => set({ refreshToken }),
   setTokens: (tokens) =>

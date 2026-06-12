@@ -173,7 +173,11 @@ export default function HistoryScreen() {
               {t('history.reminders.title')}
             </Text>
             {reminders.length === 0 ? (
-              <Text style={styles.empty}>{t('history.reminders.empty')}</Text>
+              <View style={styles.emptyBox}>
+                <Ionicons name="notifications-off-outline" size={28} color={theme.colors.textSecondary} />
+                <Text style={styles.empty}>{t('history.reminders.empty')}</Text>
+                <Text style={styles.emptyHint}>{t('history.reminders.emptyHint')}</Text>
+              </View>
             ) : (
               <View style={styles.card}>
                 {reminders.map((reminder) => (
@@ -184,7 +188,11 @@ export default function HistoryScreen() {
 
             <Text style={styles.sectionTitle}>{t('history.logs.title')}</Text>
             {logs.length === 0 ? (
-              <Text style={styles.empty}>{t('history.logs.empty')}</Text>
+              <View style={styles.emptyBox}>
+                <Ionicons name="document-text-outline" size={28} color={theme.colors.textSecondary} />
+                <Text style={styles.empty}>{t('history.logs.empty')}</Text>
+                <Text style={styles.emptyHint}>{t('history.logs.emptyHint')}</Text>
+              </View>
             ) : (
               <View style={styles.card}>
                 {logs.map((log) => (
@@ -317,7 +325,25 @@ const styles = StyleSheet.create({
   empty: {
     fontFamily: theme.fonts.body,
     fontSize: 14,
+    fontWeight: '600',
     color: theme.colors.textSecondary,
+  },
+  emptyBox: {
+    alignItems: 'center',
+    gap: theme.spacing.xs,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.lg,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderStyle: 'dashed',
+    padding: theme.spacing.xl,
+  },
+  emptyHint: {
+    fontFamily: theme.fonts.body,
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+    opacity: 0.8,
   },
   reminderRow: {
     flexDirection: 'row',

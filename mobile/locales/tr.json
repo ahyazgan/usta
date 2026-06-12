@@ -72,6 +72,11 @@
     "toolLabel": "Gerekli:",
     "torqueLabel": "Tork:",
     "verifyCta": "Doğru yeri buldun mu? Kamerayı tut, kontrol edeyim.",
+    "estimate": {
+      "title": "Tamirciye yaptırırsan",
+      "seed": "Türkiye ortalaması (tahmini aralık)",
+      "community": "{{count}} kullanıcının ödediğine göre"
+    },
     "next": "Yaptım, devam ▸",
     "finish": "Bitir ve kaydet",
     "done": {

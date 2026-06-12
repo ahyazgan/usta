@@ -16,6 +16,7 @@ import { capture } from '@/lib/analytics';
 import {
   ApiError,
   createApiClient,
+  type CostEstimate,
   type GuideStep,
   type TaskGuide,
 } from '@/lib/api';
@@ -83,6 +84,7 @@ export default function GuideScreen() {
   );
 
   const [guide, setGuide] = useState<TaskGuide | null>(null);
+  const [estimate, setEstimate] = useState<CostEstimate | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   // Kaldığın adımdan devam et (kameraya gidip dönünce sıfırlanmasın).
@@ -111,6 +113,11 @@ export default function GuideScreen() {
       setGuide(g);
       // Hatırlanan adım rehber sınırını aşıyorsa (içerik değişmiş olabilir) kırp.
       setCurrent((c) => Math.min(c, Math.max(0, g.steps.length - 1)));
+      // Fiyat şeffaflığı: tamirciye tahmini maliyet (opsiyonel; 404 = gizle).
+      client
+        .getTaskEstimate(currentVehicle.id, selectedTask.id)
+        .then(setEstimate)
+        .catch(() => setEstimate(null));
     } catch (err) {
       setError(
         err instanceof ApiError && err.status === 0
@@ -267,6 +274,27 @@ export default function GuideScreen() {
               <Text style={styles.verifyText}>{t('guide.verifyCta')}</Text>
               <Ionicons name="chevron-forward" size={16} color={theme.colors.savingsText} />
             </Pressable>
+
+            {/* Fiyat şeffaflığı — tamirciye tahmini maliyet (wedge) */}
+            {estimate != null && (
+              <View style={styles.priceCard}>
+                <View style={styles.priceIcon}>
+                  <Ionicons name="pricetags" size={18} color={theme.colors.ink} />
+                </View>
+                <View style={styles.priceBody}>
+                  <Text style={styles.priceLabel}>{t('guide.estimate.title')}</Text>
+                  <Text style={styles.priceRange}>
+                    ~{estimate.low_try.toLocaleString('tr-TR')}–
+                    {estimate.high_try.toLocaleString('tr-TR')} ₺
+                  </Text>
+                  <Text style={styles.priceSource}>
+                    {estimate.source === 'community'
+                      ? t('guide.estimate.community', { count: estimate.sample_size })
+                      : t('guide.estimate.seed')}
+                  </Text>
+                </View>
+              </View>
+            )}
 
             {/* Tamirciye git çıkışı */}
             <View style={styles.mechanicNote}>
@@ -503,6 +531,45 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: theme.colors.savingsText,
+  },
+  priceCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+  },
+  priceIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  priceBody: { flex: 1, gap: 2 },
+  priceLabel: {
+    fontFamily: theme.fonts.body,
+    fontSize: 11,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  priceRange: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 19,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  priceSource: {
+    fontFamily: theme.fonts.body,
+    fontSize: 11,
+    color: theme.colors.textSecondary,
   },
   mechanicNote: {
     flexDirection: 'row',

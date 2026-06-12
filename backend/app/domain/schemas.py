@@ -4,6 +4,7 @@ AI yanıt şemaları ürün spesifikasyonuyla bire bir eşleşir.
 """
 
 from datetime import date, datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
@@ -296,6 +297,21 @@ class TaskOut(BaseModel):
     title_tr: str
     title_en: str
     risk: Aciliyet
+
+
+class CostEstimateOut(BaseModel):
+    """Bir iş için tamirciye tahmini maliyet aralığı (TL).
+
+    source: 'seed' = TR pazarı tohum bandı; 'community' = gerçek ödenen
+    fiyatlardan (>= eşik örnek, k-anonim) türetilmiş. sample_size = harmana
+    katkıda bulunan gerçek-fiyat kaydı sayısı.
+    """
+
+    low_try: int
+    high_try: int
+    currency: str = "TRY"
+    source: Literal["seed", "community"]
+    sample_size: int
 
 
 # --------------------------------------------------------------------------- #

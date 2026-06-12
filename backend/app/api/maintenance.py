@@ -14,6 +14,7 @@ from sqlalchemy import select
 from ..domain.guides import fill_template, get_guide
 from ..domain.models import AISession
 from ..domain.schemas import (
+    CostEstimateOut,
     DiagnosisFeedbackIn,
     DiagnosisHistoryOut,
     DiagnosisResolutionIn,
@@ -26,7 +27,7 @@ from ..domain.schemas import (
     VehicleSummaryOut,
 )
 from ..domain.tasks import get_task, tasks_for_vehicle
-from ..services import maintenance_service, vehicle_service
+from ..services import cost_service, maintenance_service, vehicle_service
 
 router = APIRouter(
     prefix="/v1/vehicles/{vehicle_id}",
@@ -134,6 +135,30 @@ async def task_guide(
         steps=steps,
         mechanic_note_tr=guide.mechanic_note_tr,
         mechanic_note_en=guide.mechanic_note_en,
+    )
+
+
+@router.get("/tasks/{task_id}/estimate", response_model=CostEstimateOut)
+async def task_cost_estimate(
+    vehicle_id: int,
+    task_id: str,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> CostEstimateOut:
+    """Bu işin tamirciye tahmini maliyet aralığı (fiyat şeffaflığı wedge'i).
+
+    Tohum bandıyla başlar; aynı görev+araç-türü için yeterli gerçek ödeme
+    birikince topluluk verisine kayar (k-anonim). Bilinmeyen görevde 404.
+    """
+    vehicle = await vehicle_service.get_owned(db, user.id, vehicle_id)
+    est = await cost_service.estimate_task(db, task_id, vehicle.vehicle_type)
+    if est is None:
+        raise HTTPException(status_code=404, detail="Bu iş için maliyet tahmini yok")
+    return CostEstimateOut(
+        low_try=est.low_try,
+        high_try=est.high_try,
+        source=est.source,
+        sample_size=est.sample_size,
     )
 
 

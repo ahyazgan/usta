@@ -109,8 +109,9 @@ CATALOG: tuple[CatalogEntry, ...] = (
         fuels=(FuelType.dizel,),
         engine_codes=("K9K",),
         spec=VehicleSpecIn(
+            # 1.5 dCi K9K (Clio ile aynı motor): yağ 5W-30 ~4.8L (web-doğrulandı).
             oil_spec="5W-30",
-            oil_capacity_l=4.5,
+            oil_capacity_l=4.8,
             oil_drain_bolt_size="8mm iç altıgen (allen)",
             oil_drain_location="yağ karteri alt orta",
             oil_filter_part="örnek: 8200768927",
@@ -152,7 +153,8 @@ CATALOG: tuple[CatalogEntry, ...] = (
         fuels=(FuelType.benzin, FuelType.lpg),
         engine_codes=("H4B", "B4D"),
         spec=VehicleSpecIn(
-            oil_spec="5W-40",
+            # Yağ kapasitesi motora bağlı: 1.0 SCe ~3.0L, TCe ~4.4L — varyant farkı.
+            oil_spec="5W-30",
             oil_capacity_l=4.0,
             oil_drain_bolt_size="10mm",
             oil_drain_location="yağ karteri alt orta",
@@ -160,7 +162,7 @@ CATALOG: tuple[CatalogEntry, ...] = (
             air_filter_part="örnek: 165465154R",
             cabin_filter_part="örnek: 272772835R",
             spark_plug_part="örnek: NGK LZKAR6AP-11",
-            battery_spec="60Ah / 540A",
+            battery_spec="50-58Ah",
             battery_location="motor bölmesi sol ön",
             transmission_type="manuel",
         ),
@@ -173,15 +175,16 @@ CATALOG: tuple[CatalogEntry, ...] = (
         fuels=(FuelType.benzin, FuelType.dizel),
         engine_codes=("CJZ", "CUU", "DGT"),
         spec=VehicleSpecIn(
+            # 1.4 TSI EA211: yağ VW 504.00 ~4.0L, buji OE 04E905602D (web-doğrulandı).
             oil_spec="5W-30 (VW 504.00)",
-            oil_capacity_l=4.3,
+            oil_capacity_l=4.0,
             oil_drain_bolt_size="19mm",
             oil_drain_location="yağ karteri alt orta",
             oil_filter_part="örnek: 04E115561H",
             air_filter_part="örnek: 5Q0129620D",
             cabin_filter_part="örnek: 5Q0819669",
-            spark_plug_part="örnek: NGK 06H905611",
-            battery_spec="60Ah / 540A",
+            spark_plug_part="NGK 04E905602D (IKER7A8EGS)",
+            battery_spec="60Ah / 640A (EFB)",
             battery_location="motor bölmesi sol arka",
             transmission_type="manuel / DSG",
         ),
@@ -213,8 +216,9 @@ CATALOG: tuple[CatalogEntry, ...] = (
         year_max=2023,
         fuels=(FuelType.benzin, FuelType.dizel),
         spec=VehicleSpecIn(
+            # 1.4 MPI Gamma: yağ 5W-30 ~3.3L (web-doğrulandı).
             oil_spec="5W-30",
-            oil_capacity_l=3.6,
+            oil_capacity_l=3.3,
             oil_drain_bolt_size="17mm",
             oil_drain_location="yağ karteri alt orta",
             oil_filter_part="örnek: 26300-35505",

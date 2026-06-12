@@ -133,6 +133,12 @@ export interface MaintenanceLogInput {
 /** Reminder status returned by the backend. */
 export type ReminderStatus = 'ok' | 'soon' | 'due' | 'unknown';
 
+/** Home summary: completed maintenance count + estimated DIY savings (TRY). */
+export interface VehicleSummary {
+  maintenance_count: number;
+  savings_try: number;
+}
+
 /** A maintenance reminder derived from logs + intervals. */
 export interface Reminder {
   task: string;
@@ -167,6 +173,7 @@ export interface Vehicle {
   make: string;
   model: string;
   year: number;
+  plate: string | null;
   fuel_type: FuelType;
   engine_code: string | null;
   current_km: number | null;
@@ -178,6 +185,7 @@ export interface VehicleCreateInput {
   make: string;
   model: string;
   year: number;
+  plate?: string;
   fuel_type: FuelType;
   engine_code?: string;
   current_km?: number;
@@ -195,6 +203,7 @@ export interface ApiClient {
   addLog(vehicleId: number, input: MaintenanceLogInput): Promise<MaintenanceLog>;
   listLogs(vehicleId: number): Promise<MaintenanceLog[]>;
   getReminders(vehicleId: number): Promise<Reminder[]>;
+  getSummary(vehicleId: number): Promise<VehicleSummary>;
   listVehicles(): Promise<Vehicle[]>;
   createVehicle(input: VehicleCreateInput): Promise<Vehicle>;
   getVehicle(id: number): Promise<Vehicle>;
@@ -349,6 +358,13 @@ export function createApiClient(
     async getReminders(vehicleId) {
       const headers = await authHeaders();
       return request<Reminder[]>(`/v1/vehicles/${vehicleId}/reminders`, {
+        method: 'GET',
+        headers,
+      });
+    },
+    async getSummary(vehicleId) {
+      const headers = await authHeaders();
+      return request<VehicleSummary>(`/v1/vehicles/${vehicleId}/summary`, {
         method: 'GET',
         headers,
       });

@@ -3,6 +3,54 @@
     "name": "Usta",
     "tagline": "A master mechanic in your pocket"
   },
+  "tabs": {
+    "home": "Home",
+    "diagnosis": "Diagnose",
+    "maintenance": "Service",
+    "history": "History"
+  },
+  "home": {
+    "greeting": "Hello 👋",
+    "welcome": "Your garage",
+    "tasksTitle": "To-do",
+    "allMaintenance": "All →",
+    "signingIn": "Signing in…",
+    "connectError": "Couldn't reach the server. Check your connection and retry.",
+    "savingsTeaser": "Keep up with upkeep to extend your car's life and avoid surprise costs.",
+    "savings": "You've saved about ₺{{amount}} doing {{count}} maintenance jobs yourself.",
+    "badge": {
+      "ok": "Good",
+      "soon": "Soon",
+      "due": "Due",
+      "unknown": "—"
+    },
+    "taskMeta": {
+      "ok": "Looks healthy",
+      "soon": "Coming up",
+      "due": "It's time",
+      "unknown": "No record"
+    }
+  },
+  "maintenance": {
+    "title": "Service",
+    "subtitle": "Pick a task for your car, then verify the right spot with the camera.",
+    "risk": {
+      "dusuk": "Low risk",
+      "orta": "Medium risk",
+      "yuksek": "High risk"
+    }
+  },
+  "diagnosis": {
+    "title": "What's wrong?",
+    "show": {
+      "title": "Show",
+      "desc": "Point the camera at the part"
+    },
+    "listen": {
+      "title": "Listen",
+      "desc": "Odd noise? Describe it"
+    }
+  },
   "garage": {
     "title": "My Garage",
     "loading": "Loading your garage…",
@@ -75,6 +123,8 @@
       "modelPlaceholder": "e.g. Clio",
       "year": "Year",
       "yearPlaceholder": "e.g. 2019",
+      "plate": "Plate (optional)",
+      "platePlaceholder": "e.g. 34 ABC 123",
       "engineCode": "Engine code (optional)",
       "engineCodePlaceholder": "e.g. K9K",
       "km": "Mileage (optional)",
@@ -202,6 +252,7 @@
   "camera": {
     "stepBanner": "Step {{current}}/{{total}}",
     "stepTitle": "Find the dipstick and check the level",
+    "taskLabel": "TASK",
     "safetyStrip": "Warning: The engine may be hot. Park on firm ground; if jacked up, support it with axle stands.",
     "check": "Check",
     "analyzing": "Analyzing…",

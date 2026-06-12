@@ -15,10 +15,13 @@ export interface UstaState {
   currentVehicleId: number | null;
   authToken: string | null;
   refreshToken: string | null;
+  /** False until the initial token hydrate / auto-login attempt finishes. */
+  authBootstrapped: boolean;
   selectedTask: Task | null;
   lastResult: DiagnoseResult | null;
   setVehicles: (vehicles: Vehicle[]) => void;
   selectVehicle: (id: number | null) => void;
+  setAuthBootstrapped: (done: boolean) => void;
   setAuthToken: (token: string | null) => void;
   setRefreshToken: (token: string | null) => void;
   /** Set both tokens at once (login/hydrate) or clear both (logout). */
@@ -47,10 +50,12 @@ export const useUstaStore = create<UstaState>((set) => ({
   currentVehicleId: null,
   authToken: null,
   refreshToken: null,
+  authBootstrapped: false,
   selectedTask: null,
   lastResult: null,
   setVehicles: (vehicles) => set({ vehicles }),
   selectVehicle: (id) => set({ currentVehicleId: id }),
+  setAuthBootstrapped: (authBootstrapped) => set({ authBootstrapped }),
   setAuthToken: (authToken) => set({ authToken }),
   setRefreshToken: (refreshToken) => set({ refreshToken }),
   setTokens: (tokens) =>

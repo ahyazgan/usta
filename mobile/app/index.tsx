@@ -1,6 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useEffect } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -12,144 +11,78 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { type Task, type Vehicle } from '@/lib/api';
-import { i18n, t } from '@/lib/i18n';
+import { BottomTabBar } from '@/components/BottomTabBar';
+import { type Vehicle } from '@/lib/api';
+import { ensureDemoSession } from '@/lib/demoSession';
+import { t } from '@/lib/i18n';
 import { useUstaStore } from '@/lib/store';
 import { theme } from '@/lib/theme';
 import { useAuth } from '@/lib/useAuth';
 import { useGarageStatus, type GarageChipState } from '@/lib/useGarageStatus';
-import { useVehicleTasks } from '@/lib/useVehicleTasks';
+import { useSummary } from '@/lib/useSummary';
 import { useVehicles } from '@/lib/useVehicles';
 
-function taskTitle(task: Task): string {
-  return i18n.locale === 'en' ? task.title_en : task.title_tr;
+/** Reminder state → 0-100 health contribution. */
+const HEALTH_SCORE: Record<GarageChipState, number> = {
+  ok: 100,
+  soon: 55,
+  due: 20,
+  unknown: 70,
+};
+
+/** Reminder state → soft badge palette. */
+function badgeStyle(state: GarageChipState) {
+  if (state === 'due') return { bg: theme.colors.urgentSoftBg, fg: theme.colors.urgentSoftText };
+  if (state === 'soon') return { bg: theme.colors.warnSoftBg, fg: theme.colors.warnSoftText };
+  if (state === 'ok') return { bg: theme.colors.okSoftBg, fg: theme.colors.okSoftText };
+  return { bg: theme.colors.border, fg: theme.colors.textSecondary };
 }
 
-/**
- * Chip color for a reminder-derived garage status. Green is reserved
- * exclusively for camera verification, so it never appears here:
- * due → danger, soon → accent, ok → secondary, unknown → muted secondary.
- */
-function chipColor(state: GarageChipState): string {
-  if (state === 'due') return theme.colors.danger;
-  if (state === 'soon') return theme.colors.accent;
-  return theme.colors.textSecondary;
+function healthColor(pct: number): string {
+  if (pct >= 70) return theme.colors.successBright;
+  if (pct >= 40) return theme.colors.warningBright;
+  return theme.colors.dangerBright;
 }
 
-function StatusChip({
-  label,
-  state,
-}: {
-  label: string;
+interface TaskRowDef {
+  key: 'oil' | 'filter' | 'battery';
+  icon: keyof typeof Ionicons.glyphMap;
   state: GarageChipState;
-}) {
-  const color = chipColor(state);
-  return (
-    <View style={[styles.chip, { borderColor: color }]}>
-      <Text style={[styles.chipLabel, { color }]}>{label}</Text>
-      <Text
-        style={[
-          styles.chipState,
-          { color },
-          state === 'unknown' && styles.chipStateMuted,
-        ]}
-      >
-        {t(`garage.chipState.${state}`)}
-      </Text>
-    </View>
-  );
 }
 
-function TaskChip({
-  task,
-  selected,
-  onPress,
-}: {
-  task: Task;
-  selected: boolean;
-  onPress: () => void;
-}) {
-  // Selected = amber accent; unselected = muted. Green stays reserved for
-  // verification success only.
-  const color = selected ? theme.colors.accent : theme.colors.textSecondary;
+function TaskRow({ row, onPress }: { row: TaskRowDef; onPress: () => void }) {
+  const badge = badgeStyle(row.state);
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityState={{ selected }}
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.taskChip,
-        { borderColor: color },
-        selected && styles.taskChipSelected,
-        pressed && styles.pressed,
-      ]}
+      style={({ pressed }) => [styles.taskRow, pressed && styles.pressed]}
     >
-      <Text style={[styles.taskChipLabel, { color }]}>{taskTitle(task)}</Text>
+      <View style={[styles.taskIcon, { backgroundColor: badge.bg }]}>
+        <Ionicons name={row.icon} size={18} color={badge.fg} />
+      </View>
+      <View style={styles.taskBody}>
+        <View style={styles.taskTitleRow}>
+          <Text style={styles.taskTitle}>{t(`garage.chips.${row.key}`)}</Text>
+          <View style={[styles.badge, { backgroundColor: badge.bg }]}>
+            <Text style={[styles.badgeText, { color: badge.fg }]}>
+              {t(`home.badge.${row.state}`)}
+            </Text>
+          </View>
+        </View>
+        <Text style={styles.taskMeta}>{t(`home.taskMeta.${row.state}`)}</Text>
+      </View>
+      <Ionicons name="chevron-forward" size={18} color={theme.colors.border} />
     </Pressable>
   );
 }
 
-function InfoRow({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.infoRow}>
-      <Text style={styles.infoLabel}>{label}</Text>
-      <Text style={styles.infoValue}>{value}</Text>
-    </View>
-  );
-}
-
-function VehicleSwitcher({
-  vehicles,
-  currentId,
-  onSelect,
-}: {
-  vehicles: Vehicle[];
-  currentId: number;
-  onSelect: (id: number) => void;
-}) {
-  return (
-    <View style={styles.switcher}>
-      <Text style={styles.switchLabel}>{t('vehicle.switch')}</Text>
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.switcherRow}
-      >
-        {vehicles.map((v) => {
-          const selected = v.id === currentId;
-          const color = selected
-            ? theme.colors.accent
-            : theme.colors.textSecondary;
-          return (
-            <Pressable
-              key={v.id}
-              accessibilityRole="button"
-              accessibilityState={{ selected }}
-              onPress={() => onSelect(v.id)}
-              style={({ pressed }) => [
-                styles.switchChip,
-                { borderColor: color },
-                selected && styles.switchChipSelected,
-                pressed && styles.pressed,
-              ]}
-            >
-              <Text style={[styles.switchChipLabel, { color }]}>
-                {v.make} {v.model}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
-    </View>
-  );
-}
-
-export default function GarageScreen() {
+export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const authToken = useUstaStore((s) => s.authToken);
-  const selectedTask = useUstaStore((s) => s.selectedTask);
-  const setSelectedTask = useUstaStore((s) => s.setSelectedTask);
+  const authBootstrapped = useUstaStore((s) => s.authBootstrapped);
+  const setTokens = useUstaStore((s) => s.setTokens);
   const { logout } = useAuth();
 
   const {
@@ -160,65 +93,51 @@ export default function GarageScreen() {
     removeVehicle,
   } = useVehicles();
   const { chips } = useGarageStatus(currentVehicle?.id ?? null);
-  // Only the tasks applicable to this vehicle's fuel type (filtered server-side).
-  const { tasks } = useVehicleTasks(currentVehicle?.id ?? null);
+  const summary = useSummary(currentVehicle?.id ?? null);
 
   const isAuthenticated = authToken != null;
-
-  // If the previously selected task no longer applies to the current vehicle
-  // (e.g. switched to / edited a diesel and spark_plug vanished), clear it.
-  useEffect(() => {
-    if (selectedTask == null) return;
-    if (tasks.length === 0) return;
-    if (!tasks.some((task) => task.id === selectedTask.id)) {
-      setSelectedTask(null);
-    }
-  }, [tasks, selectedTask, setSelectedTask]);
-
-  const hasSelection = selectedTask != null;
-
-  function handleEdit(vehicle: Vehicle) {
-    router.push({ pathname: '/vehicle-new', params: { id: String(vehicle.id) } });
-  }
 
   function handleDelete(vehicle: Vehicle) {
     Alert.alert(
       t('vehicle.delete.confirmTitle'),
-      t('vehicle.delete.confirmMessage', {
-        make: vehicle.make,
-        model: vehicle.model,
-      }),
+      t('vehicle.delete.confirmMessage', { make: vehicle.make, model: vehicle.model }),
       [
         { text: t('vehicle.delete.cancel'), style: 'cancel' },
         {
           text: t('vehicle.delete.confirm'),
           style: 'destructive',
-          onPress: () => {
-            void removeVehicle(vehicle.id);
-          },
+          onPress: () => void removeVehicle(vehicle.id),
         },
       ],
     );
   }
 
+  // --- Auto-login bootstrap (login screen removed) ----------------------- //
   if (!isAuthenticated) {
+    // Demo girişi henüz sürüyor → spinner. Bittiyse ve hâlâ token yoksa,
+    // demo girişi başarısız olmuştur → tekrar dene.
+    if (!authBootstrapped) {
+      return (
+        <View style={[styles.container, styles.center, { paddingTop: insets.top + theme.spacing.lg }]}>
+          <Ionicons name="construct" size={56} color={theme.colors.ink} />
+          <Text style={styles.title}>{t('app.name')}</Text>
+          <ActivityIndicator color={theme.colors.ink} />
+          <Text style={styles.gatePrompt}>{t('home.signingIn')}</Text>
+        </View>
+      );
+    }
     return (
-      <View
-        style={[
-          styles.container,
-          styles.gateContainer,
-          { paddingTop: insets.top + theme.spacing.lg },
-        ]}
-      >
-        <Text style={styles.title}>{t('garage.title')}</Text>
-        <Text style={styles.gatePrompt}>{t('auth.loggedOutPrompt')}</Text>
+      <View style={[styles.container, styles.center, { paddingTop: insets.top + theme.spacing.lg }]}>
+        <Ionicons name="cloud-offline-outline" size={56} color={theme.colors.textSecondary} />
+        <Text style={styles.title}>{t('app.name')}</Text>
+        <Text style={styles.gatePrompt}>{t('home.connectError')}</Text>
         <Pressable
           accessibilityRole="button"
-          onPress={() => router.push('/login')}
-          style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
+          onPress={() => void ensureDemoSession(setTokens)}
+          style={({ pressed }) => [styles.cta, pressed && styles.pressed]}
         >
-          <Ionicons name="log-in" size={22} color={theme.colors.background} />
-          <Text style={styles.ctaText}>{t('auth.loggedOutCta')}</Text>
+          <Ionicons name="refresh" size={20} color={theme.colors.onInk} />
+          <Text style={styles.ctaText}>{t('common.retry')}</Text>
         </Pressable>
       </View>
     );
@@ -226,197 +145,189 @@ export default function GarageScreen() {
 
   const header = (
     <View style={styles.headerRow}>
-      <Text style={styles.title}>{t('garage.title')}</Text>
+      <View>
+        <Text style={styles.greeting}>{t('home.greeting')}</Text>
+        <Text style={styles.greetingName}>{t('home.welcome')}</Text>
+      </View>
       <Pressable
         accessibilityRole="button"
         onPress={() => void logout()}
         style={({ pressed }) => [styles.logoutButton, pressed && styles.pressed]}
       >
-        <Ionicons name="log-out" size={20} color={theme.colors.textSecondary} />
-        <Text style={styles.logoutText}>{t('auth.logout')}</Text>
+        <Ionicons name="log-out-outline" size={22} color={theme.colors.textSecondary} />
       </Pressable>
     </View>
   );
 
-  // Loading the vehicle list.
+  // --- Loading ----------------------------------------------------------- //
   if (vehiclesLoading) {
     return (
-      <View
-        style={[styles.container, { paddingTop: insets.top + theme.spacing.lg }]}
-      >
+      <View style={[styles.container, { paddingTop: insets.top + theme.spacing.lg }]}>
         {header}
-        <View style={styles.loadingBox}>
-          <ActivityIndicator color={theme.colors.accent} />
+        <View style={styles.center}>
+          <ActivityIndicator color={theme.colors.ink} />
           <Text style={styles.loadingText}>{t('garage.loading')}</Text>
         </View>
+        <BottomTabBar active="home" />
       </View>
     );
   }
 
-  // No vehicles yet — prominent empty state CTA.
+  // --- Empty (no vehicle) ------------------------------------------------ //
   if (!currentVehicle) {
     return (
-      <View
-        style={[styles.container, { paddingTop: insets.top + theme.spacing.lg }]}
-      >
+      <View style={[styles.container, { paddingTop: insets.top + theme.spacing.lg }]}>
         {header}
-        <View style={styles.emptyBox}>
-          <Ionicons
-            name="car-sport-outline"
-            size={72}
-            color={theme.colors.textSecondary}
-          />
+        <View style={styles.center}>
+          <Ionicons name="car-sport-outline" size={72} color={theme.colors.textSecondary} />
           <Text style={styles.emptyTitle}>{t('vehicle.empty.title')}</Text>
           <Text style={styles.emptyDesc}>{t('vehicle.empty.desc')}</Text>
           <Pressable
             accessibilityRole="button"
             onPress={() => router.push('/vehicle-new')}
-            style={({ pressed }) => [styles.cta, pressed && styles.ctaPressed]}
+            style={({ pressed }) => [styles.cta, pressed && styles.pressed]}
           >
-            <Ionicons name="add-circle" size={22} color={theme.colors.background} />
+            <Ionicons name="add-circle" size={20} color={theme.colors.onInk} />
             <Text style={styles.ctaText}>{t('vehicle.add')}</Text>
           </Pressable>
         </View>
+        <BottomTabBar active="home" />
       </View>
     );
   }
 
+  // --- Main -------------------------------------------------------------- //
   const fuelLabel = t(`vehicle.fuel.${currentVehicle.fuel_type}`);
+  const subParts = [String(currentVehicle.year), fuelLabel];
+  if (currentVehicle.spec?.transmission_type) subParts.push(currentVehicle.spec.transmission_type);
+
+  const states: GarageChipState[] = [chips.oil, chips.filter, chips.battery];
+  const health = Math.round(states.reduce((s, x) => s + HEALTH_SCORE[x], 0) / states.length);
+
+  const taskRows: TaskRowDef[] = [
+    { key: 'oil', icon: 'water', state: chips.oil },
+    { key: 'filter', icon: 'funnel', state: chips.filter },
+    { key: 'battery', icon: 'battery-charging', state: chips.battery },
+  ];
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + theme.spacing.lg }]}>
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        showsVerticalScrollIndicator={false}
-      >
+    <View style={[styles.container, { paddingTop: insets.top + theme.spacing.md }]}>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {header}
 
         {vehicles.length > 1 && (
-          <VehicleSwitcher
-            vehicles={vehicles}
-            currentId={currentVehicle.id}
-            onSelect={selectVehicle}
-          />
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.switcherRow}
+          >
+            {vehicles.map((v) => {
+              const selected = v.id === currentVehicle.id;
+              return (
+                <Pressable
+                  key={v.id}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
+                  onPress={() => selectVehicle(v.id)}
+                  style={[styles.switchChip, selected && styles.switchChipSelected]}
+                >
+                  <Text style={[styles.switchChipText, selected && styles.switchChipTextSelected]}>
+                    {v.make} {v.model}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
         )}
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>
+        {/* Araç kartı (koyu) */}
+        <View style={styles.carCard}>
+          <View style={styles.kmBadge}>
+            <Text style={styles.kmNum}>
+              {currentVehicle.current_km != null
+                ? currentVehicle.current_km.toLocaleString('tr-TR')
+                : '—'}
+            </Text>
+            <Text style={styles.kmLabel}>km</Text>
+          </View>
+          {currentVehicle.plate != null && currentVehicle.plate.length > 0 && (
+            <View style={styles.plateBadge}>
+              <Text style={styles.plateText}>{currentVehicle.plate}</Text>
+            </View>
+          )}
+          <Text style={styles.carName}>
             {currentVehicle.make} {currentVehicle.model}
           </Text>
-
-          <InfoRow label={t('garage.labels.make')} value={currentVehicle.make} />
-          <InfoRow label={t('garage.labels.model')} value={currentVehicle.model} />
-          <InfoRow
-            label={t('garage.labels.year')}
-            value={String(currentVehicle.year)}
-          />
-          {currentVehicle.engine_code != null &&
-            currentVehicle.engine_code.length > 0 && (
-              <InfoRow
-                label={t('garage.labels.engineCode')}
-                value={currentVehicle.engine_code}
+          <Text style={styles.carSub}>{subParts.join(' · ')}</Text>
+          <View style={styles.healthRow}>
+            <View style={styles.healthTrack}>
+              <View
+                style={[
+                  styles.healthFill,
+                  { width: `${health}%`, backgroundColor: healthColor(health) },
+                ]}
               />
-            )}
-          <InfoRow label={t('garage.labels.fuel')} value={fuelLabel} />
-          {currentVehicle.current_km != null && (
-            <InfoRow
-              label={t('garage.labels.km')}
-              value={`${currentVehicle.current_km.toLocaleString('tr-TR')} km`}
-            />
-          )}
-
-          <View style={styles.chipRow}>
-            <StatusChip label={t('garage.chips.oil')} state={chips.oil} />
-            <StatusChip label={t('garage.chips.filter')} state={chips.filter} />
-            <StatusChip label={t('garage.chips.battery')} state={chips.battery} />
+            </View>
+            <Text style={[styles.healthPct, { color: healthColor(health) }]}>%{health}</Text>
           </View>
         </View>
 
+        {/* Yönet (düzenle / sil / ekle) */}
         <View style={styles.manageRow}>
           <Pressable
             accessibilityRole="button"
-            onPress={() => handleEdit(currentVehicle)}
-            style={({ pressed }) => [
-              styles.manageButton,
-              pressed && styles.pressed,
-            ]}
+            onPress={() =>
+              router.push({ pathname: '/vehicle-new', params: { id: String(currentVehicle.id) } })
+            }
+            style={({ pressed }) => [styles.manageButton, pressed && styles.pressed]}
           >
-            <Ionicons name="create-outline" size={18} color={theme.colors.accent} />
-            <Text style={styles.manageButtonText}>{t('vehicle.edit.cta')}</Text>
+            <Ionicons name="create-outline" size={16} color={theme.colors.ink} />
+            <Text style={styles.manageText}>{t('vehicle.edit.cta')}</Text>
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.push('/vehicle-new')}
+            style={({ pressed }) => [styles.manageButton, pressed && styles.pressed]}
+          >
+            <Ionicons name="add" size={16} color={theme.colors.ink} />
+            <Text style={styles.manageText}>{t('vehicle.add')}</Text>
           </Pressable>
           <Pressable
             accessibilityRole="button"
             onPress={() => handleDelete(currentVehicle)}
-            style={({ pressed }) => [
-              styles.deleteButton,
-              pressed && styles.pressed,
-            ]}
+            style={({ pressed }) => [styles.manageButton, pressed && styles.pressed]}
           >
-            <Ionicons name="trash-outline" size={18} color={theme.colors.danger} />
-            <Text style={styles.deleteButtonText}>{t('vehicle.delete.cta')}</Text>
+            <Ionicons name="trash-outline" size={16} color={theme.colors.dangerBright} />
           </Pressable>
         </View>
 
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => router.push('/vehicle-new')}
-          style={({ pressed }) => [styles.addVehicle, pressed && styles.pressed]}
-        >
-          <Ionicons name="add" size={18} color={theme.colors.accent} />
-          <Text style={styles.addVehicleText}>{t('vehicle.add')}</Text>
-        </Pressable>
-
-        <Text style={styles.sectionTitle}>{t('garage.tasks.title')}</Text>
-        <View style={styles.taskRow}>
-          {tasks.map((task) => (
-            <TaskChip
-              key={task.id}
-              task={task}
-              selected={selectedTask?.id === task.id}
-              onPress={() => setSelectedTask(task)}
-            />
-          ))}
+        {/* Yapılacaklar */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>{t('home.tasksTitle')}</Text>
+          <Pressable accessibilityRole="button" onPress={() => router.replace('/maintenance')}>
+            <Text style={styles.sectionLink}>{t('home.allMaintenance')}</Text>
+          </Pressable>
         </View>
 
-        <View style={styles.navRow}>
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => router.push('/sound')}
-            style={({ pressed }) => [styles.navButton, pressed && styles.pressed]}
-          >
-            <Ionicons name="pulse" size={20} color={theme.colors.accent} />
-            <Text style={styles.navText}>{t('nav.sound')}</Text>
-          </Pressable>
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => router.push('/history')}
-            style={({ pressed }) => [styles.navButton, pressed && styles.pressed]}
-          >
-            <Ionicons name="time" size={20} color={theme.colors.accent} />
-            <Text style={styles.navText}>{t('nav.history')}</Text>
-          </Pressable>
+        {taskRows.map((row) => (
+          <TaskRow key={row.key} row={row} onPress={() => router.replace('/maintenance')} />
+        ))}
+
+        {/* Tasarruf bandı — gerçek loglardan tahmini DIY tasarrufu */}
+        <View style={styles.savingsBanner}>
+          <Ionicons name="trending-up" size={22} color={theme.colors.savingsText} />
+          <Text style={styles.savingsText}>
+            {summary.savings_try > 0
+              ? t('home.savings', {
+                  amount: summary.savings_try.toLocaleString('tr-TR'),
+                  count: summary.maintenance_count,
+                })
+              : t('home.savingsTeaser')}
+          </Text>
         </View>
       </ScrollView>
 
-      <View style={[styles.ctaWrap, { paddingBottom: insets.bottom + theme.spacing.lg }]}>
-        {!hasSelection && (
-          <Text style={styles.ctaHint}>{t('garage.tasks.selectHint')}</Text>
-        )}
-        <Pressable
-          accessibilityRole="button"
-          accessibilityState={{ disabled: !hasSelection }}
-          disabled={!hasSelection}
-          style={({ pressed }) => [
-            styles.cta,
-            !hasSelection && styles.ctaDisabled,
-            pressed && styles.ctaPressed,
-          ]}
-          onPress={() => router.push('/camera')}
-        >
-          <Ionicons name="camera" size={22} color={theme.colors.background} />
-          <Text style={styles.ctaText}>{t('garage.cta')}</Text>
-        </Pressable>
-      </View>
+      <BottomTabBar active="home" />
     </View>
   );
 }
@@ -425,63 +336,59 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
-    paddingHorizontal: theme.spacing.lg,
   },
   scroll: {
-    paddingBottom: theme.spacing.xxl,
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.xl,
+  },
+  center: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.md,
+  },
+  greeting: {
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    color: theme.colors.textSecondary,
+  },
+  greetingName: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 24,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    letterSpacing: -0.3,
+  },
+  logoutButton: {
+    width: theme.touchTarget,
+    height: theme.touchTarget,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
   },
   title: {
     fontFamily: theme.fonts.heading,
     fontSize: 32,
     fontWeight: '700',
     color: theme.colors.textPrimary,
-    marginBottom: theme.spacing.lg,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.xs,
-    minHeight: theme.touchTarget,
-    paddingHorizontal: theme.spacing.md,
-  },
-  logoutText: {
-    fontFamily: theme.fonts.body,
-    fontSize: 14,
-    fontWeight: '600',
-    color: theme.colors.textSecondary,
-  },
-  gateContainer: {
-    justifyContent: 'center',
-    gap: theme.spacing.lg,
   },
   gatePrompt: {
     fontFamily: theme.fonts.body,
-    fontSize: 16,
+    fontSize: 15,
     color: theme.colors.textSecondary,
     textAlign: 'center',
-  },
-  loadingBox: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: theme.spacing.md,
   },
   loadingText: {
     fontFamily: theme.fonts.body,
     fontSize: 14,
     color: theme.colors.textSecondary,
-  },
-  emptyBox: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: theme.spacing.md,
-    paddingHorizontal: theme.spacing.lg,
   },
   emptyTitle: {
     fontFamily: theme.fonts.heading,
@@ -489,244 +396,251 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: theme.colors.textPrimary,
     textAlign: 'center',
-    marginTop: theme.spacing.md,
+    marginTop: theme.spacing.sm,
   },
   emptyDesc: {
     fontFamily: theme.fonts.body,
     fontSize: 15,
     color: theme.colors.textSecondary,
     textAlign: 'center',
-    marginBottom: theme.spacing.md,
-  },
-  switcher: {
-    marginBottom: theme.spacing.md,
-  },
-  switchLabel: {
-    fontFamily: theme.fonts.body,
-    fontSize: 12,
-    color: theme.colors.textSecondary,
     marginBottom: theme.spacing.sm,
   },
   switcherRow: {
     gap: theme.spacing.sm,
-    paddingRight: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.md,
   },
   switchChip: {
-    minHeight: theme.touchTarget,
+    minHeight: 40,
     justifyContent: 'center',
-    borderWidth: 1,
-    borderRadius: theme.radius.pill,
     paddingHorizontal: theme.spacing.lg,
-  },
-  switchChipSelected: {
+    borderRadius: theme.radius.pill,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
   },
-  switchChipLabel: {
+  switchChipSelected: {
+    backgroundColor: theme.colors.ink,
+    borderColor: theme.colors.ink,
+  },
+  switchChipText: {
     fontFamily: theme.fonts.body,
-    fontSize: 14,
+    fontSize: 13,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
+  },
+  switchChipTextSelected: {
+    color: theme.colors.onInk,
+  },
+  carCard: {
+    backgroundColor: theme.colors.ink,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.xl,
+    marginHorizontal: theme.spacing.lg,
+    overflow: 'hidden',
+  },
+  kmBadge: {
+    position: 'absolute',
+    top: theme.spacing.lg,
+    right: theme.spacing.lg,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderRadius: theme.radius.md,
+    paddingVertical: theme.spacing.xs,
+    paddingHorizontal: theme.spacing.md,
+    alignItems: 'center',
+  },
+  kmNum: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.onInk,
+  },
+  kmLabel: {
+    fontFamily: theme.fonts.body,
+    fontSize: 9,
+    color: theme.colors.onInkMuted,
+  },
+  plateBadge: {
+    alignSelf: 'flex-start',
+    backgroundColor: theme.colors.onInk,
+    borderRadius: theme.radius.sm,
+    paddingVertical: 3,
+    paddingHorizontal: theme.spacing.sm,
+    marginBottom: theme.spacing.sm,
+  },
+  plateText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 11,
+    fontWeight: '700',
+    color: theme.colors.ink,
+    letterSpacing: 1,
+  },
+  carName: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 22,
+    fontWeight: '700',
+    color: theme.colors.onInk,
+    letterSpacing: -0.3,
+  },
+  carSub: {
+    fontFamily: theme.fonts.body,
+    fontSize: 12,
+    color: theme.colors.onInkMuted,
+    marginTop: theme.spacing.xs,
+    marginBottom: theme.spacing.lg,
+  },
+  healthRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.md,
+  },
+  healthTrack: {
+    flex: 1,
+    height: 6,
+    borderRadius: theme.radius.pill,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    overflow: 'hidden',
+  },
+  healthFill: {
+    height: '100%',
+    borderRadius: theme.radius.pill,
+  },
+  healthPct: {
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
     fontWeight: '700',
   },
-  navRow: {
+  manageRow: {
     flexDirection: 'row',
-    gap: theme.spacing.md,
-    marginTop: theme.spacing.xl,
+    gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.lg,
+    marginTop: theme.spacing.md,
   },
-  navButton: {
-    flex: 1,
-    minHeight: theme.touchTarget,
+  manageButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: theme.spacing.sm,
+    gap: theme.spacing.xs,
+    minHeight: 40,
+    paddingHorizontal: theme.spacing.md,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  manageText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    fontWeight: '600',
+    color: theme.colors.ink,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: theme.spacing.lg,
+    marginTop: theme.spacing.xl,
+    marginBottom: theme.spacing.md,
+  },
+  sectionTitle: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  sectionLink: {
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    fontWeight: '600',
+    color: theme.colors.success,
+  },
+  taskRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.md,
+    marginHorizontal: theme.spacing.lg,
+    marginBottom: theme.spacing.sm,
     backgroundColor: theme.colors.surface,
     borderRadius: theme.radius.md,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    paddingHorizontal: theme.spacing.md,
+    padding: theme.spacing.md,
   },
-  navText: {
-    fontFamily: theme.fonts.body,
-    fontSize: 14,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
+  taskIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: theme.radius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  card: {
-    backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.lg,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    padding: theme.spacing.lg,
+  taskBody: {
+    flex: 1,
   },
-  cardTitle: {
-    fontFamily: theme.fonts.heading,
-    fontSize: 24,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
-    marginBottom: theme.spacing.md,
-  },
-  infoRow: {
+  taskTitleRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: theme.spacing.sm,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: theme.colors.border,
+    alignItems: 'center',
+    gap: theme.spacing.sm,
   },
-  infoLabel: {
-    fontFamily: theme.fonts.body,
-    fontSize: 14,
-    color: theme.colors.textSecondary,
-  },
-  infoValue: {
+  taskTitle: {
     fontFamily: theme.fonts.body,
     fontSize: 14,
     fontWeight: '600',
     color: theme.colors.textPrimary,
   },
-  chipRow: {
-    flexDirection: 'row',
-    gap: theme.spacing.sm,
-    marginTop: theme.spacing.lg,
-  },
-  manageRow: {
-    flexDirection: 'row',
-    gap: theme.spacing.md,
-    marginTop: theme.spacing.md,
-  },
-  manageButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: theme.spacing.xs,
-    minHeight: theme.touchTarget,
-    borderRadius: theme.radius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.accent,
-    paddingHorizontal: theme.spacing.md,
-  },
-  manageButtonText: {
+  taskMeta: {
     fontFamily: theme.fonts.body,
-    fontSize: 15,
-    fontWeight: '700',
-    color: theme.colors.accent,
-  },
-  deleteButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: theme.spacing.xs,
-    minHeight: theme.touchTarget,
-    borderRadius: theme.radius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.danger,
-    paddingHorizontal: theme.spacing.md,
-  },
-  deleteButtonText: {
-    fontFamily: theme.fonts.body,
-    fontSize: 15,
-    fontWeight: '700',
-    color: theme.colors.danger,
-  },
-  addVehicle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: theme.spacing.xs,
-    minHeight: theme.touchTarget,
-    marginTop: theme.spacing.md,
-    borderRadius: theme.radius.md,
-    borderWidth: 1,
-    borderColor: theme.colors.accent,
-  },
-  addVehicleText: {
-    fontFamily: theme.fonts.body,
-    fontSize: 15,
-    fontWeight: '700',
-    color: theme.colors.accent,
-  },
-  sectionTitle: {
-    fontFamily: theme.fonts.heading,
-    fontSize: 18,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
-    marginTop: theme.spacing.xl,
-    marginBottom: theme.spacing.md,
-  },
-  taskRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: theme.spacing.sm,
-  },
-  taskChip: {
-    minHeight: theme.touchTarget,
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderRadius: theme.radius.pill,
-    paddingHorizontal: theme.spacing.lg,
-  },
-  taskChipSelected: {
-    backgroundColor: theme.colors.surface,
-  },
-  taskChipLabel: {
-    fontFamily: theme.fonts.body,
-    fontSize: 15,
-    fontWeight: '700',
-  },
-  chip: {
-    flex: 1,
-    borderWidth: 1,
-    borderRadius: theme.radius.md,
-    paddingVertical: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.md,
-    alignItems: 'center',
-  },
-  chipLabel: {
-    fontFamily: theme.fonts.body,
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  chipState: {
-    fontFamily: theme.fonts.body,
-    fontSize: 11,
+    fontSize: 12,
+    color: theme.colors.textSecondary,
     marginTop: 2,
   },
-  chipStateMuted: {
-    opacity: 0.6,
+  badge: {
+    borderRadius: theme.radius.pill,
+    paddingVertical: 2,
+    paddingHorizontal: theme.spacing.sm,
   },
-  ctaWrap: {
-    paddingTop: theme.spacing.md,
+  badgeText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  savingsBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.md,
+    marginHorizontal: theme.spacing.lg,
+    marginTop: theme.spacing.md,
+    backgroundColor: theme.colors.savingsBg,
+    borderWidth: 1,
+    borderColor: theme.colors.savingsBorder,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+  },
+  savingsText: {
+    flex: 1,
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    lineHeight: 19,
+    color: theme.colors.savingsText,
   },
   cta: {
-    minHeight: theme.touchTarget,
-    backgroundColor: theme.colors.accent,
-    borderRadius: theme.radius.md,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: theme.spacing.sm,
-    paddingHorizontal: theme.spacing.lg,
-  },
-  ctaPressed: {
-    opacity: 0.85,
-  },
-  ctaDisabled: {
-    opacity: 0.4,
-  },
-  pressed: {
-    opacity: 0.85,
-  },
-  ctaHint: {
-    fontFamily: theme.fonts.body,
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: theme.spacing.sm,
+    minHeight: theme.touchTarget,
+    paddingHorizontal: theme.spacing.xl,
+    backgroundColor: theme.colors.ink,
+    borderRadius: theme.radius.md,
   },
   ctaText: {
     fontFamily: theme.fonts.heading,
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '700',
-    color: theme.colors.background,
+    color: theme.colors.onInk,
+  },
+  pressed: {
+    opacity: 0.85,
   },
 });

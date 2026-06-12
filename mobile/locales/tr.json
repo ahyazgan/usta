@@ -3,6 +3,54 @@
     "name": "Usta",
     "tagline": "Cebindeki usta"
   },
+  "tabs": {
+    "home": "Ana Sayfa",
+    "diagnosis": "Teşhis",
+    "maintenance": "Bakım",
+    "history": "Geçmiş"
+  },
+  "home": {
+    "greeting": "Merhaba 👋",
+    "welcome": "Garajın",
+    "tasksTitle": "Yapılacaklar",
+    "allMaintenance": "Tümü →",
+    "signingIn": "Giriş yapılıyor…",
+    "connectError": "Sunucuya bağlanılamadı. İnternetini kontrol edip tekrar dene.",
+    "savingsTeaser": "Düzenli bakımla araç ömrünü uzat ve sürpriz masraflardan kaçın.",
+    "savings": "Kendin yaptığın {{count}} bakımla yaklaşık ₺{{amount}} tasarruf ettin.",
+    "badge": {
+      "ok": "İyi",
+      "soon": "Yakın",
+      "due": "Acil",
+      "unknown": "—"
+    },
+    "taskMeta": {
+      "ok": "Durum iyi görünüyor",
+      "soon": "Zamanı yaklaşıyor",
+      "due": "Zamanı geldi",
+      "unknown": "Kayıt yok"
+    }
+  },
+  "maintenance": {
+    "title": "Bakım",
+    "subtitle": "Aracına uygun bir bakım görevi seç, kamerayla doğru yeri doğrula.",
+    "risk": {
+      "dusuk": "Düşük risk",
+      "orta": "Orta risk",
+      "yuksek": "Yüksek risk"
+    }
+  },
+  "diagnosis": {
+    "title": "Neyin var?",
+    "show": {
+      "title": "Göster",
+      "desc": "Motoru veya parçayı kameraya tut"
+    },
+    "listen": {
+      "title": "Dinlet",
+      "desc": "Garip bir ses mi var? Tarif et"
+    }
+  },
   "garage": {
     "title": "Garajım",
     "loading": "Garajın yükleniyor…",
@@ -75,6 +123,8 @@
       "modelPlaceholder": "Örn: Clio",
       "year": "Yıl",
       "yearPlaceholder": "Örn: 2019",
+      "plate": "Plaka (isteğe bağlı)",
+      "platePlaceholder": "Örn: 34 ABC 123",
       "engineCode": "Motor kodu (isteğe bağlı)",
       "engineCodePlaceholder": "Örn: K9K",
       "km": "Kilometre (isteğe bağlı)",
@@ -202,6 +252,7 @@
   "camera": {
     "stepBanner": "Adım {{current}}/{{total}}",
     "stepTitle": "Yağ çubuğunu bul ve seviyeyi kontrol et",
+    "taskLabel": "GÖREV",
     "safetyStrip": "Dikkat: Motor sıcak olabilir. Aracı sabit zemine al, krikoyla kaldırdıysan takozla destekle.",
     "check": "Kontrol Et",
     "analyzing": "İnceleniyor…",

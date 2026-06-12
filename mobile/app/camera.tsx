@@ -1,6 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
+
+import { goBack } from '@/lib/nav';
 import { useRef } from 'react';
 import {
   ActivityIndicator,
@@ -13,14 +15,16 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { t } from '@/lib/i18n';
+import { i18n, t } from '@/lib/i18n';
 import { useUstaStore } from '@/lib/store';
 import { theme } from '@/lib/theme';
 import { useDiagnose } from '@/lib/useDiagnose';
-import type { DiagnoseResult, Konum } from '@/lib/api';
+import type { DiagnoseResult, Konum, Task } from '@/lib/api';
 
-const CURRENT_STEP = 3;
-const TOTAL_STEPS = 7;
+/** Localized task title for the banner. */
+function taskTitle(task: Task): string {
+  return i18n.locale === 'en' ? task.title_en : task.title_tr;
+}
 
 /** Localized direction text for a 3x3 grid location code. */
 function konumText(konum: Konum): string | null {
@@ -93,7 +97,6 @@ export default function CameraScreen() {
   const selectedTask = useUstaStore((s) => s.selectedTask);
   const { loading, error, result, runImageDiagnose } = useDiagnose();
 
-  const progress = CURRENT_STEP / TOTAL_STEPS;
   const granted = permission?.granted === true;
   const canAskAgain = permission?.canAskAgain !== false;
 
@@ -107,15 +110,13 @@ export default function CameraScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + theme.spacing.md }]}>
-      {/* Step banner + progress */}
+      {/* Görev banner'ı */}
       <View style={styles.banner}>
-        <Text style={styles.bannerStep}>
-          {t('camera.stepBanner', { current: CURRENT_STEP, total: TOTAL_STEPS })}
+        <Text style={styles.bannerStep}>{t('camera.taskLabel')}</Text>
+        <Text style={styles.bannerTitle}>
+          {selectedTask ? taskTitle(selectedTask) : t('camera.stepTitle')}
         </Text>
-        <Text style={styles.bannerTitle}>{t('camera.stepTitle')}</Text>
-        <View style={styles.progressTrack}>
-          <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
-        </View>
+        <Text style={styles.bannerHint}>{t('camera.hint')}</Text>
       </View>
 
       {/* Persistent safety strip */}
@@ -204,7 +205,7 @@ export default function CameraScreen() {
           <Pressable
             accessibilityRole="button"
             style={({ pressed }) => [styles.secondaryButton, pressed && styles.pressed]}
-            onPress={() => router.back()}
+            onPress={() => goBack(router)}
           >
             <Text style={styles.secondaryText}>{t('common.cancel')}</Text>
           </Pressable>
@@ -212,7 +213,7 @@ export default function CameraScreen() {
             <Pressable
               accessibilityRole="button"
               style={({ pressed }) => [styles.mechanicButton, pressed && styles.pressed]}
-              onPress={() => router.back()}
+              onPress={() => goBack(router)}
             >
               <Ionicons name="construct" size={18} color={theme.colors.background} />
               <Text style={styles.mechanicText}>{t('common.goToMechanic')}</Text>
@@ -245,9 +246,16 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   bannerTitle: {
-    fontFamily: theme.fonts.body,
-    fontSize: 16,
+    fontFamily: theme.fonts.heading,
+    fontSize: 20,
+    fontWeight: '700',
     color: theme.colors.textPrimary,
+    marginTop: theme.spacing.xs,
+  },
+  bannerHint: {
+    fontFamily: theme.fonts.body,
+    fontSize: 12,
+    color: theme.colors.textSecondary,
     marginTop: theme.spacing.xs,
   },
   progressTrack: {
@@ -266,7 +274,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing.sm,
-    backgroundColor: theme.colors.warning,
+    backgroundColor: theme.colors.warningBright,
     borderRadius: theme.radius.sm,
     paddingVertical: theme.spacing.sm,
     paddingHorizontal: theme.spacing.md,
@@ -277,7 +285,7 @@ const styles = StyleSheet.create({
     fontFamily: theme.fonts.body,
     fontSize: 12,
     fontWeight: '600',
-    color: theme.colors.background,
+    color: theme.colors.ink,
   },
   cameraArea: {
     flex: 1,

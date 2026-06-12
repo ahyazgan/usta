@@ -12,36 +12,59 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { BottomTabBar } from '@/components/BottomTabBar';
 import type { Aciliyet, KayitKosulu, SoundDiagnoseResult } from '@/lib/api';
 import { t } from '@/lib/i18n';
 import { theme } from '@/lib/theme';
 import { useSoundDiagnose } from '@/lib/useSoundDiagnose';
 
-const CONDITIONS: KayitKosulu[] = [
-  'rolanti',
-  'gazda',
-  'soguk_motor',
-  'seyirde',
-];
+const CONDITIONS: KayitKosulu[] = ['rolanti', 'gazda', 'soguk_motor', 'seyirde'];
 
-/** Urgency color — NEVER green; secondary/amber/red by level. */
-function urgencyColor(aciliyet: Aciliyet): string {
-  if (aciliyet === 'yuksek') return theme.colors.danger;
-  if (aciliyet === 'orta') return theme.colors.accent;
-  return theme.colors.textSecondary;
+/** Urgency → soft badge palette. */
+function urgencyMeta(aciliyet: Aciliyet) {
+  if (aciliyet === 'yuksek') return { bg: theme.colors.urgentSoftBg, fg: theme.colors.urgentSoftText };
+  if (aciliyet === 'orta') return { bg: theme.colors.warnSoftBg, fg: theme.colors.warnSoftText };
+  return { bg: theme.colors.okSoftBg, fg: theme.colors.okSoftText };
+}
+
+function ModeCard({
+  icon,
+  title,
+  desc,
+  active,
+  onPress,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  title: string;
+  desc: string;
+  active: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ selected: active }}
+      onPress={onPress}
+      style={({ pressed }) => [styles.modeCard, active && styles.modeCardActive, pressed && styles.pressed]}
+    >
+      <View style={[styles.modeIcon, active && styles.modeIconActive]}>
+        <Ionicons name={icon} size={24} color={active ? theme.colors.onInk : theme.colors.ink} />
+      </View>
+      <Text style={styles.modeTitle}>{title}</Text>
+      <Text style={styles.modeDesc}>{desc}</Text>
+    </Pressable>
+  );
 }
 
 function ResultPanel({ result }: { result: SoundDiagnoseResult }) {
-  const urgency = urgencyColor(result.aciliyet);
+  const urgency = urgencyMeta(result.aciliyet);
   return (
     <View style={styles.resultPanel}>
       <Text style={styles.resultTitle}>{t('sound.result.title')}</Text>
 
       <View style={styles.resultRow}>
         <Text style={styles.resultLabel}>{t('sound.result.kategori')}</Text>
-        <Text style={styles.resultValue}>
-          {t(`sound.kategori.${result.ses_kategorisi}`)}
-        </Text>
+        <Text style={styles.resultValue}>{t(`sound.kategori.${result.ses_kategorisi}`)}</Text>
       </View>
 
       <View style={styles.resultRow}>
@@ -51,15 +74,13 @@ function ResultPanel({ result }: { result: SoundDiagnoseResult }) {
 
       <View style={styles.resultRow}>
         <Text style={styles.resultLabel}>{t('sound.result.guven')}</Text>
-        <Text style={styles.resultValue}>
-          {t(`camera.guven.${result.guven}`)}
-        </Text>
+        <Text style={styles.resultValue}>{t(`camera.guven.${result.guven}`)}</Text>
       </View>
 
       <View style={styles.resultRow}>
         <Text style={styles.resultLabel}>{t('sound.result.aciliyet')}</Text>
-        <View style={[styles.urgencyBadge, { borderColor: urgency }]}>
-          <Text style={[styles.urgencyText, { color: urgency }]}>
+        <View style={[styles.badge, { backgroundColor: urgency.bg }]}>
+          <Text style={[styles.badgeText, { color: urgency.fg }]}>
             {t(`sound.aciliyet.${result.aciliyet}`)}
           </Text>
         </View>
@@ -72,7 +93,7 @@ function ResultPanel({ result }: { result: SoundDiagnoseResult }) {
 
       {result.guvenlik_uyarisi != null && (
         <View style={styles.warningBox}>
-          <Ionicons name="warning" size={18} color={theme.colors.background} />
+          <Ionicons name="warning" size={18} color={theme.colors.onInk} />
           <Text style={styles.warningText}>{result.guvenlik_uyarisi}</Text>
         </View>
       )}
@@ -80,7 +101,7 @@ function ResultPanel({ result }: { result: SoundDiagnoseResult }) {
   );
 }
 
-export default function SoundScreen() {
+export default function DiagnosisScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { loading, error, result, runSoundDiagnose } = useSoundDiagnose();
@@ -89,37 +110,34 @@ export default function SoundScreen() {
   const [condition, setCondition] = useState<KayitKosulu>('rolanti');
 
   return (
-    <View
-      style={[styles.container, { paddingTop: insets.top + theme.spacing.lg }]}
-    >
-      <View style={styles.headerRow}>
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => router.back()}
-          style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
-        >
-          <Ionicons
-            name="chevron-back"
-            size={22}
-            color={theme.colors.textPrimary}
-          />
-          <Text style={styles.backText}>{t('common.back')}</Text>
-        </Pressable>
-      </View>
+    <View style={[styles.container, { paddingTop: insets.top + theme.spacing.md }]}>
+      <Text style={styles.title}>{t('diagnosis.title')}</Text>
 
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.title}>{t('sound.title')}</Text>
+        {/* Göster / Dinlet modları */}
+        <View style={styles.modeGrid}>
+          <ModeCard
+            icon="camera"
+            title={t('diagnosis.show.title')}
+            desc={t('diagnosis.show.desc')}
+            active={false}
+            onPress={() => router.replace('/maintenance')}
+          />
+          <ModeCard
+            icon="pulse"
+            title={t('diagnosis.listen.title')}
+            desc={t('diagnosis.listen.desc')}
+            active
+            onPress={() => undefined}
+          />
+        </View>
 
         <View style={styles.recordedHint}>
-          <Ionicons
-            name="information-circle"
-            size={18}
-            color={theme.colors.textSecondary}
-          />
+          <Ionicons name="information-circle" size={18} color={theme.colors.textSecondary} />
           <Text style={styles.recordedHintText}>{t('sound.recordedHint')}</Text>
         </View>
 
@@ -138,9 +156,6 @@ export default function SoundScreen() {
         <View style={styles.conditionRow}>
           {CONDITIONS.map((c) => {
             const selected = condition === c;
-            const color = selected
-              ? theme.colors.accent
-              : theme.colors.textSecondary;
             return (
               <Pressable
                 key={c}
@@ -149,12 +164,11 @@ export default function SoundScreen() {
                 onPress={() => setCondition(c)}
                 style={({ pressed }) => [
                   styles.conditionChip,
-                  { borderColor: color },
                   selected && styles.conditionChipSelected,
                   pressed && styles.pressed,
                 ]}
               >
-                <Text style={[styles.conditionLabel, { color }]}>
+                <Text style={[styles.conditionLabel, selected && styles.conditionLabelSelected]}>
                   {t(`sound.condition.${c}`)}
                 </Text>
               </Pressable>
@@ -164,11 +178,7 @@ export default function SoundScreen() {
 
         {error && (
           <View style={styles.errorBox}>
-            <Ionicons
-              name="alert-circle"
-              size={18}
-              color={theme.colors.danger}
-            />
+            <Ionicons name="alert-circle" size={18} color={theme.colors.dangerBright} />
             <Text style={styles.errorText}>{t(error)}</Text>
           </View>
         )}
@@ -178,28 +188,16 @@ export default function SoundScreen() {
         {result?.tamirciye_git_onerisi === true && (
           <Pressable
             accessibilityRole="button"
-            onPress={() => router.back()}
-            style={({ pressed }) => [
-              styles.mechanicButton,
-              pressed && styles.pressed,
-            ]}
+            onPress={() => router.replace('/maintenance')}
+            style={({ pressed }) => [styles.mechanicButton, pressed && styles.pressed]}
           >
-            <Ionicons
-              name="construct"
-              size={18}
-              color={theme.colors.background}
-            />
+            <Ionicons name="construct" size={18} color={theme.colors.onInk} />
             <Text style={styles.mechanicText}>{t('common.goToMechanic')}</Text>
           </Pressable>
         )}
       </ScrollView>
 
-      <View
-        style={[
-          styles.footer,
-          { paddingBottom: insets.bottom + theme.spacing.lg },
-        ]}
-      >
+      <View style={styles.footer}>
         <Pressable
           accessibilityRole="button"
           accessibilityState={{ disabled: loading }}
@@ -213,17 +211,19 @@ export default function SoundScreen() {
         >
           {loading ? (
             <>
-              <ActivityIndicator color={theme.colors.background} />
+              <ActivityIndicator color={theme.colors.onInk} />
               <Text style={styles.analyzeText}>{t('sound.analyzing')}</Text>
             </>
           ) : (
             <>
-              <Ionicons name="pulse" size={22} color={theme.colors.background} />
+              <Ionicons name="pulse" size={22} color={theme.colors.onInk} />
               <Text style={styles.analyzeText}>{t('sound.analyze')}</Text>
             </>
           )}
         </Pressable>
       </View>
+
+      <BottomTabBar active="diagnosis" />
     </View>
   );
 }
@@ -232,33 +232,62 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
-    paddingHorizontal: theme.spacing.lg,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    minHeight: theme.touchTarget,
-    paddingRight: theme.spacing.md,
-  },
-  backText: {
-    fontFamily: theme.fonts.body,
-    fontSize: 15,
-    fontWeight: '600',
-    color: theme.colors.textPrimary,
-  },
-  scroll: {
-    paddingBottom: theme.spacing.xxl,
   },
   title: {
     fontFamily: theme.fonts.heading,
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: '700',
     color: theme.colors.textPrimary,
+    letterSpacing: -0.3,
+    paddingHorizontal: theme.spacing.lg,
     marginBottom: theme.spacing.md,
+  },
+  scroll: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.lg,
+  },
+  modeGrid: {
+    flexDirection: 'row',
+    gap: theme.spacing.md,
+    marginBottom: theme.spacing.lg,
+  },
+  modeCard: {
+    flex: 1,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.lg,
+    borderWidth: 1.5,
+    borderColor: theme.colors.border,
+    padding: theme.spacing.lg,
+    alignItems: 'center',
+    gap: 4,
+  },
+  modeCardActive: {
+    borderColor: theme.colors.ink,
+  },
+  modeIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: theme.spacing.xs,
+  },
+  modeIconActive: {
+    backgroundColor: theme.colors.ink,
+  },
+  modeTitle: {
+    fontFamily: theme.fonts.body,
+    fontSize: 14,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  modeDesc: {
+    fontFamily: theme.fonts.body,
+    fontSize: 11,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 15,
   },
   recordedHint: {
     flexDirection: 'row',
@@ -269,7 +298,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.border,
     padding: theme.spacing.md,
-    marginBottom: theme.spacing.lg,
+    marginBottom: theme.spacing.md,
   },
   recordedHintText: {
     flex: 1,
@@ -301,19 +330,26 @@ const styles = StyleSheet.create({
     gap: theme.spacing.sm,
   },
   conditionChip: {
-    minHeight: theme.touchTarget,
+    minHeight: 44,
     justifyContent: 'center',
     borderWidth: 1,
+    borderColor: theme.colors.border,
     borderRadius: theme.radius.pill,
     paddingHorizontal: theme.spacing.lg,
+    backgroundColor: theme.colors.surface,
   },
   conditionChipSelected: {
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.ink,
+    borderColor: theme.colors.ink,
   },
   conditionLabel: {
     fontFamily: theme.fonts.body,
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '700',
+    color: theme.colors.textSecondary,
+  },
+  conditionLabelSelected: {
+    color: theme.colors.onInk,
   },
   errorBox: {
     flexDirection: 'row',
@@ -325,7 +361,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: theme.fonts.body,
     fontSize: 14,
-    color: theme.colors.danger,
+    color: theme.colors.dangerBright,
   },
   resultPanel: {
     backgroundColor: theme.colors.surface,
@@ -356,24 +392,23 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary,
     marginTop: 2,
   },
-  urgencyBadge: {
+  badge: {
     alignSelf: 'flex-start',
-    borderWidth: 1,
     borderRadius: theme.radius.pill,
-    paddingVertical: theme.spacing.xs,
+    paddingVertical: 3,
     paddingHorizontal: theme.spacing.md,
     marginTop: theme.spacing.xs,
   },
-  urgencyText: {
+  badgeText: {
     fontFamily: theme.fonts.body,
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '700',
   },
   warningBox: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing.sm,
-    backgroundColor: theme.colors.warning,
+    backgroundColor: theme.colors.warningBright,
     borderRadius: theme.radius.sm,
     paddingVertical: theme.spacing.md,
     paddingHorizontal: theme.spacing.md,
@@ -384,12 +419,12 @@ const styles = StyleSheet.create({
     fontFamily: theme.fonts.body,
     fontSize: 13,
     fontWeight: '600',
-    color: theme.colors.background,
+    color: theme.colors.onInk,
   },
   mechanicButton: {
     minHeight: theme.touchTarget,
     borderRadius: theme.radius.md,
-    backgroundColor: theme.colors.accent,
+    backgroundColor: theme.colors.ink,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -400,14 +435,16 @@ const styles = StyleSheet.create({
     fontFamily: theme.fonts.heading,
     fontSize: 16,
     fontWeight: '700',
-    color: theme.colors.background,
+    color: theme.colors.onInk,
   },
   footer: {
-    paddingTop: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+    paddingTop: theme.spacing.sm,
+    paddingBottom: theme.spacing.sm,
   },
   analyzeButton: {
     minHeight: theme.touchTarget,
-    backgroundColor: theme.colors.accent,
+    backgroundColor: theme.colors.ink,
     borderRadius: theme.radius.md,
     flexDirection: 'row',
     alignItems: 'center',
@@ -421,7 +458,7 @@ const styles = StyleSheet.create({
     fontFamily: theme.fonts.heading,
     fontSize: 18,
     fontWeight: '700',
-    color: theme.colors.background,
+    color: theme.colors.onInk,
   },
   pressed: {
     opacity: 0.85,

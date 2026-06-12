@@ -1,5 +1,4 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -12,6 +11,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { BottomTabBar } from '@/components/BottomTabBar';
 import type {
   MaintenanceLog,
   Reminder,
@@ -102,7 +102,6 @@ function LogRow({ log }: { log: MaintenanceLog }) {
 }
 
 export default function HistoryScreen() {
-  const router = useRouter();
   const insets = useSafeAreaInsets();
   const {
     loading,
@@ -137,21 +136,6 @@ export default function HistoryScreen() {
     <View
       style={[styles.container, { paddingTop: insets.top + theme.spacing.lg }]}
     >
-      <View style={styles.headerRow}>
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => router.back()}
-          style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
-        >
-          <Ionicons
-            name="chevron-back"
-            size={22}
-            color={theme.colors.textPrimary}
-          />
-          <Text style={styles.backText}>{t('common.back')}</Text>
-        </Pressable>
-      </View>
-
       <ScrollView
         contentContainerStyle={[
           styles.scroll,
@@ -290,6 +274,8 @@ export default function HistoryScreen() {
           </Pressable>
         </View>
       </ScrollView>
+
+      <BottomTabBar active="history" />
     </View>
   );
 }
@@ -298,25 +284,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
-    paddingHorizontal: theme.spacing.lg,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    minHeight: theme.touchTarget,
-    paddingRight: theme.spacing.md,
-  },
-  backText: {
-    fontFamily: theme.fonts.body,
-    fontSize: 15,
-    fontWeight: '600',
-    color: theme.colors.textPrimary,
   },
   scroll: {
+    paddingHorizontal: theme.spacing.lg,
     paddingBottom: theme.spacing.xxl,
   },
   title: {

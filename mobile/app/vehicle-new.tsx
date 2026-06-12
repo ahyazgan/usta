@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { FuelType } from '@/lib/api';
 import { t } from '@/lib/i18n';
+import { goBack } from '@/lib/nav';
 import { useUstaStore } from '@/lib/store';
 import { theme } from '@/lib/theme';
 import { useVehicles } from '@/lib/useVehicles';
@@ -45,6 +46,7 @@ export default function VehicleNewScreen() {
   const [year, setYear] = useState(
     editVehicle != null ? String(editVehicle.year) : '',
   );
+  const [plate, setPlate] = useState(editVehicle?.plate ?? '');
   const [fuelType, setFuelType] = useState<FuelType | null>(
     editVehicle?.fuel_type ?? null,
   );
@@ -84,6 +86,7 @@ export default function VehicleNewScreen() {
       make: make.trim(),
       model: model.trim(),
       year: parsedYear,
+      plate: plate.trim().length > 0 ? plate.trim().toUpperCase() : undefined,
       fuel_type: fuelType,
       engine_code:
         engineCode.trim().length > 0 ? engineCode.trim() : undefined,
@@ -109,7 +112,7 @@ export default function VehicleNewScreen() {
       <View style={styles.headerRow}>
         <Pressable
           accessibilityRole="button"
-          onPress={() => router.back()}
+          onPress={() => goBack(router)}
           style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
         >
           <Ionicons
@@ -177,13 +180,22 @@ export default function VehicleNewScreen() {
           maxLength={4}
         />
 
+        <Text style={styles.label}>{t('vehicle.form.plate')}</Text>
+        <TextInput
+          style={styles.input}
+          value={plate}
+          onChangeText={setPlate}
+          placeholder={t('vehicle.form.platePlaceholder')}
+          placeholderTextColor={theme.colors.textSecondary}
+          autoCapitalize="characters"
+          autoCorrect={false}
+          maxLength={15}
+        />
+
         <Text style={styles.label}>{t('vehicle.form.fuel')}</Text>
         <View style={styles.fuelRow}>
           {FUEL_TYPES.map((fuel) => {
             const selected = fuelType === fuel;
-            const color = selected
-              ? theme.colors.accent
-              : theme.colors.textSecondary;
             return (
               <Pressable
                 key={fuel}
@@ -192,12 +204,16 @@ export default function VehicleNewScreen() {
                 onPress={() => setFuelType(fuel)}
                 style={({ pressed }) => [
                   styles.fuelChip,
-                  { borderColor: color },
                   selected && styles.fuelChipSelected,
                   pressed && styles.pressed,
                 ]}
               >
-                <Text style={[styles.fuelLabel, { color }]}>
+                <Text
+                  style={[
+                    styles.fuelLabel,
+                    selected ? styles.fuelLabelSelected : styles.fuelLabelUnselected,
+                  ]}
+                >
                   {t(`vehicle.fuel.${fuel}`)}
                 </Text>
               </Pressable>
@@ -256,13 +272,13 @@ export default function VehicleNewScreen() {
           ]}
         >
           {submitting ? (
-            <ActivityIndicator color={theme.colors.background} />
+            <ActivityIndicator color={theme.colors.onInk} />
           ) : (
             <>
               <Ionicons
                 name={isEdit ? 'checkmark-circle' : 'add-circle'}
                 size={22}
-                color={theme.colors.background}
+                color={theme.colors.onInk}
               />
               <Text style={styles.saveText}>
                 {isEdit ? t('vehicle.edit.cta') : t('vehicle.form.save')}
@@ -351,16 +367,25 @@ const styles = StyleSheet.create({
     minHeight: theme.touchTarget,
     justifyContent: 'center',
     borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
     borderRadius: theme.radius.pill,
     paddingHorizontal: theme.spacing.lg,
   },
   fuelChipSelected: {
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.ink,
+    borderColor: theme.colors.ink,
   },
   fuelLabel: {
     fontFamily: theme.fonts.body,
     fontSize: 15,
     fontWeight: '700',
+  },
+  fuelLabelSelected: {
+    color: theme.colors.onInk,
+  },
+  fuelLabelUnselected: {
+    color: theme.colors.textSecondary,
   },
   errorBox: {
     flexDirection: 'row',
@@ -393,7 +418,7 @@ const styles = StyleSheet.create({
     fontFamily: theme.fonts.heading,
     fontSize: 18,
     fontWeight: '700',
-    color: theme.colors.background,
+    color: theme.colors.onInk,
   },
   pressed: {
     opacity: 0.85,

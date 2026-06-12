@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..domain.maintenance import Reminder, compute_reminders
 from ..domain.models import MaintenanceLog
 from ..domain.schemas import MaintenanceLogCreate
+from ..domain.tasks import tasks_for_fuel
 from . import vehicle_service
 
 
@@ -42,4 +43,7 @@ async def get_reminders(db: AsyncSession, user_id: int, vehicle_id: int) -> list
         if log.km is not None and log.task not in last_km_by_task:
             last_km_by_task[log.task] = log.km
 
-    return compute_reminders(vehicle.current_km, last_km_by_task)
+    reminders = compute_reminders(vehicle.current_km, last_km_by_task)
+    # Bu aracın yakıtına uygulanamayan görevleri ele (örn. dizelde buji).
+    applicable = {t.id for t in tasks_for_fuel(vehicle.fuel_type)}
+    return [r for r in reminders if r.task in applicable]

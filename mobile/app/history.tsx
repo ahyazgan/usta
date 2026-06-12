@@ -18,11 +18,13 @@ import type {
   ReminderStatus,
 } from '@/lib/api';
 import { i18n, t } from '@/lib/i18n';
+import { selectCurrentVehicle, useUstaStore } from '@/lib/store';
 import { theme } from '@/lib/theme';
 import { useHistory } from '@/lib/useHistory';
+import { useVehicleTasks } from '@/lib/useVehicleTasks';
 
-/** Tasks reused for the add-log picker (mirrors the garage chips). */
-const TASK_IDS = ['oil_change', 'battery', 'cabin_filter'] as const;
+/** Seçici boşken / yüklenirken kullanılacak çekirdek görevler. */
+const FALLBACK_TASK_IDS = ['oil_change', 'battery', 'cabin_filter'];
 
 /** Resolve a task id to a localized title, falling back to the raw id. */
 function taskTitle(id: string): string {
@@ -114,7 +116,13 @@ export default function HistoryScreen() {
     submitError,
   } = useHistory();
 
-  const [task, setTask] = useState<string>(TASK_IDS[0]);
+  // Kayıt seçicisi bu aracın TÜM uygun görevlerini listeler (sunucu filtreli).
+  const vehicle = useUstaStore(selectCurrentVehicle);
+  const { tasks: vehicleTasks } = useVehicleTasks(vehicle?.id ?? null);
+  const taskIds =
+    vehicleTasks.length > 0 ? vehicleTasks.map((x) => x.id) : FALLBACK_TASK_IDS;
+
+  const [task, setTask] = useState<string>(FALLBACK_TASK_IDS[0]);
   const [km, setKm] = useState('');
   const [note, setNote] = useState('');
 
@@ -207,7 +215,7 @@ export default function HistoryScreen() {
         <View style={styles.card}>
           <Text style={styles.label}>{t('history.addLog.taskLabel')}</Text>
           <View style={styles.taskRow}>
-            {TASK_IDS.map((id) => {
+            {taskIds.map((id) => {
               const selected = task === id;
               const color = selected
                 ? theme.colors.accent

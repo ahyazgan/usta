@@ -14,6 +14,7 @@ import { BottomTabBar } from '@/components/BottomTabBar';
 import { type Task, type TaskRisk } from '@/lib/api';
 import { i18n, t } from '@/lib/i18n';
 import { useUstaStore } from '@/lib/store';
+import { TASK_ICON } from '@/lib/taskIcons';
 import { theme } from '@/lib/theme';
 import { useVehicleTasks } from '@/lib/useVehicleTasks';
 import { useVehicles } from '@/lib/useVehicles';
@@ -32,20 +33,6 @@ function riskMeta(risk: TaskRisk) {
   }
   return { bg: theme.colors.okSoftBg, fg: theme.colors.okSoftText, icon: 'leaf' as const };
 }
-
-/** Map a task id to a representative icon. */
-const TASK_ICON: Record<string, keyof typeof Ionicons.glyphMap> = {
-  oil_change: 'water',
-  spark_plug: 'flash',
-  battery: 'battery-charging',
-  brake_check: 'disc',
-  air_filter: 'funnel',
-  cabin_filter: 'leaf',
-  coolant: 'thermometer',
-  tire: 'ellipse',
-  wiper: 'rainy',
-  headlight: 'bulb',
-};
 
 export default function MaintenanceScreen() {
   const router = useRouter();

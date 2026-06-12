@@ -15,10 +15,11 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomTabBar } from '@/components/BottomTabBar';
-import { type Vehicle } from '@/lib/api';
+import { type Reminder, type Vehicle } from '@/lib/api';
 import { ensureDemoSession } from '@/lib/demoSession';
 import { t } from '@/lib/i18n';
 import { useUstaStore } from '@/lib/store';
+import { TASK_ICON } from '@/lib/taskIcons';
 import { theme } from '@/lib/theme';
 import { useAuth } from '@/lib/useAuth';
 import { useGarageStatus, type GarageChipState } from '@/lib/useGarageStatus';
@@ -47,14 +48,34 @@ function healthColor(pct: number): string {
   return theme.colors.dangerBright;
 }
 
-interface TaskRowDef {
-  key: 'oil' | 'filter' | 'battery';
-  icon: keyof typeof Ionicons.glyphMap;
-  state: GarageChipState;
+/** Görev id → yerelleştirilmiş ad (garage.tasks sözlüğünden, yoksa ham id). */
+function taskName(id: string): string {
+  const translated = t(`garage.tasks.${id}`);
+  return translated.startsWith('[missing') ? id : translated;
 }
 
-function TaskRow({ row, onPress }: { row: TaskRowDef; onPress: () => void }) {
-  const badge = badgeStyle(row.state);
+/** Hatırlatıcı satırı alt metni: aciliyete göre kalan km / durum. */
+function reminderMeta(reminder: Reminder): string {
+  if (reminder.status === 'due') return t('home.taskMeta.due');
+  if (reminder.status === 'unknown') return t('home.taskMeta.unknown');
+  if (reminder.remaining_km != null) {
+    return t('history.reminders.remaining', {
+      km: reminder.remaining_km.toLocaleString('tr-TR'),
+    });
+  }
+  return t(`home.taskMeta.${reminder.status}`);
+}
+
+/** Aciliyet sırası: önce zamanı gelenler. */
+const STATUS_PRIORITY: Record<GarageChipState, number> = {
+  due: 0,
+  soon: 1,
+  unknown: 2,
+  ok: 3,
+};
+
+function TaskRow({ reminder, onPress }: { reminder: Reminder; onPress: () => void }) {
+  const badge = badgeStyle(reminder.status);
   return (
     <Pressable
       accessibilityRole="button"
@@ -62,18 +83,22 @@ function TaskRow({ row, onPress }: { row: TaskRowDef; onPress: () => void }) {
       style={({ pressed }) => [styles.taskRow, pressed && styles.pressed]}
     >
       <View style={[styles.taskIcon, { backgroundColor: badge.bg }]}>
-        <Ionicons name={row.icon} size={18} color={badge.fg} />
+        <Ionicons
+          name={TASK_ICON[reminder.task] ?? 'build'}
+          size={18}
+          color={badge.fg}
+        />
       </View>
       <View style={styles.taskBody}>
         <View style={styles.taskTitleRow}>
-          <Text style={styles.taskTitle}>{t(`garage.chips.${row.key}`)}</Text>
+          <Text style={styles.taskTitle}>{taskName(reminder.task)}</Text>
           <View style={[styles.badge, { backgroundColor: badge.bg }]}>
             <Text style={[styles.badgeText, { color: badge.fg }]}>
-              {t(`home.badge.${row.state}`)}
+              {t(`home.badge.${reminder.status}`)}
             </Text>
           </View>
         </View>
-        <Text style={styles.taskMeta}>{t(`home.taskMeta.${row.state}`)}</Text>
+        <Text style={styles.taskMeta}>{reminderMeta(reminder)}</Text>
       </View>
       <Ionicons name="chevron-forward" size={18} color={theme.colors.border} />
     </Pressable>
@@ -96,7 +121,7 @@ export default function HomeScreen() {
     removeVehicle,
     updateVehicle,
   } = useVehicles();
-  const { chips } = useGarageStatus(currentVehicle?.id ?? null);
+  const { chips, reminders } = useGarageStatus(currentVehicle?.id ?? null);
   const summary = useSummary(currentVehicle?.id ?? null);
 
   // Km hızlı güncelleme modalı (km rozetine dokun → yaz → kaydet).
@@ -228,14 +253,17 @@ export default function HomeScreen() {
   const subParts = [String(currentVehicle.year), fuelLabel];
   if (currentVehicle.spec?.transmission_type) subParts.push(currentVehicle.spec.transmission_type);
 
-  const states: GarageChipState[] = [chips.oil, chips.filter, chips.battery];
+  // Sağlık skoru: tüm km-bazlı hatırlatıcıların ortalaması; hiç yoksa nötr çipler.
+  const states: GarageChipState[] =
+    reminders.length > 0
+      ? reminders.map((r) => r.status)
+      : [chips.oil, chips.filter, chips.battery];
   const health = Math.round(states.reduce((s, x) => s + HEALTH_SCORE[x], 0) / states.length);
 
-  const taskRows: TaskRowDef[] = [
-    { key: 'oil', icon: 'water', state: chips.oil },
-    { key: 'filter', icon: 'funnel', state: chips.filter },
-    { key: 'battery', icon: 'battery-charging', state: chips.battery },
-  ];
+  // Yapılacaklar: aciliyete göre sıralı gerçek hatırlatıcılar (ilk 4).
+  const taskRows = [...reminders]
+    .sort((a, b) => STATUS_PRIORITY[a.status] - STATUS_PRIORITY[b.status])
+    .slice(0, 4);
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + theme.spacing.md }]}>
@@ -343,9 +371,20 @@ export default function HomeScreen() {
           </Pressable>
         </View>
 
-        {taskRows.map((row) => (
-          <TaskRow key={row.key} row={row} onPress={() => router.replace('/maintenance')} />
-        ))}
+        {taskRows.length === 0 ? (
+          <View style={styles.taskEmpty}>
+            <Ionicons name="sparkles-outline" size={20} color={theme.colors.textSecondary} />
+            <Text style={styles.taskEmptyText}>{t('home.tasksEmpty')}</Text>
+          </View>
+        ) : (
+          taskRows.map((row) => (
+            <TaskRow
+              key={row.task}
+              reminder={row}
+              onPress={() => router.replace('/maintenance')}
+            />
+          ))
+        )}
 
         {/* Tasarruf bandı — gerçek loglardan tahmini DIY tasarrufu */}
         <View style={styles.savingsBanner}>
@@ -743,6 +782,24 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: theme.colors.textSecondary,
     marginTop: 2,
+  },
+  taskEmpty: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    marginHorizontal: theme.spacing.lg,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderStyle: 'dashed',
+    padding: theme.spacing.lg,
+  },
+  taskEmptyText: {
+    flex: 1,
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    color: theme.colors.textSecondary,
   },
   badge: {
     borderRadius: theme.radius.pill,

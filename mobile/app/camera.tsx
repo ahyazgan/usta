@@ -95,7 +95,14 @@ export default function CameraScreen() {
   const cameraRef = useRef<CameraView>(null);
 
   const selectedTask = useUstaStore((s) => s.selectedTask);
+  const guideProgress = useUstaStore((s) => s.guideProgress);
   const { loading, error, result, runImageDiagnose } = useDiagnose();
+
+  // Rehberden gelindiyse kaldığı adım (1 bazlı) banner'da görünür.
+  const guideStep =
+    selectedTask != null && guideProgress[selectedTask.id] != null
+      ? guideProgress[selectedTask.id] + 1
+      : null;
 
   const granted = permission?.granted === true;
   const canAskAgain = permission?.canAskAgain !== false;
@@ -112,7 +119,16 @@ export default function CameraScreen() {
     <View style={[styles.container, { paddingTop: insets.top + theme.spacing.md }]}>
       {/* Görev banner'ı */}
       <View style={styles.banner}>
-        <Text style={styles.bannerStep}>{t('camera.taskLabel')}</Text>
+        <View style={styles.bannerTopRow}>
+          <Text style={styles.bannerStep}>{t('camera.taskLabel')}</Text>
+          {guideStep != null && (
+            <View style={styles.stepChip}>
+              <Text style={styles.stepChipText}>
+                {t('camera.guideStep', { step: guideStep })}
+              </Text>
+            </View>
+          )}
+        </View>
         <Text style={styles.bannerTitle}>
           {selectedTask ? taskTitle(selectedTask) : t('camera.stepTitle')}
         </Text>
@@ -238,12 +254,29 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
     padding: theme.spacing.lg,
   },
+  bannerTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   bannerStep: {
     fontFamily: theme.fonts.heading,
     fontSize: 14,
     fontWeight: '700',
     color: theme.colors.accent,
     letterSpacing: 1,
+  },
+  stepChip: {
+    backgroundColor: theme.colors.okSoftBg,
+    borderRadius: theme.radius.pill,
+    paddingVertical: 3,
+    paddingHorizontal: theme.spacing.md,
+  },
+  stepChipText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 11,
+    fontWeight: '700',
+    color: theme.colors.okSoftText,
   },
   bannerTitle: {
     fontFamily: theme.fonts.heading,

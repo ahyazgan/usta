@@ -103,3 +103,27 @@ async def test_reminders_endpoint_reflects_logs(client):
     oil = next(x for x in r.json() if x["task"] == "oil_change")
     assert oil["due_km"] == 85000
     assert oil["status"] in {"soon", "due"}
+
+
+@pytest.mark.asyncio
+async def test_reminders_filtered_by_fuel(client):
+    """Hatırlatıcılar aracın yakıtına uygulanamayan görevleri içermez."""
+    headers = await register_and_login(client, "rem2@usta.app")
+
+    # LPG araç (conftest helper) -> buji hatırlatıcısı VAR.
+    lpg = await create_vehicle(client, headers)
+    r = await client.get(f"/v1/vehicles/{lpg['id']}/reminders", headers=headers)
+    lpg_tasks = {x["task"] for x in r.json()}
+    assert "spark_plug" in lpg_tasks
+    assert {"air_filter", "coolant", "brake_check", "tire"} <= lpg_tasks
+
+    # Dizel araç -> buji hatırlatıcısı YOK, yağ/hava filtresi var.
+    dz = await client.post(
+        "/v1/vehicles",
+        json={"make": "Renault", "model": "Clio", "year": 2018, "fuel_type": "dizel", "engine_code": "K9K"},
+        headers=headers,
+    )
+    r = await client.get(f"/v1/vehicles/{dz.json()['id']}/reminders", headers=headers)
+    dizel_tasks = {x["task"] for x in r.json()}
+    assert "spark_plug" not in dizel_tasks
+    assert {"oil_change", "air_filter"} <= dizel_tasks

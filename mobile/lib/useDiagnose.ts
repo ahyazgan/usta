@@ -31,6 +31,7 @@ function errorKey(err: unknown): string {
 export function useDiagnose(): UseDiagnose {
   const vehicle = useUstaStore(selectCurrentVehicle);
   const selectedTask = useUstaStore((s) => s.selectedTask);
+  const guideProgress = useUstaStore((s) => s.guideProgress);
   const authToken = useUstaStore((s) => s.authToken);
   const lastResult = useUstaStore((s) => s.lastResult);
   const setLastResult = useUstaStore((s) => s.setLastResult);
@@ -59,9 +60,13 @@ export function useDiagnose(): UseDiagnose {
       setError(null);
       try {
         const { base64, mediaType } = await captureAndEncode(photoUri);
+        // Rehberden gelindiyse mevcut adımı AI'ye ilet (prompt "MEVCUT ADIM"
+        // bölümünü doldurur, doğrulama bağlama göre keskinleşir).
+        const progress = guideProgress[selectedTask.id];
         const result = await client.diagnoseImage({
           vehicle_id: vehicle.id,
           task: selectedTask.id,
+          step: progress != null ? progress + 1 : undefined,
           frame_base64: base64,
           media_type: mediaType,
         });
@@ -72,7 +77,7 @@ export function useDiagnose(): UseDiagnose {
         setLoading(false);
       }
     },
-    [client, vehicle, selectedTask, setLastResult],
+    [client, vehicle, selectedTask, guideProgress, setLastResult],
   );
 
   return { loading, error, result: lastResult, runImageDiagnose };

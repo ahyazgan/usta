@@ -16,6 +16,7 @@ from ..domain.guides import fill_template, get_guide
 from ..domain.models import AISession
 from ..domain.schemas import (
     CostEstimateOut,
+    TaskEstimateOut,
     DiagnosisFeedbackIn,
     DiagnosisHistoryOut,
     DiagnosisResolutionIn,
@@ -137,6 +138,35 @@ async def task_guide(
         mechanic_note_tr=guide.mechanic_note_tr,
         mechanic_note_en=guide.mechanic_note_en,
     )
+
+
+@router.get("/estimates", response_model=list[TaskEstimateOut])
+async def vehicle_estimates(
+    vehicle_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> list[TaskEstimateOut]:
+    """Fiyat vitrini: bu araca uygulanabilir tüm işlerin tamirci maliyet
+    tahmini (tohum/topluluk). Fiyat şeffaflığı wedge'inin gezilebilir hâli."""
+    vehicle = await vehicle_service.get_owned(db, user.id, vehicle_id)
+    out: list[TaskEstimateOut] = []
+    for task in tasks_for_vehicle(vehicle.fuel_type, vehicle.vehicle_type):
+        est = await cost_service.estimate_task(db, task.id, vehicle.vehicle_type)
+        if est is None:
+            continue
+        out.append(
+            TaskEstimateOut(
+                id=task.id,
+                title_tr=task.title_tr,
+                title_en=task.title_en,
+                risk=task.risk,
+                low_try=est.low_try,
+                high_try=est.high_try,
+                source=est.source,
+                sample_size=est.sample_size,
+            )
+        )
+    return out
 
 
 @router.get("/tasks/{task_id}/estimate", response_model=CostEstimateOut)

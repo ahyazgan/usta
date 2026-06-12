@@ -115,6 +115,21 @@ async def test_task_estimate_requires_auth_401(client):
     assert r.status_code == 401
 
 
+@pytest.mark.asyncio
+async def test_vehicle_estimates_list(client):
+    """Fiyat vitrini: araca uygulanabilir tüm işler + tahmin tek çağrıda."""
+    headers = await register_and_login(client, "vest@usta.app")
+    vid = await _make_car(client, headers)
+    rows = (await client.get(f"/v1/vehicles/{vid}/estimates", headers=headers)).json()
+    assert len(rows) >= 8
+    ids = {r["id"] for r in rows}
+    assert "oil_change" in ids and "chain" not in ids  # araba; zincir yok
+    for r in rows:
+        assert r["high_try"] >= r["low_try"] > 0
+        assert r["source"] in {"seed", "community"}
+        assert {"title_tr", "title_en", "risk"} <= r.keys()
+
+
 # --- Uç: teşhis (arıza sistemi) tahmini -------------------------------------- #
 
 @pytest.mark.asyncio

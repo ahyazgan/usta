@@ -189,6 +189,19 @@ export interface CostEstimate {
   sample_size: number;
 }
 
+/** One row of the price showroom: a task + its mechanic cost estimate. */
+export interface TaskEstimate {
+  id: string;
+  title_tr: string;
+  title_en: string;
+  risk: TaskRisk;
+  low_try: number;
+  high_try: number;
+  currency: string;
+  source: 'seed' | 'community';
+  sample_size: number;
+}
+
 /** Vehicle-system taxonomy a diagnosis maps to (queryable stats). */
 export type ArizaSistem =
   | 'motor'
@@ -342,6 +355,8 @@ export interface ApiClient {
   getGuide(vehicleId: number, taskId: string): Promise<TaskGuide>;
   /** Mechanic cost estimate for a task on this vehicle (404 if none). */
   getTaskEstimate(vehicleId: number, taskId: string): Promise<CostEstimate>;
+  /** Price showroom: all applicable tasks + their estimates, one call. */
+  getVehicleEstimates(vehicleId: number): Promise<TaskEstimate[]>;
   /** Recent AI diagnoses for this vehicle (image + sound), newest first. */
   getDiagnoses(vehicleId: number): Promise<DiagnosisHistory[]>;
   /** 👍/👎 a past diagnosis; re-voting overwrites. Returns the updated row. */
@@ -556,6 +571,13 @@ export function createApiClient(
         `/v1/vehicles/${vehicleId}/tasks/${taskId}/estimate`,
         { method: 'GET', headers },
       );
+    },
+    async getVehicleEstimates(vehicleId) {
+      const headers = await authHeaders();
+      return request<TaskEstimate[]>(`/v1/vehicles/${vehicleId}/estimates`, {
+        method: 'GET',
+        headers,
+      });
     },
     async getDiagnoses(vehicleId) {
       const headers = await authHeaders();

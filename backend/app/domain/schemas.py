@@ -260,6 +260,20 @@ class CostEstimateOut(BaseModel):
     sample_size: int
 
 
+class TaskEstimateOut(BaseModel):
+    """Fiyat vitrini satırı: görev + tamirciye tahmini maliyet aralığı."""
+
+    id: str
+    title_tr: str
+    title_en: str
+    risk: Aciliyet
+    low_try: int
+    high_try: int
+    currency: str = "TRY"
+    source: Literal["seed", "community"]
+    sample_size: int
+
+
 # --------------------------------------------------------------------------- #
 # AI — Görüntü teşhisi
 # --------------------------------------------------------------------------- #

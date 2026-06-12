@@ -396,6 +396,25 @@ export default function HomeScreen() {
           }}
         />
 
+        {/* Fiyat şeffaflığı vitrini */}
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => {
+            void capture('open_prices');
+            router.push('/prices');
+          }}
+          style={({ pressed }) => [styles.priceGuide, pressed && styles.pressed]}
+        >
+          <View style={styles.priceGuideIcon}>
+            <Ionicons name="pricetags" size={20} color={theme.colors.ink} />
+          </View>
+          <View style={styles.priceGuideBody}>
+            <Text style={styles.priceGuideTitle}>{t('home.priceGuide.title')}</Text>
+            <Text style={styles.priceGuideDesc}>{t('home.priceGuide.desc')}</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={theme.colors.textSecondary} />
+        </Pressable>
+
         {vehicles.length > 1 && (
           <ScrollView
             horizontal
@@ -749,6 +768,38 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: theme.colors.textSecondary,
     lineHeight: 16,
+  },
+  priceGuide: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.md,
+    marginHorizontal: theme.spacing.lg,
+    marginTop: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+  },
+  priceGuideIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  priceGuideBody: { flex: 1, gap: 2 },
+  priceGuideTitle: {
+    fontFamily: theme.fonts.body,
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  priceGuideDesc: {
+    fontFamily: theme.fonts.body,
+    fontSize: 12,
+    color: theme.colors.textSecondary,
   },
   switcherRow: {
     gap: theme.spacing.sm,

@@ -23,6 +23,10 @@
         "desc": "Do it yourself with a step-by-step guide"
       }
     },
+    "priceGuide": {
+      "title": "Price Guide",
+      "desc": "What do jobs cost at a mechanic for this car?"
+    },
     "tasksTitle": "To-do",
     "tasksEmpty": "Add maintenance entries and your to-dos will appear here.",
     "allMaintenance": "All →",
@@ -65,6 +69,13 @@
       "orta": "Medium risk",
       "yuksek": "High risk"
     }
+  },
+  "prices": {
+    "title": "Price Guide",
+    "subtitle": "Estimated mechanic costs for common jobs on this car. Tap a job to see how it's done.",
+    "seed": "Turkey average",
+    "community": "based on {{count}} users' payments",
+    "disclaimer": "Estimated range; varies by car, city and severity. Get a quote for an exact price."
   },
   "guide": {
     "estMinutes": "~{{min}} min",

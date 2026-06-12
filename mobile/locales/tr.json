@@ -23,6 +23,10 @@
         "desc": "Adım adım rehberle kendin yap"
       }
     },
+    "priceGuide": {
+      "title": "Fiyat Rehberi",
+      "desc": "Bu araç için işler tamirciye ne tutar?"
+    },
     "tasksTitle": "Yapılacaklar",
     "tasksEmpty": "Bakım kaydı ekledikçe yapılacaklar burada belirir.",
     "allMaintenance": "Tümü →",
@@ -65,6 +69,13 @@
       "orta": "Orta risk",
       "yuksek": "Yüksek risk"
     }
+  },
+  "prices": {
+    "title": "Fiyat Rehberi",
+    "subtitle": "Bu araç için yaygın işlerin tamirciye tahmini maliyeti. Bir işe dokun, nasıl yapılacağını gör.",
+    "seed": "Türkiye ortalaması",
+    "community": "{{count}} kullanıcının ödediğine göre",
+    "disclaimer": "Tahmini aralıktır; araca, şehre ve arızanın boyutuna göre değişir. Kesin fiyat için teklif al."
   },
   "guide": {
     "estMinutes": "~{{min}} dk",

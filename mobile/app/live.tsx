@@ -37,7 +37,8 @@ export default function LiveScreen() {
   const scrollRef = useRef<ScrollView>(null);
 
   const vtype = currentVehicle?.vehicle_type === 'motosiklet' ? 'motosiklet' : 'araba';
-  const { status, lines, elapsed, error, start, stop, sendFrame } = useLiveSession(vtype);
+  const { status, lines, elapsed, error, premiumRequired, start, stop, sendFrame } =
+    useLiveSession(vtype);
 
   const live = status === 'live';
 
@@ -135,7 +136,16 @@ export default function LiveScreen() {
 
       {/* Kontroller */}
       <View style={[styles.footer, { paddingBottom: insets.bottom + theme.spacing.md }]}>
-        {status === 'connecting' ? (
+        {premiumRequired ? (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.push('/premium')}
+            style={({ pressed }) => [styles.startBtn, pressed && styles.pressed]}
+          >
+            <Ionicons name="star" size={20} color={theme.colors.ink} />
+            <Text style={styles.startText}>{t('premium.cta')}</Text>
+          </Pressable>
+        ) : status === 'connecting' ? (
           <View style={styles.connecting}>
             <ActivityIndicator color={theme.colors.onInk} />
             <Text style={styles.connectingText}>{t('live.connecting')}</Text>

@@ -84,8 +84,30 @@
       "error": "Error"
     },
     "error": {
-      "start": "Couldn't start the live session."
+      "start": "Couldn't start the live session.",
+      "premium": "You've used your free live minutes this month — go unlimited with Premium."
     }
+  },
+  "premium": {
+    "title": "Usta Premium",
+    "tagline": "Your car's master, unlimited in your pocket.",
+    "active": "Premium active 🎉",
+    "free": "You're on the free plan.",
+    "benefit": {
+      "live": "Unlimited live voice guidance",
+      "diagnosis": "Unlimited AI diagnosis",
+      "prices": "Full price data + rip-off shield",
+      "support": "Priority support + new features"
+    },
+    "priceMonthly": "₺149",
+    "perMonth": "/ mo",
+    "priceYearly": "₺999",
+    "perYear": "/ yr",
+    "bestValue": "Best value",
+    "cta": "Go Premium",
+    "comingSoon": "Purchases go live at launch. Preview for now.",
+    "disclaimer": "Cancel anytime. Prices confirmed at the store.",
+    "refresh": "Refresh status"
   },
   "prices": {
     "title": "Price Guide",

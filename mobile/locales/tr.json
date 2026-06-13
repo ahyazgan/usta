@@ -84,8 +84,30 @@
       "error": "Hata"
     },
     "error": {
-      "start": "Canlı oturum başlatılamadı."
+      "start": "Canlı oturum başlatılamadı.",
+      "premium": "Aylık ücretsiz canlı süren doldu — premium ile sınırsız."
     }
+  },
+  "premium": {
+    "title": "Usta Premium",
+    "tagline": "Aracının ustası, sınırsız cebinde.",
+    "active": "Premium aktif 🎉",
+    "free": "Şu an ücretsiz plandasın.",
+    "benefit": {
+      "live": "Sınırsız canlı sesli rehber",
+      "diagnosis": "Sınırsız AI teşhis",
+      "prices": "Tam fiyat verisi + kazıklanma kalkanı",
+      "support": "Öncelikli destek + yeni özellikler"
+    },
+    "priceMonthly": "₺149",
+    "perMonth": "/ ay",
+    "priceYearly": "₺999",
+    "perYear": "/ yıl",
+    "bestValue": "En avantajlı",
+    "cta": "Premium Ol",
+    "comingSoon": "Satın alma lansmanla aktif olacak. Şimdilik önizleme.",
+    "disclaimer": "İstediğin zaman iptal edebilirsin. Fiyatlar mağazada onaylanır.",
+    "refresh": "Durumu yenile"
   },
   "prices": {
     "title": "Fiyat Rehberi",

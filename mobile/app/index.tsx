@@ -308,6 +308,14 @@ export default function HomeScreen() {
         )}
         <Pressable
           accessibilityRole="button"
+          accessibilityLabel={t('premium.title')}
+          onPress={() => router.push('/premium')}
+          style={({ pressed }) => [styles.headerIcon, pressed && styles.pressed]}
+        >
+          <Ionicons name="star-outline" size={22} color={theme.colors.warningBright} />
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
           accessibilityLabel={t('privacy.title')}
           onPress={() => router.push('/privacy')}
           style={({ pressed }) => [styles.headerIcon, pressed && styles.pressed]}

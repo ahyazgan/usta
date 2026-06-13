@@ -8,7 +8,7 @@
  */
 import { useCallback, useMemo, useRef, useState } from 'react';
 
-import { createApiClient } from '@/lib/api';
+import { ApiError, createApiClient } from '@/lib/api';
 import { LiveEngine, type LiveStatus } from '@/lib/live/engine';
 import { useUstaStore } from '@/lib/store';
 
@@ -28,6 +28,8 @@ export function useLiveSession(vehicleType: 'araba' | 'motosiklet' = 'araba') {
   const [lines, setLines] = useState<LiveLine[]>([]);
   const [elapsed, setElapsed] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  // Aylık ücretsiz canlı limiti doldu (402) → premium upsell tetikle.
+  const [premiumRequired, setPremiumRequired] = useState(false);
 
   const engineRef = useRef<LiveEngine | null>(null);
   const usageIdRef = useRef<number | null>(null);
@@ -61,6 +63,7 @@ export function useLiveSession(vehicleType: 'araba' | 'motosiklet' = 'araba') {
   const start = useCallback(
     async (vehicleId: number, task?: string) => {
       setError(null);
+      setPremiumRequired(false);
       setLines([]);
       setElapsed(0);
       elapsedRef.current = 0;
@@ -68,7 +71,12 @@ export function useLiveSession(vehicleType: 'araba' | 'motosiklet' = 'araba') {
       try {
         session = await client.startLiveSession(vehicleId, task, 'tr');
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'live.error.start');
+        if (err instanceof ApiError && err.status === 402) {
+          setPremiumRequired(true); // aylık ücretsiz canlı doldu
+          setError('live.error.premium');
+        } else {
+          setError(err instanceof Error ? err.message : 'live.error.start');
+        }
         setStatus('error');
         return;
       }
@@ -109,5 +117,5 @@ export function useLiveSession(vehicleType: 'araba' | 'motosiklet' = 'araba') {
     engineRef.current?.sendFrame(base64Jpeg);
   }, []);
 
-  return { status, lines, elapsed, error, start, stop, sendFrame };
+  return { status, lines, elapsed, error, premiumRequired, start, stop, sendFrame };
 }

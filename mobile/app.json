@@ -10,11 +10,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#16181D"
-    },
     "assetBundlePatterns": [
       "**/*"
     ],
@@ -53,7 +48,15 @@
         }
       ],
       "expo-font",
-      "expo-notifications"
+      "expo-notifications",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#16181D"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

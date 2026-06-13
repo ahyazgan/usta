@@ -24,7 +24,9 @@ function ensureHandler(): void {
   if (configured) return;
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
-      shouldShowAlert: true,
+      // SDK 52+ API: shouldShowAlert yerine banner + list.
+      shouldShowBanner: true,
+      shouldShowList: true,
       shouldPlaySound: false,
       shouldSetBadge: false,
     }),
@@ -95,7 +97,11 @@ export async function syncVehicleReminders(vehicles: Vehicle[]): Promise<void> {
     for (const p of planned) {
       await Notifications.scheduleNotificationAsync({
         content: { title: t('notifications.title'), body: p.body },
-        trigger: new Date(p.whenMs),
+        // SDK 52+ API: ham Date yerine yapısal tarih tetikleyici.
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.DATE,
+          date: p.whenMs,
+        },
       });
     }
   } catch {

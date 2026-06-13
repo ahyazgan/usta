@@ -45,8 +45,12 @@ class Settings(BaseSettings):
     parts_buy_url_template: str = "https://www.google.com/search?q={q}"
 
     # Canlı sesli rehber (Gemini Live). Anahtar boşsa canlı mod KAPALI (503).
+    # API anahtarı SADECE ortam değişkeniyle verilir (koda/git'e ASLA yazma):
+    #   USTA_GEMINI_API_KEY=...
     gemini_api_key: str = ""
-    gemini_live_model: str = "gemini-2.0-flash-live-001"
+    # Model adı API ile doğrulandı (models?key= → mevcut). Gerekirse "models/" öneki
+    # ya da güncel sürüm için env ile değiştir: USTA_GEMINI_LIVE_MODEL=...
+    gemini_live_model: str = "gemini-3.1-flash-live-preview"
     gemini_default_voice: str = "Puck"  # Gemini Live ses adı
     # Ücretsiz katmanda aylık canlı saniye sınırı (maliyet freni). Premium = sınırsız.
     free_live_seconds_per_month: int = 600  # 10 dk/ay

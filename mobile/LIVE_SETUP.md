@@ -15,14 +15,20 @@ Bitince → backend /v1/live/session/{id}/end (dakika sayacı)
 istemciye sızmaz.
 
 ## 1) Backend'i aç
-`.env` (Render ortam değişkeni):
+`.env` (Render ortam değişkeni — anahtarı ASLA koda/git'e yazma):
 ```
 USTA_GEMINI_API_KEY=...        # Google AI Studio'dan
-USTA_GEMINI_LIVE_MODEL=gemini-2.0-flash-live-001   # güncel modeli doğrula
+USTA_GEMINI_LIVE_MODEL=gemini-3.1-flash-live-preview   # API ile doğrulandı (mevcut)
 USTA_GEMINI_DEFAULT_VOICE=Puck
 USTA_FREE_LIVE_SECONDS_PER_MONTH=600
 ```
 Anahtar boşsa `/v1/live/session` **503** döner (canlı mod kapalı).
+
+> ✅ Doğrulandı (canlı API testi): anahtar `?key=` ile çalışıyor; canlı model
+> `gemini-3.1-flash-live-preview` mevcut; ephemeral token ucu `v1alpha/auth_tokens`
+> 200 + `{"name": ...}` döndürüyor (kodumuz bu alanı okuyor). Kalan tek belirsiz:
+> `liveConnectConstraints` config-bağlama şeklinin tam alanları (güvenlik config'i
+> token'a bağlar) — Render'da ilk gerçek oturumda teyit et.
 
 ## 2) Dev-build oluştur
 ```

@@ -5,8 +5,10 @@ yanlışsa 403. Kullanıcıya açık DEĞİL — kurucu/iş-geliştirme içindir
 """
 
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi.responses import FileResponse
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,6 +19,14 @@ from ..domain.enums import SubscriptionTier
 from ..domain.models import LiveUsage, Mechanic, MechanicLead, PartLead, User
 
 router = APIRouter(prefix="/v1/admin", tags=["admin"])
+
+_DASHBOARD = Path(__file__).resolve().parent.parent / "static" / "admin.html"
+
+
+@router.get("/dashboard", include_in_schema=False)
+async def dashboard() -> FileResponse:
+    """Token'la açılan basit web paneli (veri /stats'tan client-side çekilir)."""
+    return FileResponse(_DASHBOARD, media_type="text/html")
 
 
 def _require_admin(x_admin_token: str | None) -> None:

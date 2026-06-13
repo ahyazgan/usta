@@ -83,6 +83,15 @@ async def test_buy_intent_requires_auth_401(client):
 
 
 @pytest.mark.asyncio
+async def test_admin_dashboard_served(client):
+    """Panel HTML token gerektirmez (veriyi client-side token'la çeker)."""
+    r = await client.get("/v1/admin/dashboard")
+    assert r.status_code == 200
+    assert "text/html" in r.headers["content-type"]
+    assert "Yönetim Paneli" in r.text
+
+
+@pytest.mark.asyncio
 async def test_admin_stats_not_configured_503(client):
     assert (await client.get("/v1/admin/stats")).status_code == 503
 

@@ -92,6 +92,8 @@
       "title": "Calendar",
       "muayene": "Inspection",
       "sigorta": "Insurance",
+      "mtv": "MTV (motor vehicle tax)",
+      "mtvHint": "Due — end of January/July",
       "remaining": "{{days}} days left",
       "today": "Today!",
       "overdue": "{{days}} days overdue"
@@ -662,7 +664,8 @@
   },
   "notifications": {
     "title": "Usta reminder 🔧",
-    "body": "{{name}} {{label}} is coming up: {{date}} ({{days}} days left)."
+    "body": "{{name}} {{label}} is coming up: {{date}} ({{days}} days left).",
+    "mtvBody": "MTV payment deadline is coming up: {{date}} ({{days}} days left)."
   },
   "common": {
     "loading": "Loading…",

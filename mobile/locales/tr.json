@@ -92,6 +92,8 @@
       "title": "Takvim",
       "muayene": "Muayene",
       "sigorta": "Sigorta",
+      "mtv": "MTV (Motorlu Taşıt Vergisi)",
+      "mtvHint": "Son ödeme — Ocak/Temmuz sonu",
       "remaining": "{{days}} gün kaldı",
       "today": "Bugün!",
       "overdue": "{{days}} gün geçti"
@@ -662,7 +664,8 @@
   },
   "notifications": {
     "title": "Usta hatırlatıyor 🔧",
-    "body": "{{name}} {{label}} tarihi yaklaşıyor: {{date}} ({{days}} gün kaldı)."
+    "body": "{{name}} {{label}} tarihi yaklaşıyor: {{date}} ({{days}} gün kaldı).",
+    "mtvBody": "MTV son ödeme tarihi yaklaşıyor: {{date}} ({{days}} gün kaldı)."
   },
   "common": {
     "loading": "Yükleniyor…",

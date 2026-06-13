@@ -12,6 +12,7 @@ import { Platform } from 'react-native';
 import type { Vehicle } from '@/lib/api';
 import { daysUntil, formatTrDate } from '@/lib/dateReminders';
 import { t } from '@/lib/i18n';
+import { nextMtvDeadline } from '@/lib/mtv';
 import { useUstaStore } from '@/lib/store';
 
 // Tarihten kaç gün önce hatırlatılsın.
@@ -40,9 +41,8 @@ interface Planned {
   body: string;
 }
 
-/** Bir araç + tarih için (varsa) planlanacak bildirimi üretir. */
-function planFor(vehicle: Vehicle, iso: string | null, labelKey: string): Planned | null {
-  if (iso == null) return null;
+/** ISO tarihten bildirim zamanını (ms) hesaplar; geçmiş/geçersizse null. */
+function computeWhen(iso: string): number | null {
   const remaining = daysUntil(iso);
   if (Number.isNaN(remaining) || remaining < 0) return null; // geçmiş tarih atlanır
 
@@ -57,15 +57,33 @@ function planFor(vehicle: Vehicle, iso: string | null, labelKey: string): Planne
     when.setHours(NOTIFY_HOUR, 0, 0, 0);
   }
   if (when.getTime() <= now.getTime()) return null;
+  return when.getTime();
+}
 
+/** Bir araç + tarih için (varsa) planlanacak bildirimi üretir. */
+function planFor(vehicle: Vehicle, iso: string | null, labelKey: string): Planned | null {
+  if (iso == null) return null;
+  const when = computeWhen(iso);
+  if (when == null) return null;
   const name = vehicle.plate ?? `${vehicle.make} ${vehicle.model}`;
   const body = t('notifications.body', {
     name,
     label: t(labelKey),
-    days: remaining,
+    days: daysUntil(iso),
     date: formatTrDate(iso),
   });
-  return { whenMs: when.getTime(), body };
+  return { whenMs: when, body };
+}
+
+/** MTV son ödeme hatırlatıcısı (araçtan bağımsız; tek sefer planlanır). */
+function planMtv(iso: string): Planned | null {
+  const when = computeWhen(iso);
+  if (when == null) return null;
+  const body = t('notifications.mtvBody', {
+    days: daysUntil(iso),
+    date: formatTrDate(iso),
+  });
+  return { whenMs: when, body };
 }
 
 /**
@@ -104,6 +122,11 @@ export async function syncVehicleReminders(vehicles: Vehicle[]): Promise<void> {
       const b = planFor(v, v.sigorta_date, 'home.dates.sigorta');
       if (a) planned.push(a);
       if (b) planned.push(b);
+    }
+    // MTV: araçtan bağımsız tek hatırlatıcı (araç varsa).
+    if (vehicles.length > 0) {
+      const mtv = planMtv(nextMtvDeadline());
+      if (mtv) planned.push(mtv);
     }
 
     for (const p of planned) {

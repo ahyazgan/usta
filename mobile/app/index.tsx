@@ -18,6 +18,7 @@ import { BottomTabBar } from '@/components/BottomTabBar';
 import { BrandBadge } from '@/components/BrandBadge';
 import { type Reminder, type Vehicle } from '@/lib/api';
 import { dateStatus, daysUntil, formatTrDate } from '@/lib/dateReminders';
+import { nextMtvDeadline } from '@/lib/mtv';
 import { capture } from '@/lib/analytics';
 import { ensureDemoSession } from '@/lib/demoSession';
 import { t } from '@/lib/i18n';
@@ -79,33 +80,34 @@ const STATUS_PRIORITY: Record<GarageChipState, number> = {
   ok: 3,
 };
 
-/** Takvim (tarih) hatırlatıcı satırı — muayene / sigorta. */
+/** Takvim (tarih) hatırlatıcı satırı — muayene / sigorta / MTV. */
 function DateRow({
   icon,
   label,
   iso,
   onPress,
+  hint,
 }: {
   icon: keyof typeof Ionicons.glyphMap;
   label: string;
   iso: string;
-  onPress: () => void;
+  /** Düzenlenebilir tarihlerde (muayene/sigorta) verilir; MTV gibi sabitlerde yok. */
+  onPress?: () => void;
+  /** Alt metin yerine sabit ipucu (örn. MTV "Ocak/Temmuz sonu"). */
+  hint?: string;
 }) {
   const status = dateStatus(iso);
   const days = daysUntil(iso);
   const badge = badgeStyle(status as GarageChipState);
   const meta =
-    days < 0
+    hint ??
+    (days < 0
       ? t('home.dates.overdue', { days: Math.abs(days) })
       : days === 0
         ? t('home.dates.today')
-        : t('home.dates.remaining', { days });
-  return (
-    <Pressable
-      accessibilityRole="button"
-      onPress={onPress}
-      style={({ pressed }) => [styles.taskRow, pressed && styles.pressed]}
-    >
+        : t('home.dates.remaining', { days }));
+  const inner = (
+    <>
       <View style={[styles.taskIcon, { backgroundColor: badge.bg }]}>
         <Ionicons name={icon} size={18} color={badge.fg} />
       </View>
@@ -118,7 +120,17 @@ function DateRow({
         </View>
         <Text style={styles.taskMeta}>{meta}</Text>
       </View>
-      <Ionicons name="chevron-forward" size={18} color={theme.colors.border} />
+      {onPress != null && <Ionicons name="chevron-forward" size={18} color={theme.colors.border} />}
+    </>
+  );
+  if (onPress == null) return <View style={styles.taskRow}>{inner}</View>;
+  return (
+    <Pressable
+      accessibilityRole="button"
+      onPress={onPress}
+      style={({ pressed }) => [styles.taskRow, pressed && styles.pressed]}
+    >
+      {inner}
     </Pressable>
   );
 }
@@ -619,28 +631,31 @@ export default function HomeScreen() {
           ))
         )}
 
-        {/* Takvim — muayene / sigorta (tarih bazlı) */}
-        {(currentVehicle.muayene_date != null || currentVehicle.sigorta_date != null) && (
-          <>
-            <Text style={styles.sectionTitle}>{t('home.dates.title')}</Text>
-            {currentVehicle.muayene_date != null && (
-              <DateRow
-                icon="clipboard"
-                label={t('home.dates.muayene')}
-                iso={currentVehicle.muayene_date}
-                onPress={() => handleEditCurrent()}
-              />
-            )}
-            {currentVehicle.sigorta_date != null && (
-              <DateRow
-                icon="shield-checkmark"
-                label={t('home.dates.sigorta')}
-                iso={currentVehicle.sigorta_date}
-                onPress={() => handleEditCurrent()}
-              />
-            )}
-          </>
+        {/* Takvim — muayene / sigorta / MTV (tarih bazlı) */}
+        <Text style={styles.sectionTitle}>{t('home.dates.title')}</Text>
+        {currentVehicle.muayene_date != null && (
+          <DateRow
+            icon="clipboard"
+            label={t('home.dates.muayene')}
+            iso={currentVehicle.muayene_date}
+            onPress={() => handleEditCurrent()}
+          />
         )}
+        {currentVehicle.sigorta_date != null && (
+          <DateRow
+            icon="shield-checkmark"
+            label={t('home.dates.sigorta')}
+            iso={currentVehicle.sigorta_date}
+            onPress={() => handleEditCurrent()}
+          />
+        )}
+        {/* MTV — herkes için sabit (Ocak/Temmuz sonu), hesaplanır, düzenlenemez */}
+        <DateRow
+          icon="cash-outline"
+          label={t('home.dates.mtv')}
+          iso={nextMtvDeadline()}
+          hint={t('home.dates.mtvHint')}
+        />
 
         {/* Tasarruf bandı — gerçek loglardan tahmini DIY tasarrufu */}
         <View style={styles.savingsBanner}>

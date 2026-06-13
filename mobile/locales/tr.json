@@ -529,6 +529,37 @@
       "desc": "Yazıyla anlat, teşhis edeyim"
     }
   },
+  "fuel": {
+    "title": "Yakıt Takibi",
+    "avgConsumption": "Ort. tüketim",
+    "consumptionValue": "{{value}} L/100",
+    "totalSpent": "Toplam harcama",
+    "entries": "Dolum",
+    "consumptionHint": "Tüketim için en az 2 tam-depo dolumu gerekir.",
+    "addTitle": "Dolum Ekle",
+    "odometer": "Kilometre",
+    "odometerPlaceholder": "Örn: 102500",
+    "liters": "Litre",
+    "litersPlaceholder": "Örn: 42.5",
+    "total": "Tutar (TL, isteğe bağlı)",
+    "totalPlaceholder": "Örn: 1800",
+    "fullTank": "Depo tam dolduruldu",
+    "fullTankDesc": "Tüketim hesabı tam dolumlara göre yapılır",
+    "add": "Kaydet",
+    "historyTitle": "Geçmiş",
+    "empty": "Henüz dolum eklenmedi.",
+    "row": {
+      "liters": "{{liters}} L",
+      "km": "{{km}} km"
+    },
+    "error": {
+      "invalid": "Kilometre ve litre geçerli olmalı"
+    },
+    "entry": {
+      "title": "Yakıt Takibi",
+      "desc": "Tüketim (L/100km) ve masrafını izle"
+    }
+  },
   "share": {
     "report": {
       "title": "🔧 Usta Raporu",

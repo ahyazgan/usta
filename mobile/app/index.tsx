@@ -480,6 +480,25 @@ export default function HomeScreen() {
           <Ionicons name="chevron-forward" size={18} color={theme.colors.textSecondary} />
         </Pressable>
 
+        {/* Yakıt & masraf takibi */}
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => {
+            void capture('open_fuel');
+            router.push('/fuel');
+          }}
+          style={({ pressed }) => [styles.priceGuide, pressed && styles.pressed]}
+        >
+          <View style={styles.priceGuideIcon}>
+            <Ionicons name="water-outline" size={20} color={theme.colors.ink} />
+          </View>
+          <View style={styles.priceGuideBody}>
+            <Text style={styles.priceGuideTitle}>{t('fuel.entry.title')}</Text>
+            <Text style={styles.priceGuideDesc}>{t('fuel.entry.desc')}</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={theme.colors.textSecondary} />
+        </Pressable>
+
         {vehicles.length > 1 && (
           <ScrollView
             horizontal

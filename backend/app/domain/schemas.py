@@ -131,6 +131,43 @@ class VehicleSummaryOut(BaseModel):
     savings_try: int
 
 
+# --------------------------------------------------------------------------- #
+# Yakıt & masraf takibi
+# --------------------------------------------------------------------------- #
+
+
+class FuelLogCreate(BaseModel):
+    odometer_km: int = Field(ge=0, le=2_000_000, description="dolum anındaki kilometre")
+    liters: float = Field(gt=0, le=500, description="alınan yakıt (litre)")
+    total_try: int | None = Field(default=None, ge=0, le=100_000, description="ödenen toplam (TL)")
+    full_tank: bool = Field(default=True, description="depo tam mı dolduruldu")
+    note: str | None = Field(default=None, max_length=200)
+
+
+class FuelLogOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    odometer_km: int
+    liters: float
+    total_try: int | None
+    full_tank: bool
+    note: str | None
+    created_at: datetime
+
+
+class FuelSummaryOut(BaseModel):
+    """Yakıt özeti: tüketim (L/100km) + masraf."""
+
+    entry_count: int
+    total_liters: float
+    total_spent_try: int
+    # Ortalama tüketim (L/100km); en az 2 tam-depo dolumu yoksa null.
+    avg_consumption: float | None
+    last_odometer_km: int | None
+    currency: str = "TRY"
+
+
 class GuideStepOut(BaseModel):
     """Adım adım rehberin tek adımı (araç spec'iyle doldurulmuş)."""
 

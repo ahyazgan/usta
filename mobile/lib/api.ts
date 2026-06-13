@@ -178,6 +178,36 @@ export interface SymptomInput {
   description: string;
 }
 
+/** A persisted fuel fill-up entry. */
+export interface FuelLog {
+  id: number;
+  odometer_km: number;
+  liters: number;
+  total_try: number | null;
+  full_tank: boolean;
+  note: string | null;
+  created_at: string;
+}
+
+/** Fuel tracking summary: consumption (L/100km) + spend. */
+export interface FuelSummary {
+  entry_count: number;
+  total_liters: number;
+  total_spent_try: number;
+  /** Average L/100km, or null when fewer than 2 full-tank entries. */
+  avg_consumption: number | null;
+  last_odometer_km: number | null;
+  currency: string;
+}
+
+export interface FuelLogInput {
+  odometer_km: number;
+  liters: number;
+  total_try?: number;
+  full_tank?: boolean;
+  note?: string;
+}
+
 /** Auth token bundle returned by login/register-then-login/refresh. */
 export interface TokenResponse {
   access_token: string;
@@ -465,6 +495,10 @@ export interface ApiClient {
   refresh(refreshToken: string): Promise<TokenResponse>;
   addLog(vehicleId: number, input: MaintenanceLogInput): Promise<MaintenanceLog>;
   listLogs(vehicleId: number): Promise<MaintenanceLog[]>;
+  /** Fuel tracking: add a fill-up, list fill-ups, get consumption/spend summary. */
+  addFuelLog(vehicleId: number, input: FuelLogInput): Promise<FuelLog>;
+  listFuelLogs(vehicleId: number): Promise<FuelLog[]>;
+  getFuelSummary(vehicleId: number): Promise<FuelSummary>;
   getReminders(vehicleId: number): Promise<Reminder[]>;
   getSummary(vehicleId: number): Promise<VehicleSummary>;
   /** Step-by-step guide for a task, filled with this vehicle's spec. */
@@ -685,6 +719,20 @@ export function createApiClient(
     async listLogs(vehicleId) {
       const headers = await authHeaders();
       return request<MaintenanceLog[]>(`/v1/vehicles/${vehicleId}/logs`, {
+        method: 'GET',
+        headers,
+      });
+    },
+    addFuelLog(vehicleId, input) {
+      return post<FuelLog, FuelLogInput>(`/v1/vehicles/${vehicleId}/fuel`, input);
+    },
+    async listFuelLogs(vehicleId) {
+      const headers = await authHeaders();
+      return request<FuelLog[]>(`/v1/vehicles/${vehicleId}/fuel`, { method: 'GET', headers });
+    },
+    async getFuelSummary(vehicleId) {
+      const headers = await authHeaders();
+      return request<FuelSummary>(`/v1/vehicles/${vehicleId}/fuel/summary`, {
         method: 'GET',
         headers,
       });

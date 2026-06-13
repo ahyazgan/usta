@@ -121,6 +121,26 @@ class MaintenanceLog(Base):
     vehicle: Mapped["Vehicle"] = relationship(back_populates="logs")
 
 
+class FuelLog(Base):
+    """Yakıt dolumu kaydı — tüketim (L/100km) + masraf takibi.
+
+    Yeni tablo (create_all kurar). vehicle_id FK CASCADE → araç/hesap silinince
+    otomatik temizlenir (KVKK).
+    """
+
+    __tablename__ = "fuel_logs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    vehicle_id: Mapped[int] = mapped_column(ForeignKey("vehicles.id", ondelete="CASCADE"), index=True)
+    odometer_km: Mapped[int] = mapped_column(Integer, nullable=False)
+    liters: Mapped[float] = mapped_column(Float, nullable=False)
+    total_try: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    # Depo tam mı dolduruldu (tüketim hesabı full-to-full yöntemiyle yapılır).
+    full_tank: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    note: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+
+
 class AISession(Base):
     """Her AI çağrısı için token kullanımını + teşhis özetini loglar.
 

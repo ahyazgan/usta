@@ -529,6 +529,37 @@
       "desc": "Tell me in text and I'll diagnose it"
     }
   },
+  "fuel": {
+    "title": "Fuel Tracking",
+    "avgConsumption": "Avg. consumption",
+    "consumptionValue": "{{value}} L/100",
+    "totalSpent": "Total spent",
+    "entries": "Fill-ups",
+    "consumptionHint": "Consumption needs at least 2 full-tank fill-ups.",
+    "addTitle": "Add Fill-up",
+    "odometer": "Odometer",
+    "odometerPlaceholder": "e.g. 102500",
+    "liters": "Liters",
+    "litersPlaceholder": "e.g. 42.5",
+    "total": "Amount (₺, optional)",
+    "totalPlaceholder": "e.g. 1800",
+    "fullTank": "Filled to full",
+    "fullTankDesc": "Consumption is computed from full fill-ups",
+    "add": "Save",
+    "historyTitle": "History",
+    "empty": "No fill-ups yet.",
+    "row": {
+      "liters": "{{liters}} L",
+      "km": "{{km}} km"
+    },
+    "error": {
+      "invalid": "Odometer and liters must be valid"
+    },
+    "entry": {
+      "title": "Fuel Tracking",
+      "desc": "Track consumption (L/100km) and spend"
+    }
+  },
   "share": {
     "report": {
       "title": "🔧 Usta Report",

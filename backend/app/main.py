@@ -20,6 +20,7 @@ from .api import (
     billing,
     catalog,
     estimates,
+    fuel,
     live,
     maintenance,
     mechanics,
@@ -106,6 +107,7 @@ app.include_router(catalog.router)
 app.include_router(vehicles.router)
 app.include_router(tasks.router)
 app.include_router(maintenance.router)
+app.include_router(fuel.router)
 app.include_router(estimates.router)
 app.include_router(ai.router)
 app.include_router(live.router)

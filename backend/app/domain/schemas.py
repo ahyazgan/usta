@@ -353,6 +353,34 @@ class DashboardDiagnoseResponse(BaseModel):
 
 
 # --------------------------------------------------------------------------- #
+# AI — Arıza kodu (OBD-II / DTC) açıklama
+# --------------------------------------------------------------------------- #
+
+
+class DtcDiagnoseRequest(BaseModel):
+    vehicle_id: int
+    code: str = Field(min_length=2, max_length=10, description="örn. P0300")
+    user_note: str | None = Field(default=None, max_length=500)
+
+
+class DtcDiagnoseResponse(BaseModel):
+    """Arıza kodu açıklama yanıtı (kesin teşhis YOK; 'büyük ihtimalle')."""
+
+    tespit: str
+    guven: Guven
+    kod: str = Field(max_length=10)
+    baslik: str = Field(max_length=120, description="kodun kısa anlamı")
+    olasi_nedenler: list[str]
+    aciliyet: Aciliyet
+    surulebilir_mi: bool | None
+    sonraki_adim: str
+    guvenlik_uyarisi: str | None
+    tamirciye_git_onerisi: bool
+    # Token/maliyet loglandığı AISession id'si — 👍/👎 geri bildirimi buna bağlanır.
+    session_id: int | None = None
+
+
+# --------------------------------------------------------------------------- #
 # AI — Ses teşhisi (transkripsiyon YOK; tarif + koşul + araç verisi)
 # --------------------------------------------------------------------------- #
 

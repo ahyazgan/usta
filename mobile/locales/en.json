@@ -446,6 +446,30 @@
       "desc": "Snap a photo of the light on your cluster and I'll explain"
     }
   },
+  "dtc": {
+    "title": "Fault Code",
+    "intro": "Enter the fault code you read from an OBD-II scanner; I'll explain what it likely means for this vehicle.",
+    "codeLabel": "Fault code",
+    "codePlaceholder": "e.g. P0300",
+    "noteLabel": "Note (optional)",
+    "notePlaceholder": "Add symptoms if any: misfire, light on…",
+    "disclaimer": "The same code can mean different things on different cars. This is preliminary info — see a mechanic for a definitive diagnosis.",
+    "explain": "Explain",
+    "another": "Another Code",
+    "causes": "Likely causes",
+    "drivable": {
+      "yes": "🚗 Likely drivable",
+      "no": "⛔ Don't keep driving",
+      "unknown": "❓ Uncertain"
+    },
+    "error": {
+      "empty": "Enter a valid fault code (e.g. P0300)"
+    },
+    "entry": {
+      "title": "What does this fault code mean?",
+      "desc": "Type a code like P0300 and I'll explain"
+    }
+  },
   "share": {
     "report": {
       "title": "🔧 Usta Report",

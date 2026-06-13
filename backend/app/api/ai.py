@@ -10,13 +10,15 @@ from ..domain.models import User
 from ..domain.schemas import (
     DashboardDiagnoseRequest,
     DashboardDiagnoseResponse,
+    DtcDiagnoseRequest,
+    DtcDiagnoseResponse,
     ImageDiagnoseRequest,
     ImageDiagnoseResponse,
     SoundDiagnoseRequest,
     SoundDiagnoseResponse,
 )
 from ..services import vehicle_service
-from ..services.ai import audio_service, dashboard_service, vision_service
+from ..services.ai import audio_service, dashboard_service, dtc_service, vision_service
 from ..services.ai.claude_client import ClaudeClient, get_claude_client
 
 router = APIRouter(
@@ -61,5 +63,18 @@ async def diagnose_dashboard(
 ) -> DashboardDiagnoseResponse:
     vehicle = await vehicle_service.get_owned(db, user.id, payload.vehicle_id)
     return await dashboard_service.diagnose_dashboard(
+        db=db, claude=claude, user=user, vehicle=vehicle, payload=payload
+    )
+
+
+@router.post("/diagnose/code", response_model=DtcDiagnoseResponse)
+async def diagnose_code(
+    payload: DtcDiagnoseRequest,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+    claude: ClaudeClient = Depends(get_claude_client),
+) -> DtcDiagnoseResponse:
+    vehicle = await vehicle_service.get_owned(db, user.id, payload.vehicle_id)
+    return await dtc_service.diagnose_dtc(
         db=db, claude=claude, user=user, vehicle=vehicle, payload=payload
     )

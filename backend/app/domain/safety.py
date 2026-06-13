@@ -16,6 +16,7 @@ import re
 from .enums import Aciliyet, SesKategori
 from .schemas import (
     DashboardDiagnoseResponse,
+    DtcDiagnoseResponse,
     ImageDiagnoseResponse,
     SoundDiagnoseResponse,
 )
@@ -36,6 +37,9 @@ SAFETY_TRIGGER_KEYWORDS: tuple[str, ...] = (
     "sogutma",
     "basınç",
     "basinc",
+    "basıncı",
+    "basinci",
+    "hararet",
     "fren",
     "lpg",
 )
@@ -210,3 +214,41 @@ def enforce_dashboard_safety(
         data["guvenlik_uyarisi"] = DEFAULT_SAFETY_WARNING
 
     return DashboardDiagnoseResponse(**data)
+
+
+def enforce_dtc_safety(
+    result: DtcDiagnoseResponse, *, context: str = ""
+) -> DtcDiagnoseResponse:
+    """Arıza kodu açıklama yanıtına güvenlik kurallarını uygula.
+
+    - Kesin teşhis dilini yumuşat.
+    - Sürülemez (surulebilir_mi=False) veya yüksek aciliyet => tamirci + uyarı.
+    - Güvenlik konusu (hararet/yağ basıncı/fren/akü...) geçiyorsa uyarı zorunlu.
+    - LPG müdahalesi engellenip yetkili servise yönlendirilir.
+    """
+    data = result.model_dump()
+    haystack = " ".join(
+        str(v)
+        for v in (
+            data["tespit"],
+            data["baslik"],
+            data["sonraki_adim"],
+            context,
+            *(data.get("olasi_nedenler") or []),
+        )
+        if v
+    )
+
+    data["tespit"] = _ensure_hedge(data["tespit"])
+
+    if _mentions_lpg_intervention(haystack):
+        data["guvenlik_uyarisi"] = LPG_SAFETY_WARNING
+        data["tamirciye_git_onerisi"] = True
+    elif data.get("surulebilir_mi") is False or data["aciliyet"] == Aciliyet.yuksek.value:
+        data["tamirciye_git_onerisi"] = True
+        if not data.get("guvenlik_uyarisi"):
+            data["guvenlik_uyarisi"] = DEFAULT_SAFETY_WARNING
+    elif _mentions_safety_topic(haystack) and not data.get("guvenlik_uyarisi"):
+        data["guvenlik_uyarisi"] = DEFAULT_SAFETY_WARNING
+
+    return DtcDiagnoseResponse(**data)

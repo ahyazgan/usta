@@ -60,3 +60,9 @@ def build_dashboard_prompt(vehicle: Vehicle) -> str:
     """Gösterge paneli uyarı ışığı tanıma prompt'u (kendi JSON şeması)."""
     base = _read("dashboard/_base.md")
     return f"{vehicle_context(vehicle)}\n\n{base}"
+
+
+def build_dtc_prompt(vehicle: Vehicle) -> str:
+    """Arıza kodu (OBD-II / DTC) açıklama prompt'u (kendi JSON şeması)."""
+    base = _read("dtc/_base.md")
+    return f"{vehicle_context(vehicle)}\n\n{base}"

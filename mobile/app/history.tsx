@@ -99,7 +99,15 @@ function DiagnosisRow({
   vehicleId: number | null;
   onShowMechanic: (item: DiagnosisHistory) => void;
 }) {
-  const icon = item.kind === 'image' ? 'camera' : 'pulse';
+  // İkon önce özel kategoriye göre (pano/arıza kodu), yoksa girdi türüne göre.
+  const icon: keyof typeof Ionicons.glyphMap =
+    item.kategori === 'pano_uyari'
+      ? 'warning-outline'
+      : item.kategori === 'ariza_kodu'
+        ? 'barcode-outline'
+        : item.kind === 'image'
+          ? 'camera'
+          : 'pulse';
   const metaParts = [
     formatDate(item.created_at),
     item.guven != null ? t(`camera.guven.${item.guven}`) : null,

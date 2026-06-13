@@ -134,6 +134,29 @@ export interface DashboardInput {
   user_note?: string;
 }
 
+/** OBD-II fault-code (DTC) explanation response. */
+export interface DtcResult {
+  tespit: string;
+  guven: Guven;
+  kod: string;
+  baslik: string;
+  olasi_nedenler: string[];
+  aciliyet: Aciliyet;
+  /** Can the user keep driving? (null = uncertain) */
+  surulebilir_mi: boolean | null;
+  sonraki_adim: string;
+  guvenlik_uyarisi: string | null;
+  tamirciye_git_onerisi: boolean;
+  session_id: number | null;
+}
+
+export interface DtcInput {
+  vehicle_id: number;
+  /** OBD-II code, e.g. "P0300". */
+  code: string;
+  user_note?: string;
+}
+
 /** Auth token bundle returned by login/register-then-login/refresh. */
 export interface TokenResponse {
   access_token: string;
@@ -411,6 +434,8 @@ export interface ApiClient {
   diagnoseSound(input: DiagnoseSoundInput): Promise<SoundDiagnoseResult>;
   /** Identify dashboard warning lights from a photo of the instrument cluster. */
   diagnoseDashboard(input: DashboardInput): Promise<DashboardResult>;
+  /** Explain an OBD-II fault code (DTC) for this vehicle. */
+  diagnoseDtc(input: DtcInput): Promise<DtcResult>;
   getTasks(): Promise<Task[]>;
   register(input: AuthInput): Promise<UserOut>;
   login(input: AuthInput): Promise<TokenResponse>;
@@ -605,6 +630,9 @@ export function createApiClient(
         '/v1/ai/diagnose/dashboard',
         input,
       );
+    },
+    diagnoseDtc(input) {
+      return post<DtcResult, DtcInput>('/v1/ai/diagnose/code', input);
     },
     async getTasks() {
       const headers = await authHeaders();

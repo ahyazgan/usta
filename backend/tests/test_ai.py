@@ -43,6 +43,10 @@ def _dashboard_payload(vehicle_id: int) -> dict:
     }
 
 
+def _dtc_payload(vehicle_id: int) -> dict:
+    return {"vehicle_id": vehicle_id, "code": "p0300", "user_note": "Motor teklemesi var"}
+
+
 # --------------------------------------------------------------------------- #
 # Görüntü teşhisi
 # --------------------------------------------------------------------------- #
@@ -320,6 +324,116 @@ async def test_dashboard_per_light_anlam_hedged(client, fake_claude):
     anlam = r.json()["isiklar"][0]["anlam"].casefold()
     assert "büyük ihtimalle" in anlam
     assert "kesinlikle" not in anlam
+
+
+# --------------------------------------------------------------------------- #
+# Arıza kodu (OBD-II / DTC) açıklama
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.asyncio
+async def test_dtc_diagnose_happy(client, fake_claude):
+    headers = await register_and_login(client, "dtc1@usta.app")
+    vehicle = await create_vehicle(client, headers)
+
+    r = await client.post("/v1/ai/diagnose/code", json=_dtc_payload(vehicle["id"]), headers=headers)
+    assert r.status_code == 200
+    body = r.json()
+    assert "büyük ihtimalle" in body["tespit"].casefold()
+    assert body["guven"] in {"yuksek", "orta", "dusuk"}
+    assert body["aciliyet"] in {"dusuk", "orta", "yuksek"}
+    assert isinstance(body["olasi_nedenler"], list) and len(body["olasi_nedenler"]) >= 1
+    assert "baslik" in body and body["kod"]
+    # Metin analizi → sonnet (Opus yasak).
+    assert "opus" not in fake_claude.calls[0]["model"].lower()
+    assert "sonnet" in fake_claude.calls[0]["model"].lower()
+
+
+@pytest.mark.asyncio
+async def test_dtc_requires_auth_401(client):
+    r = await client.post("/v1/ai/diagnose/code", json=_dtc_payload(1))
+    assert r.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_dtc_validation_422(client):
+    headers = await register_and_login(client, "dtc2@usta.app")
+    # code eksik
+    r = await client.post("/v1/ai/diagnose/code", json={"vehicle_id": 1}, headers=headers)
+    assert r.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_dtc_other_vehicle_403(client):
+    owner = await register_and_login(client, "dtcowner@usta.app")
+    vehicle = await create_vehicle(client, owner)
+    intruder = await register_and_login(client, "dtcintruder@usta.app")
+    r = await client.post("/v1/ai/diagnose/code", json=_dtc_payload(vehicle["id"]), headers=intruder)
+    assert r.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_dtc_rate_limit_429(client):
+    headers = await register_and_login(client, "dtc3@usta.app")
+    vehicle = await create_vehicle(client, headers)
+
+    async def _always_limited():
+        from fastapi import HTTPException, status
+
+        raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="limit")
+
+    app.dependency_overrides[enforce_rate_limit] = _always_limited
+    try:
+        r = await client.post("/v1/ai/diagnose/code", json=_dtc_payload(vehicle["id"]), headers=headers)
+        assert r.status_code == 429
+    finally:
+        app.dependency_overrides.pop(enforce_rate_limit, None)
+
+
+@pytest.mark.asyncio
+async def test_dtc_not_drivable_forces_mechanic(client, fake_claude):
+    """surulebilir_mi=False => tamirci + güvenlik uyarısı zorunlu."""
+    headers = await register_and_login(client, "dtc4@usta.app")
+    vehicle = await create_vehicle(client, headers)
+
+    fake_claude.dtc_response = {
+        "tespit": "Büyük ihtimalle ciddi bir ateşleme sorunu.",
+        "guven": "orta",
+        "kod": "P0301",
+        "baslik": "1. silindir ateşleme teklemesi",
+        "olasi_nedenler": ["Buji", "Bobin"],
+        "aciliyet": "dusuk",  # tutarsız; sistem yükseltmeli değil ama surulebilir False
+        "surulebilir_mi": False,
+        "sonraki_adim": "Devam et.",
+        "guvenlik_uyarisi": None,
+        "tamirciye_git_onerisi": False,
+    }
+    r = await client.post("/v1/ai/diagnose/code", json=_dtc_payload(vehicle["id"]), headers=headers)
+    body = r.json()
+    assert body["tamirciye_git_onerisi"] is True
+    assert body["guvenlik_uyarisi"], "sürülemez kodda güvenlik uyarısı zorunlu"
+
+
+@pytest.mark.asyncio
+async def test_dtc_hararet_triggers_warning(client, fake_claude):
+    """'hararet' geçen yanıtta uyarı boşsa sistem doldurmalı (tetikleyici kelime)."""
+    headers = await register_and_login(client, "dtc5@usta.app")
+    vehicle = await create_vehicle(client, headers)
+
+    fake_claude.dtc_response = {
+        "tespit": "Büyük ihtimalle soğutma sıcaklığı sensörüyle ilgili bir kod.",
+        "guven": "orta",
+        "kod": "P0118",
+        "baslik": "Motor hararet sensörü yüksek sinyal",
+        "olasi_nedenler": ["Hararet sensörü arızası", "Kablo/konnektör"],
+        "aciliyet": "orta",
+        "surulebilir_mi": True,
+        "sonraki_adim": "Hararet göstergesini izle; yükselirse dur.",
+        "guvenlik_uyarisi": None,
+        "tamirciye_git_onerisi": True,
+    }
+    r = await client.post("/v1/ai/diagnose/code", json=_dtc_payload(vehicle["id"]), headers=headers)
+    assert r.json()["guvenlik_uyarisi"], "hararet geçen yanıtta güvenlik uyarısı zorunlu"
 
 
 # --------------------------------------------------------------------------- #

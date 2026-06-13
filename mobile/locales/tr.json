@@ -446,6 +446,30 @@
       "desc": "Panodaki ışığın fotoğrafını çek, açıklayayım"
     }
   },
+  "dtc": {
+    "title": "Arıza Kodu",
+    "intro": "OBD-II cihazından okuduğun arıza kodunu yaz; bu araç için ne anlama geldiğini açıklayayım.",
+    "codeLabel": "Arıza kodu",
+    "codePlaceholder": "Örn. P0300",
+    "noteLabel": "Not (isteğe bağlı)",
+    "notePlaceholder": "Belirti varsa yaz: tekleme, ışık yanıyor…",
+    "disclaimer": "Aynı kod farklı araçlarda farklı nedene işaret edebilir. Bu bir ön bilgidir, kesin teşhis için tamirciye danış.",
+    "explain": "Açıkla",
+    "another": "Başka Kod",
+    "causes": "Olası nedenler",
+    "drivable": {
+      "yes": "🚗 Büyük ihtimalle sürülebilir",
+      "no": "⛔ Sürmeye devam etme",
+      "unknown": "❓ Belirsiz"
+    },
+    "error": {
+      "empty": "Geçerli bir arıza kodu yaz (örn. P0300)"
+    },
+    "entry": {
+      "title": "Arıza kodu ne demek?",
+      "desc": "P0300 gibi bir kodu yaz, açıklayayım"
+    }
+  },
   "share": {
     "report": {
       "title": "🔧 Usta Raporu",

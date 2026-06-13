@@ -75,11 +75,26 @@ DEFAULT_DASHBOARD = {
 }
 
 
+DEFAULT_DTC = {
+    "tespit": "Büyük ihtimalle P0300, çoklu silindir ateşleme teklemesi demek.",
+    "guven": "orta",
+    "kod": "P0300",
+    "baslik": "Rastgele/çoklu silindir ateşleme teklemesi",
+    "olasi_nedenler": ["Eskimiş buji veya bobin", "Yakıt karışımı sorunu"],
+    "aciliyet": "orta",
+    "surulebilir_mi": False,
+    "sonraki_adim": "Bujileri ve bobinleri kontrol ettir.",
+    "guvenlik_uyarisi": None,
+    "tamirciye_git_onerisi": True,
+}
+
+
 class FakeClaudeClient:
     def __init__(self) -> None:
         self.image_response = dict(DEFAULT_IMAGE)
         self.sound_response = dict(DEFAULT_SOUND)
         self.dashboard_response = dict(DEFAULT_DASHBOARD)
+        self.dtc_response = dict(DEFAULT_DTC)
         self.tokens_in = 120
         self.tokens_out = 40
         self.calls: list[dict] = []
@@ -89,6 +104,8 @@ class FakeClaudeClient:
         if isinstance(content, list):
             # Görüntü tabanlı çağrılar; pano prompt'u ile görüntü teşhisini ayır.
             data = self.dashboard_response if "PANO" in (system or "") else self.image_response
+        elif "ARIZA KODU" in (system or ""):
+            data = self.dtc_response
         else:
             data = self.sound_response
         return ClaudeResult(data=dict(data), tokens_in=self.tokens_in, tokens_out=self.tokens_out)

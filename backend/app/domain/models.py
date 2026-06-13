@@ -199,6 +199,26 @@ class MechanicLead(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
 
 
+class LiveUsage(Base):
+    """Canlı sesli rehber oturum kullanımı (dakika sayacı + maliyet freni).
+
+    Oturum başında 0 saniyeyle açılır; istemci bitince süreyi bildirir. Aylık
+    toplam, ücretsiz katman limitiyle karşılaştırılır (premium = sınırsız).
+    """
+
+    __tablename__ = "live_usage"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    vehicle_id: Mapped[int | None] = mapped_column(
+        ForeignKey("vehicles.id", ondelete="SET NULL"), nullable=True
+    )
+    task: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    lang: Mapped[str] = mapped_column(String(5), default="tr")
+    seconds: Mapped[int] = mapped_column(Integer, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+
+
 class RefreshToken(Base):
     """Yenileme token'ları sha256 hash olarak saklanır (düz metin DB'de tutulmaz)."""
 

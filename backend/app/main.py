@@ -18,6 +18,7 @@ from .api import (
     auth,
     catalog,
     estimates,
+    live,
     maintenance,
     mechanics,
     stats,
@@ -104,5 +105,6 @@ app.include_router(tasks.router)
 app.include_router(maintenance.router)
 app.include_router(estimates.router)
 app.include_router(ai.router)
+app.include_router(live.router)
 app.include_router(mechanics.router)
 app.include_router(stats.router)

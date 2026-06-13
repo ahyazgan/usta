@@ -341,6 +341,35 @@ class SoundDiagnoseResponse(BaseModel):
     cost_estimate: CostEstimateOut | None = None
 
 
+# --------------------------------------------------------------------------- #
+# AI — Canlı sesli rehber (Gemini Live oturumu)
+# --------------------------------------------------------------------------- #
+
+
+class LiveSessionRequest(BaseModel):
+    vehicle_id: int
+    task: str | None = Field(default=None, max_length=60)
+    lang: Literal["tr", "en"] = "tr"
+
+
+class LiveSessionOut(BaseModel):
+    """Canlı oturum başlatma yanıtı — istemci bununla Gemini'ye bağlanır.
+
+    system_instruction İÇERMEZ (server-side kalır; istemciye sızdırılmaz).
+    """
+
+    token: str  # ephemeral token
+    model: str
+    voice: str
+    language: str
+    live_usage_id: int  # bitişte süre bu kayda yazılır
+    max_seconds: int  # tek oturum sert sınırı
+
+
+class LiveSessionEndIn(BaseModel):
+    seconds: int = Field(ge=0, le=86_400)
+
+
 class TaskOut(BaseModel):
     id: str
     title_tr: str

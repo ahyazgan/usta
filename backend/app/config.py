@@ -44,6 +44,15 @@ class Settings(BaseSettings):
     # Boş string → "Satın Al" linki gösterilmez.
     parts_buy_url_template: str = "https://www.google.com/search?q={q}"
 
+    # Canlı sesli rehber (Gemini Live). Anahtar boşsa canlı mod KAPALI (503).
+    gemini_api_key: str = ""
+    gemini_live_model: str = "gemini-2.0-flash-live-001"
+    gemini_default_voice: str = "Puck"  # Gemini Live ses adı
+    # Ücretsiz katmanda aylık canlı saniye sınırı (maliyet freni). Premium = sınırsız.
+    free_live_seconds_per_month: int = 600  # 10 dk/ay
+    # Tek oturum sert üst sınırı (saniye) — kaçak maliyeti engeller.
+    live_session_max_seconds: int = 600
+
     @property
     def cors_origins(self) -> list[str]:
         return ["*"] if self.debug else [self.prod_cors_origin]

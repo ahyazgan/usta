@@ -45,3 +45,27 @@ def test_live_instruction_with_task_includes_steps_parts_price():
 def test_live_instruction_unknown_task_skips_section():
     instr = build_live_system_instruction(_vehicle(), task_id="uydurma_gorev")
     assert "MEVCUT GÖREV" not in instr  # bilinmeyen görev → bölüm yok, hata yok
+
+
+def test_live_instruction_english():
+    instr = build_live_system_instruction(_vehicle(), task_id="oil_change", lang="en")
+    low = instr.casefold()
+    assert "most likely" in low  # EN taban prompt
+    assert "lpg" in low and "mechanic" in low  # güvenlik EN'de de var
+    assert "VEHICLE CONTEXT" in instr and "CURRENT TASK" in instr
+    assert "Oil Change" in instr  # title_en
+    assert "Required parts" in instr and "55256470" in instr
+
+
+def test_build_session_config_shape():
+    from app.services.ai.live_service import build_session_config, tool_declarations
+
+    cfg = build_session_config(
+        _vehicle(), task_id="oil_change", lang="en", model="gemini-x", voice="Puck"
+    )
+    assert cfg["model"] == "gemini-x" and cfg["voice"] == "Puck"
+    assert cfg["language"] == "en"
+    assert "VEHICLE CONTEXT" in cfg["system_instruction"]
+    names = {t["name"] for t in cfg["tools"]}
+    assert {"fiyat_tahmini", "tamirci_bul"} <= names
+    assert tool_declarations("tr")[0]["parameters"]["required"] == ["ariza_sistem"]

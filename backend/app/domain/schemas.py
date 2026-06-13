@@ -370,6 +370,31 @@ class LiveSessionEndIn(BaseModel):
     seconds: int = Field(ge=0, le=86_400)
 
 
+# --------------------------------------------------------------------------- #
+# Abonelik / faturalandırma + parça niyeti (ölçüm)
+# --------------------------------------------------------------------------- #
+
+
+class SubscriptionOut(BaseModel):
+    tier: SubscriptionTier
+    is_premium: bool
+    live_unlimited: bool
+    free_live_seconds_remaining: int | None  # premium → null (sınırsız)
+
+
+class BillingEventIn(BaseModel):
+    """RevenueCat tarzı webhook (basitleştirilmiş): kullanıcıyı premium yap/yapma."""
+
+    app_user_id: str = Field(min_length=3, max_length=255)  # = e-posta
+    premium: bool
+
+
+class BuyIntentIn(BaseModel):
+    vehicle_id: int
+    task: str | None = Field(default=None, max_length=60)
+    part_label: str = Field(min_length=1, max_length=80)
+
+
 class TaskOut(BaseModel):
     id: str
     title_tr: str

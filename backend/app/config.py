@@ -38,6 +38,12 @@ class Settings(BaseSettings):
     # Kullanıcı-bazlı rate limit (dakikada istek)
     rate_limit_per_minute: int = 30
 
+    # Faturalandırma webhook'u (RevenueCat tarzı) — premium'u açar/kapatır.
+    # Boşsa webhook 503. Üretimde sağlayıcı imza/secret'ı ile doğrula.
+    billing_webhook_secret: str = ""
+    # Admin istatistik paneli token'ı (lead/click özeti). Boşsa /admin/* 503.
+    admin_token: str = ""
+
     # Parça "Satın Al" linki (affiliate iskeleti). {q} = arama sorgusu.
     # Şimdilik jenerik arama; affiliate anlaşması gelince env ile değiştir:
     #   USTA_PARTS_BUY_URL_TEMPLATE="https://ORTAK.com/ara?q={q}&aff=USTA"

@@ -258,6 +258,11 @@ export default function GuideScreen() {
                               accessibilityRole="link"
                               onPress={() => {
                                 void capture('buy_link_tap', { part: p.label_tr });
+                                if (currentVehicle != null) {
+                                  void client
+                                    .logBuyIntent(currentVehicle.id, p.label_tr, guide.task_id)
+                                    .catch(() => {});
+                                }
                                 void Linking.openURL(p.buy_url!);
                               }}
                               style={({ pressed }) => [styles.buyLink, pressed && styles.pressed]}

@@ -14,13 +14,16 @@ from sqlalchemy import text
 
 from .api import (
     account,
+    admin,
     ai,
     auth,
+    billing,
     catalog,
     estimates,
     live,
     maintenance,
     mechanics,
+    parts,
     stats,
     tasks,
     vehicles,
@@ -106,5 +109,8 @@ app.include_router(maintenance.router)
 app.include_router(estimates.router)
 app.include_router(ai.router)
 app.include_router(live.router)
+app.include_router(parts.router)
+app.include_router(billing.router)
+app.include_router(admin.router)
 app.include_router(mechanics.router)
 app.include_router(stats.router)

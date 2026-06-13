@@ -200,6 +200,15 @@ export interface CostEstimate {
   sample_size: number;
 }
 
+/** Subscription status + premium feature gates. */
+export interface Subscription {
+  tier: 'free' | 'premium';
+  is_premium: boolean;
+  live_unlimited: boolean;
+  /** Remaining free live seconds this month (null = premium / unlimited). */
+  free_live_seconds_remaining: number | null;
+}
+
 /** Live voice session start response (ephemeral token + session info). */
 export interface LiveSession {
   /** Ephemeral token to connect directly to Gemini Live. */
@@ -381,6 +390,10 @@ export interface ApiClient {
   getTaskEstimate(vehicleId: number, taskId: string): Promise<CostEstimate>;
   /** Price showroom: all applicable tasks + their estimates, one call. */
   getVehicleEstimates(vehicleId: number): Promise<TaskEstimate[]>;
+  /** Subscription status + premium feature gates. */
+  getSubscription(): Promise<Subscription>;
+  /** Log a part 'Buy' tap (affiliate demand metric / partnership proof). */
+  logBuyIntent(vehicleId: number, partLabel: string, task?: string): Promise<void>;
   /** Mechanic cost estimate for a fault system (live tool 'fiyat_tahmini'). */
   getDiagnosisEstimate(
     arizaSistem: string,
@@ -614,6 +627,18 @@ export function createApiClient(
       return request<TaskEstimate[]>(`/v1/vehicles/${vehicleId}/estimates`, {
         method: 'GET',
         headers,
+      });
+    },
+    async getSubscription() {
+      const headers = await authHeaders();
+      return request<Subscription>('/v1/me/subscription', { method: 'GET', headers });
+    },
+    async logBuyIntent(vehicleId, partLabel, task) {
+      const headers = await authHeaders();
+      await requestVoid('/v1/parts/buy-intent', {
+        method: 'POST',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vehicle_id: vehicleId, part_label: partLabel, task }),
       });
     },
     async getDiagnosisEstimate(arizaSistem, vehicleType = 'araba') {

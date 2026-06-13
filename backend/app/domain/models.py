@@ -199,6 +199,25 @@ class MechanicLead(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
 
 
+class PartLead(Base):
+    """Parça 'Satın Al' niyeti (affiliate ölçüm + ortaklık kozu).
+
+    Kullanıcı bir parçanın satın-al linkine dokununca kaydedilir; admin paneli
+    bunu toplar ("şu kadar parça-alım niyeti ürettik" → perakendeci görüşmesi).
+    """
+
+    __tablename__ = "part_leads"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    vehicle_id: Mapped[int | None] = mapped_column(
+        ForeignKey("vehicles.id", ondelete="SET NULL"), nullable=True
+    )
+    task: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    part_label: Mapped[str] = mapped_column(String(80), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
+
+
 class LiveUsage(Base):
     """Canlı sesli rehber oturum kullanımı (dakika sayacı + maliyet freni).
 

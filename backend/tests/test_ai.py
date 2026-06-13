@@ -34,6 +34,15 @@ def _sound_payload(vehicle_id: int) -> dict:
     }
 
 
+def _dashboard_payload(vehicle_id: int) -> dict:
+    return {
+        "vehicle_id": vehicle_id,
+        "frame_base64": FRAME_B64,
+        "media_type": "image/jpeg",
+        "user_note": "Panoda ne yanıyor?",
+    }
+
+
 # --------------------------------------------------------------------------- #
 # Görüntü teşhisi
 # --------------------------------------------------------------------------- #
@@ -174,6 +183,143 @@ async def test_image_lpg_intervention_blocked(client, fake_claude):
     assert body["tamirciye_git_onerisi"] is True
     assert "lpg" in (body["guvenlik_uyarisi"] or "").casefold()
     assert "sök" not in body["sonraki_adim"].casefold()
+
+
+# --------------------------------------------------------------------------- #
+# Gösterge paneli uyarı ışığı tanıma
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.asyncio
+async def test_dashboard_diagnose_happy(client, fake_claude):
+    headers = await register_and_login(client, "pano1@usta.app")
+    vehicle = await create_vehicle(client, headers)
+
+    r = await client.post(
+        "/v1/ai/diagnose/dashboard", json=_dashboard_payload(vehicle["id"]), headers=headers
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert "büyük ihtimalle" in body["tespit"].casefold()
+    assert body["guven"] in {"yuksek", "orta", "dusuk"}
+    assert isinstance(body["isiklar"], list) and len(body["isiklar"]) >= 1
+    light = body["isiklar"][0]
+    assert light["renk"] in {"kirmizi", "sari", "yesil", "mavi", "bilinmiyor"}
+    assert light["aciliyet"] in {"dusuk", "orta", "yuksek"}
+    assert body["en_yuksek_aciliyet"] in {"dusuk", "orta", "yuksek"}
+    # Vision modeli sonnet olmalı (Opus yasak).
+    assert "opus" not in fake_claude.calls[0]["model"].lower()
+    assert "sonnet" in fake_claude.calls[0]["model"].lower()
+
+
+@pytest.mark.asyncio
+async def test_dashboard_requires_auth_401(client):
+    r = await client.post("/v1/ai/diagnose/dashboard", json=_dashboard_payload(1))
+    assert r.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_dashboard_validation_422(client):
+    headers = await register_and_login(client, "pano2@usta.app")
+    # frame_base64 eksik
+    r = await client.post(
+        "/v1/ai/diagnose/dashboard", json={"vehicle_id": 1}, headers=headers
+    )
+    assert r.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_dashboard_other_vehicle_403(client):
+    owner = await register_and_login(client, "panoowner@usta.app")
+    vehicle = await create_vehicle(client, owner)
+    intruder = await register_and_login(client, "panointruder@usta.app")
+    r = await client.post(
+        "/v1/ai/diagnose/dashboard", json=_dashboard_payload(vehicle["id"]), headers=intruder
+    )
+    assert r.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_dashboard_red_light_forces_mechanic(client, fake_claude):
+    """KIRMIZI ışık => her zaman tamirci + güvenlik uyarısı, aciliyet yükselir."""
+    headers = await register_and_login(client, "pano3@usta.app")
+    vehicle = await create_vehicle(client, headers)
+
+    fake_claude.dashboard_response = {
+        "tespit": "Büyük ihtimalle kırmızı yağ basıncı ışığı yanıyor.",
+        "guven": "orta",
+        "isiklar": [
+            {
+                "isim": "Yağ basıncı uyarısı",
+                "renk": "kirmizi",
+                "anlam": "Büyük ihtimalle yağ basıncı düşük.",
+                "aciliyet": "dusuk",  # model yanlış verse de sistem yükseltmeli
+                "ne_yapmali": "Devam et.",
+            }
+        ],
+        "en_yuksek_aciliyet": "dusuk",  # sistem yeniden hesaplamalı
+        "guvenlik_uyarisi": None,
+        "sonraki_adim": "Sürmeye devam et.",
+        "tamirciye_git_onerisi": False,
+    }
+    r = await client.post(
+        "/v1/ai/diagnose/dashboard", json=_dashboard_payload(vehicle["id"]), headers=headers
+    )
+    body = r.json()
+    assert body["tamirciye_git_onerisi"] is True
+    assert body["guvenlik_uyarisi"], "kırmızı ışıkta güvenlik uyarısı zorunlu"
+
+
+@pytest.mark.asyncio
+async def test_dashboard_hedge_phrase_enforced(client, fake_claude):
+    """Kesin teşhis dili geldiğinde 'büyük ihtimalle' eklenmeli."""
+    headers = await register_and_login(client, "pano4@usta.app")
+    vehicle = await create_vehicle(client, headers)
+
+    fake_claude.dashboard_response = {
+        "tespit": "Motor arıza ışığı kesinlikle ateşleme arızası.",
+        "guven": "yuksek",
+        "isiklar": [],
+        "en_yuksek_aciliyet": "dusuk",
+        "guvenlik_uyarisi": None,
+        "sonraki_adim": "Tekrar dene.",
+        "tamirciye_git_onerisi": False,
+    }
+    r = await client.post(
+        "/v1/ai/diagnose/dashboard", json=_dashboard_payload(vehicle["id"]), headers=headers
+    )
+    assert "büyük ihtimalle" in r.json()["tespit"].casefold()
+
+
+@pytest.mark.asyncio
+async def test_dashboard_per_light_anlam_hedged(client, fake_claude):
+    """Her ışığın `anlam`'ı da hedge'lenmeli; kesin dil ('kesinlikle') yumuşatılmalı."""
+    headers = await register_and_login(client, "pano5@usta.app")
+    vehicle = await create_vehicle(client, headers)
+
+    fake_claude.dashboard_response = {
+        "tespit": "Büyük ihtimalle bir uyarı ışığı yanıyor.",
+        "guven": "orta",
+        "isiklar": [
+            {
+                "isim": "ABS uyarısı",
+                "renk": "sari",
+                "anlam": "Kesinlikle ABS arızası var.",  # kesin dil — yumuşatılmalı
+                "aciliyet": "orta",
+                "ne_yapmali": "Kontrol ettir.",
+            }
+        ],
+        "en_yuksek_aciliyet": "orta",
+        "guvenlik_uyarisi": None,
+        "sonraki_adim": "Tamirciye uğra.",
+        "tamirciye_git_onerisi": True,
+    }
+    r = await client.post(
+        "/v1/ai/diagnose/dashboard", json=_dashboard_payload(vehicle["id"]), headers=headers
+    )
+    anlam = r.json()["isiklar"][0]["anlam"].casefold()
+    assert "büyük ihtimalle" in anlam
+    assert "kesinlikle" not in anlam
 
 
 # --------------------------------------------------------------------------- #

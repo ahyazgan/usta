@@ -8,13 +8,15 @@ from ..core.rate_limit import enforce_rate_limit
 from ..database import get_db
 from ..domain.models import User
 from ..domain.schemas import (
+    DashboardDiagnoseRequest,
+    DashboardDiagnoseResponse,
     ImageDiagnoseRequest,
     ImageDiagnoseResponse,
     SoundDiagnoseRequest,
     SoundDiagnoseResponse,
 )
 from ..services import vehicle_service
-from ..services.ai import audio_service, vision_service
+from ..services.ai import audio_service, dashboard_service, vision_service
 from ..services.ai.claude_client import ClaudeClient, get_claude_client
 
 router = APIRouter(
@@ -46,5 +48,18 @@ async def diagnose_sound(
 ) -> SoundDiagnoseResponse:
     vehicle = await vehicle_service.get_owned(db, user.id, payload.vehicle_id)
     return await audio_service.diagnose_sound(
+        db=db, claude=claude, user=user, vehicle=vehicle, payload=payload
+    )
+
+
+@router.post("/diagnose/dashboard", response_model=DashboardDiagnoseResponse)
+async def diagnose_dashboard(
+    payload: DashboardDiagnoseRequest,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+    claude: ClaudeClient = Depends(get_claude_client),
+) -> DashboardDiagnoseResponse:
+    vehicle = await vehicle_service.get_owned(db, user.id, payload.vehicle_id)
+    return await dashboard_service.diagnose_dashboard(
         db=db, claude=claude, user=user, vehicle=vehicle, payload=payload
     )

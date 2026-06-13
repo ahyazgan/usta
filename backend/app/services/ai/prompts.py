@@ -54,3 +54,9 @@ def build_vision_prompt(vehicle: Vehicle, task: str, step: int | None) -> str:
 def build_audio_prompt(vehicle: Vehicle) -> str:
     base = _read("audio/_base.md")
     return f"{vehicle_context(vehicle)}\n\n{base}"
+
+
+def build_dashboard_prompt(vehicle: Vehicle) -> str:
+    """Gösterge paneli uyarı ışığı tanıma prompt'u (kendi JSON şeması)."""
+    base = _read("dashboard/_base.md")
+    return f"{vehicle_context(vehicle)}\n\n{base}"

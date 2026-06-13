@@ -101,6 +101,39 @@ export interface SoundDiagnoseResult {
   cost_estimate?: CostEstimate | null;
 }
 
+/** Dashboard warning light color (severity signal). */
+export type DashboardRenk = 'kirmizi' | 'sari' | 'yesil' | 'mavi' | 'bilinmiyor';
+
+/** One identified dashboard warning light. */
+export interface DashboardLight {
+  isim: string;
+  renk: DashboardRenk;
+  anlam: string;
+  aciliyet: Aciliyet;
+  ne_yapmali: string;
+}
+
+/** Dashboard warning-light identification response. */
+export interface DashboardResult {
+  tespit: string;
+  guven: Guven;
+  isiklar: DashboardLight[];
+  en_yuksek_aciliyet: Aciliyet;
+  guvenlik_uyarisi: string | null;
+  sonraki_adim: string;
+  tamirciye_git_onerisi: boolean;
+  /** AISession id — 👍/👎 feedback attaches to this. */
+  session_id: number | null;
+}
+
+export interface DashboardInput {
+  vehicle_id: number;
+  /** Base64-encoded JPEG frame (no data URI prefix). */
+  frame_base64: string;
+  media_type: 'image/jpeg';
+  user_note?: string;
+}
+
 /** Auth token bundle returned by login/register-then-login/refresh. */
 export interface TokenResponse {
   access_token: string;
@@ -376,6 +409,8 @@ export type GetToken = () => string | null | Promise<string | null>;
 export interface ApiClient {
   diagnoseImage(input: DiagnoseImageInput): Promise<DiagnoseResult>;
   diagnoseSound(input: DiagnoseSoundInput): Promise<SoundDiagnoseResult>;
+  /** Identify dashboard warning lights from a photo of the instrument cluster. */
+  diagnoseDashboard(input: DashboardInput): Promise<DashboardResult>;
   getTasks(): Promise<Task[]>;
   register(input: AuthInput): Promise<UserOut>;
   login(input: AuthInput): Promise<TokenResponse>;
@@ -562,6 +597,12 @@ export function createApiClient(
     diagnoseSound(input) {
       return post<SoundDiagnoseResult, DiagnoseSoundInput>(
         '/v1/ai/diagnose/sound',
+        input,
+      );
+    },
+    diagnoseDashboard(input) {
+      return post<DashboardResult, DashboardInput>(
+        '/v1/ai/diagnose/dashboard',
         input,
       );
     },

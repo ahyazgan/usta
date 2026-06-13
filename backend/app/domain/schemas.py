@@ -317,6 +317,42 @@ class ImageDiagnoseResponse(BaseModel):
 
 
 # --------------------------------------------------------------------------- #
+# AI — Gösterge paneli uyarı ışığı tanıma
+# --------------------------------------------------------------------------- #
+
+
+class DashboardLight(BaseModel):
+    """Panoda tanınan tek bir uyarı ışığı."""
+
+    isim: str = Field(max_length=80, description="örn. Motor arıza lambası (check engine)")
+    renk: Literal["kirmizi", "sari", "yesil", "mavi", "bilinmiyor"]
+    anlam: str = Field(max_length=300, description="büyük ihtimalle ... ile başlayan açıklama")
+    aciliyet: Aciliyet
+    ne_yapmali: str = Field(max_length=300)
+
+
+class DashboardDiagnoseRequest(BaseModel):
+    vehicle_id: int
+    frame_base64: str = Field(min_length=16, description="1024px JPEG 0.7, base64")
+    media_type: str = Field(default="image/jpeg", pattern=r"^image/(jpeg|png|webp)$")
+    user_note: str | None = Field(default=None, max_length=500)
+
+
+class DashboardDiagnoseResponse(BaseModel):
+    """Pano uyarı ışığı tanıma yanıtı (kesin teşhis YOK; 'büyük ihtimalle')."""
+
+    tespit: str
+    guven: Guven
+    isiklar: list[DashboardLight]
+    en_yuksek_aciliyet: Aciliyet
+    guvenlik_uyarisi: str | None
+    sonraki_adim: str
+    tamirciye_git_onerisi: bool
+    # Token/maliyet loglandığı AISession id'si — 👍/👎 geri bildirimi buna bağlanır.
+    session_id: int | None = None
+
+
+# --------------------------------------------------------------------------- #
 # AI — Ses teşhisi (transkripsiyon YOK; tarif + koşul + araç verisi)
 # --------------------------------------------------------------------------- #
 

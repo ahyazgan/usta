@@ -429,6 +429,23 @@
       "busy": "The service is busy right now. Please try again shortly."
     }
   },
+  "dashboard": {
+    "title": "Warning Light",
+    "safetyStrip": "Don't shoot while driving. Stop somewhere safe and capture the cluster with the ignition on.",
+    "scan": "Scan Cluster",
+    "retake": "Retake",
+    "noLights": "I couldn't clearly make out a warning light. Try a brighter, sharper photo.",
+    "findMechanic": "Find a Mechanic",
+    "urgency": {
+      "dusuk": "Low",
+      "orta": "Medium",
+      "yuksek": "High"
+    },
+    "entry": {
+      "title": "What does this warning light mean?",
+      "desc": "Snap a photo of the light on your cluster and I'll explain"
+    }
+  },
   "share": {
     "report": {
       "title": "🔧 Usta Report",

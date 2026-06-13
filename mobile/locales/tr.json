@@ -429,6 +429,23 @@
       "busy": "Servis şu an yoğun. Lütfen biraz sonra tekrar dene."
     }
   },
+  "dashboard": {
+    "title": "Uyarı Işığı",
+    "safetyStrip": "Aracı sürerken çekme. Güvenli bir yerde dur, kontak açıkken panoyu çek.",
+    "scan": "Panoyu Tara",
+    "retake": "Tekrar Çek",
+    "noLights": "Net bir uyarı ışığı seçemedim. Daha aydınlık ve net bir fotoğraf dene.",
+    "findMechanic": "Tamirci Bul",
+    "urgency": {
+      "dusuk": "Düşük",
+      "orta": "Orta",
+      "yuksek": "Yüksek"
+    },
+    "entry": {
+      "title": "Uyarı ışığı ne demek?",
+      "desc": "Panodaki ışığın fotoğrafını çek, açıklayayım"
+    }
+  },
   "share": {
     "report": {
       "title": "🔧 Usta Raporu",

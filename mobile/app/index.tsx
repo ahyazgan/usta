@@ -423,6 +423,25 @@ export default function HomeScreen() {
           <Ionicons name="chevron-forward" size={18} color={theme.colors.textSecondary} />
         </Pressable>
 
+        {/* Gösterge paneli uyarı ışığı tanıma (kamera tabanlı) */}
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => {
+            void capture('open_dashboard');
+            router.push('/dashboard');
+          }}
+          style={({ pressed }) => [styles.priceGuide, pressed && styles.pressed]}
+        >
+          <View style={styles.priceGuideIcon}>
+            <Ionicons name="warning-outline" size={20} color={theme.colors.warningBright} />
+          </View>
+          <View style={styles.priceGuideBody}>
+            <Text style={styles.priceGuideTitle}>{t('dashboard.entry.title')}</Text>
+            <Text style={styles.priceGuideDesc}>{t('dashboard.entry.desc')}</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={theme.colors.textSecondary} />
+        </Pressable>
+
         {vehicles.length > 1 && (
           <ScrollView
             horizontal

@@ -56,18 +56,41 @@ DEFAULT_SOUND = {
     "tamirciye_git_onerisi": False,
 }
 
+DEFAULT_DASHBOARD = {
+    "tespit": "Büyük ihtimalle sarı motor arıza ışığı yanıyor.",
+    "guven": "orta",
+    "isiklar": [
+        {
+            "isim": "Motor arıza lambası (check engine)",
+            "renk": "sari",
+            "anlam": "Büyük ihtimalle motor yönetiminde bir arıza kodu var.",
+            "aciliyet": "orta",
+            "ne_yapmali": "Yakın zamanda arıza kodunu okut.",
+        }
+    ],
+    "en_yuksek_aciliyet": "orta",
+    "guvenlik_uyarisi": None,
+    "sonraki_adim": "Yakın zamanda tamirciye uğra.",
+    "tamirciye_git_onerisi": True,
+}
+
 
 class FakeClaudeClient:
     def __init__(self) -> None:
         self.image_response = dict(DEFAULT_IMAGE)
         self.sound_response = dict(DEFAULT_SOUND)
+        self.dashboard_response = dict(DEFAULT_DASHBOARD)
         self.tokens_in = 120
         self.tokens_out = 40
         self.calls: list[dict] = []
 
     async def complete_json(self, *, model, system, content, max_tokens=None) -> ClaudeResult:
         self.calls.append({"model": model, "system": system, "content": content})
-        data = self.image_response if isinstance(content, list) else self.sound_response
+        if isinstance(content, list):
+            # Görüntü tabanlı çağrılar; pano prompt'u ile görüntü teşhisini ayır.
+            data = self.dashboard_response if "PANO" in (system or "") else self.image_response
+        else:
+            data = self.sound_response
         return ClaudeResult(data=dict(data), tokens_in=self.tokens_in, tokens_out=self.tokens_out)
 
 

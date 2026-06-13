@@ -47,7 +47,9 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Usta kamerayı doğru parçayı bulduğunu doğrulamak için kullanır."
+          "cameraPermission": "Usta kamerayı doğru parçayı bulduğunu doğrulamak için kullanır.",
+          "microphonePermission": "Usta mikrofonu canlı sesli rehberlik için kullanır.",
+          "recordAudioAndroid": true
         }
       ],
       "expo-font",

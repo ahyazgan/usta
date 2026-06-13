@@ -200,6 +200,19 @@ export interface CostEstimate {
   sample_size: number;
 }
 
+/** Live voice session start response (ephemeral token + session info). */
+export interface LiveSession {
+  /** Ephemeral token to connect directly to Gemini Live. */
+  token: string;
+  model: string;
+  voice: string;
+  language: string;
+  /** Usage row id — report duration to this on end (minute metering). */
+  live_usage_id: number;
+  /** Hard cap on a single session (seconds). */
+  max_seconds: number;
+}
+
 /** One row of the price showroom: a task + its mechanic cost estimate. */
 export interface TaskEstimate {
   id: string;
@@ -368,6 +381,19 @@ export interface ApiClient {
   getTaskEstimate(vehicleId: number, taskId: string): Promise<CostEstimate>;
   /** Price showroom: all applicable tasks + their estimates, one call. */
   getVehicleEstimates(vehicleId: number): Promise<TaskEstimate[]>;
+  /** Mechanic cost estimate for a fault system (live tool 'fiyat_tahmini'). */
+  getDiagnosisEstimate(
+    arizaSistem: string,
+    vehicleType?: 'araba' | 'motosiklet',
+  ): Promise<CostEstimate>;
+  /** Start a live voice session → ephemeral token (503 if disabled, 402 if over limit). */
+  startLiveSession(
+    vehicleId: number,
+    task?: string,
+    lang?: 'tr' | 'en',
+  ): Promise<LiveSession>;
+  /** Report live session duration (minute metering / cost guard). */
+  endLiveSession(liveUsageId: number, seconds: number): Promise<void>;
   /** Recent AI diagnoses for this vehicle (image + sound), newest first. */
   getDiagnoses(vehicleId: number): Promise<DiagnosisHistory[]>;
   /** 👍/👎 a past diagnosis; re-voting overwrites. Returns the updated row. */
@@ -588,6 +614,29 @@ export function createApiClient(
       return request<TaskEstimate[]>(`/v1/vehicles/${vehicleId}/estimates`, {
         method: 'GET',
         headers,
+      });
+    },
+    async getDiagnosisEstimate(arizaSistem, vehicleType = 'araba') {
+      const headers = await authHeaders();
+      return request<CostEstimate>(
+        `/v1/estimate/diagnosis?ariza_sistem=${arizaSistem}&vehicle_type=${vehicleType}`,
+        { method: 'GET', headers },
+      );
+    },
+    async startLiveSession(vehicleId, task, lang = 'tr') {
+      const headers = await authHeaders();
+      return request<LiveSession>('/v1/live/session', {
+        method: 'POST',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vehicle_id: vehicleId, task, lang }),
+      });
+    },
+    async endLiveSession(liveUsageId, seconds) {
+      const headers = await authHeaders();
+      await requestVoid(`/v1/live/session/${liveUsageId}/end`, {
+        method: 'POST',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ seconds }),
       });
     },
     async getDiagnoses(vehicleId) {

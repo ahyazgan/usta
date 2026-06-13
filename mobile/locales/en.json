@@ -70,6 +70,23 @@
       "yuksek": "High risk"
     }
   },
+  "live": {
+    "start": "Live Voice Guide",
+    "end": "End",
+    "connecting": "Connecting…",
+    "intro": "Tap Start, point the camera at the part and ask out loud — I'll tell you what it most likely is.",
+    "cameraHint": "Camera permission needed — I'll ask when you tap Start.",
+    "audioNotReady": "Audio module not wired in this build (dev-build required). Video works, audio is silent.",
+    "status": {
+      "connecting": "Connecting",
+      "live": "Live",
+      "closed": "Closed",
+      "error": "Error"
+    },
+    "error": {
+      "start": "Couldn't start the live session."
+    }
+  },
   "prices": {
     "title": "Price Guide",
     "subtitle": "Estimated mechanic costs for common jobs on this car. Tap a job to see how it's done.",

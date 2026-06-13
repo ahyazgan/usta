@@ -70,6 +70,23 @@
       "yuksek": "Yüksek risk"
     }
   },
+  "live": {
+    "start": "Canlı Sesli Rehber",
+    "end": "Bitir",
+    "connecting": "Bağlanıyor…",
+    "intro": "Başlat'a bas, kamerayı parçaya tut ve sesle sor — büyük ihtimalle ne olduğunu söyleyeyim.",
+    "cameraHint": "Kamera izni gerekiyor — Başlat'a basınca isteyeceğim.",
+    "audioNotReady": "Ses modülü bu derlemede bağlı değil (dev-build gerekli). Görüntü çalışır, ses sessiz.",
+    "status": {
+      "connecting": "Bağlanıyor",
+      "live": "Canlı",
+      "closed": "Kapalı",
+      "error": "Hata"
+    },
+    "error": {
+      "start": "Canlı oturum başlatılamadı."
+    }
+  },
   "prices": {
     "title": "Fiyat Rehberi",
     "subtitle": "Bu araç için yaygın işlerin tamirciye tahmini maliyeti. Bir işe dokun, nasıl yapılacağını gör.",

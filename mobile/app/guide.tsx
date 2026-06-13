@@ -329,6 +329,19 @@ export default function GuideScreen() {
               <Ionicons name="chevron-forward" size={16} color={theme.colors.savingsText} />
             </Pressable>
 
+            {/* Canlı sesli rehber (göreve özel) */}
+            <Pressable
+              accessibilityRole="button"
+              onPress={() =>
+                router.push({ pathname: '/live', params: { task: guide.task_id } })
+              }
+              style={({ pressed }) => [styles.liveBanner, pressed && styles.pressed]}
+            >
+              <Ionicons name="mic" size={20} color={theme.colors.onInk} />
+              <Text style={styles.liveText}>{t('live.start')}</Text>
+              <Ionicons name="chevron-forward" size={16} color={theme.colors.onInk} />
+            </Pressable>
+
             {/* Fiyat şeffaflığı — tamirciye tahmini maliyet (wedge) */}
             {estimate != null && (
               <View style={styles.priceCard}>
@@ -656,6 +669,22 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: theme.colors.savingsText,
+  },
+  liveBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.md,
+    backgroundColor: theme.colors.ink,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+  },
+  liveText: {
+    flex: 1,
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    fontWeight: '700',
+    color: theme.colors.onInk,
   },
   priceCard: {
     flexDirection: 'row',

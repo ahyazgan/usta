@@ -59,7 +59,12 @@ class Vehicle(Base):
     fuel_type: Mapped[FuelType] = mapped_column(SAEnum(FuelType), nullable=False)
     # Araç türü (görev uygunluğunu etkiler). Eski kayıtlarda null = araba.
     vehicle_type: Mapped[VehicleType | None] = mapped_column(
-        SAEnum(VehicleType), nullable=True
+        # native_enum=False: string-backed (VARCHAR). vehicle_type mevcut vehicles
+        # tablosuna sonradan VARCHAR(12) migration'la eklendi; Postgres native
+        # 'vehicletype' enum tipi hiç oluşmadı → enum karşılaştırmalı sorgular
+        # (fiyat tahmini) 500 veriyordu. name==value olduğu için veri değişmez.
+        SAEnum(VehicleType, native_enum=False, length=12),
+        nullable=True,
     )
     current_km: Mapped[int | None] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)

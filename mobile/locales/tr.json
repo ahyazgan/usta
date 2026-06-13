@@ -7,7 +7,43 @@
     "home": "Ana Sayfa",
     "diagnosis": "Teşhis",
     "maintenance": "Bakım",
-    "history": "Geçmiş"
+    "history": "Geçmiş",
+    "settings": "Profil"
+  },
+  "settings": {
+    "title": "Profil",
+    "account": {
+      "title": "Hesap",
+      "free": "Ücretsiz plan",
+      "upgradeDesc": "Sınırsız canlı rehber, teşhis ve fiyat verisi",
+      "premiumActive": "Premium üyelik",
+      "premiumTag": "Aktif"
+    },
+    "prefs": {
+      "title": "Tercihler",
+      "language": "Dil",
+      "notifications": "Bildirimler",
+      "notificationsDesc": "Muayene/sigorta ve bakım hatırlatıcıları"
+    },
+    "privacy": {
+      "title": "Gizlilik & Yasal",
+      "policy": "Gizlilik Politikası",
+      "analytics": "Anonim kullanım analitiği",
+      "analyticsDesc": "Uygulamayı iyileştirmemize yardımcı olur (kişisel veri içermez)"
+    },
+    "actions": {
+      "title": "Hesap İşlemleri",
+      "logout": "Çıkış yap",
+      "delete": "Hesabı sil"
+    },
+    "delete": {
+      "confirmTitle": "Hesabı sil?",
+      "confirmMessage": "Hesabın ve tüm verilerin (araçlar, teşhisler, kayıtlar) kalıcı olarak silinir. Bu işlem geri alınamaz.",
+      "confirm": "Sil"
+    },
+    "about": {
+      "version": "Usta sürüm {{version}}"
+    }
   },
   "home": {
     "greeting": "Merhaba 👋",

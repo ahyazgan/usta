@@ -12,6 +12,7 @@ import { Platform } from 'react-native';
 import type { Vehicle } from '@/lib/api';
 import { daysUntil, formatTrDate } from '@/lib/dateReminders';
 import { t } from '@/lib/i18n';
+import { useUstaStore } from '@/lib/store';
 
 // Tarihten kaç gün önce hatırlatılsın.
 const LEAD_DAYS = 7;
@@ -73,6 +74,17 @@ function planFor(vehicle: Vehicle, iso: string | null, labelKey: string): Planne
  */
 export async function syncVehicleReminders(vehicles: Vehicle[]): Promise<void> {
   if (Platform.OS === 'web') return; // web'de zamanlanmış yerel bildirim yok
+
+  // Kullanıcı bildirimleri ayarlardan kapattıysa: planlanmışları temizle, çık.
+  if (!useUstaStore.getState().remindersEnabled) {
+    try {
+      ensureHandler();
+      await Notifications.cancelAllScheduledNotificationsAsync();
+    } catch {
+      /* sessiz */
+    }
+    return;
+  }
 
   try {
     ensureHandler();

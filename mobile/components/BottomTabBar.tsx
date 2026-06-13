@@ -6,11 +6,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { t } from '@/lib/i18n';
 import { theme } from '@/lib/theme';
 
-type TabKey = 'home' | 'diagnosis' | 'maintenance' | 'history';
+type TabKey = 'home' | 'diagnosis' | 'maintenance' | 'history' | 'settings';
 
 interface TabDef {
   key: TabKey;
-  route: '/' | '/sound' | '/maintenance' | '/history';
+  route: '/' | '/sound' | '/maintenance' | '/history' | '/settings';
   icon: keyof typeof Ionicons.glyphMap;
   labelKey: string;
   /** Show a small attention dot (e.g. pending diagnosis). */
@@ -22,6 +22,7 @@ const TABS: TabDef[] = [
   { key: 'diagnosis', route: '/sound', icon: 'pulse', labelKey: 'tabs.diagnosis' },
   { key: 'maintenance', route: '/maintenance', icon: 'construct', labelKey: 'tabs.maintenance' },
   { key: 'history', route: '/history', icon: 'time', labelKey: 'tabs.history' },
+  { key: 'settings', route: '/settings', icon: 'person', labelKey: 'tabs.settings' },
 ];
 
 /**

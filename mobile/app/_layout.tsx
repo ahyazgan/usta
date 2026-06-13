@@ -9,6 +9,7 @@ import { loadTokens } from '@/lib/auth';
 import { ensureDemoSession } from '@/lib/demoSession';
 // Side-effect import: initializes i18n locale before any screen renders.
 import '@/lib/i18n';
+import { loadPrefs } from '@/lib/prefs';
 import { useUstaStore } from '@/lib/store';
 import { theme } from '@/lib/theme';
 
@@ -16,6 +17,10 @@ export default function RootLayout() {
   const setTokens = useUstaStore((s) => s.setTokens);
   const setAuthBootstrapped = useUstaStore((s) => s.setAuthBootstrapped);
   const setAnalyticsConsent = useUstaStore((s) => s.setAnalyticsConsent);
+  const hydrateLocale = useUstaStore((s) => s.hydrateLocale);
+  const setRemindersEnabled = useUstaStore((s) => s.setRemindersEnabled);
+  // Dil değişince tüm ağaç bu key ile yeniden monte olur → metinler güncellenir.
+  const locale = useUstaStore((s) => s.locale);
 
   // On launch: reuse a persisted session if any, otherwise auto-login a demo
   // account (login screen removed). `authBootstrapped` flips true either way so
@@ -23,6 +28,17 @@ export default function RootLayout() {
   useEffect(() => {
     let active = true;
     (async () => {
+      // Kullanıcı tercihlerini (dil/bildirim) ekranlardan önce uygula.
+      try {
+        const prefs = await loadPrefs();
+        if (active) {
+          if (prefs.locale) hydrateLocale(prefs.locale);
+          setRemindersEnabled(prefs.remindersEnabled);
+        }
+      } catch {
+        /* tercih okunamadı — varsayılanlar kalır */
+      }
+
       let tokens = null;
       try {
         tokens = await loadTokens();
@@ -57,10 +73,10 @@ export default function RootLayout() {
     return () => {
       active = false;
     };
-  }, [setTokens, setAuthBootstrapped, setAnalyticsConsent]);
+  }, [setTokens, setAuthBootstrapped, setAnalyticsConsent, hydrateLocale, setRemindersEnabled]);
 
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider key={locale}>
       <StatusBar style="dark" />
       <Stack
         screenOptions={{

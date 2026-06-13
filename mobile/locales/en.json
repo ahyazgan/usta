@@ -7,7 +7,43 @@
     "home": "Home",
     "diagnosis": "Diagnose",
     "maintenance": "Service",
-    "history": "History"
+    "history": "History",
+    "settings": "Profile"
+  },
+  "settings": {
+    "title": "Profile",
+    "account": {
+      "title": "Account",
+      "free": "Free plan",
+      "upgradeDesc": "Unlimited live guide, diagnosis and price data",
+      "premiumActive": "Premium membership",
+      "premiumTag": "Active"
+    },
+    "prefs": {
+      "title": "Preferences",
+      "language": "Language",
+      "notifications": "Notifications",
+      "notificationsDesc": "Inspection/insurance and maintenance reminders"
+    },
+    "privacy": {
+      "title": "Privacy & Legal",
+      "policy": "Privacy Policy",
+      "analytics": "Anonymous usage analytics",
+      "analyticsDesc": "Helps us improve the app (no personal data)"
+    },
+    "actions": {
+      "title": "Account Actions",
+      "logout": "Log out",
+      "delete": "Delete account"
+    },
+    "delete": {
+      "confirmTitle": "Delete account?",
+      "confirmMessage": "Your account and all data (vehicles, diagnoses, logs) will be permanently deleted. This cannot be undone.",
+      "confirm": "Delete"
+    },
+    "about": {
+      "version": "Usta version {{version}}"
+    }
   },
   "home": {
     "greeting": "Hello 👋",

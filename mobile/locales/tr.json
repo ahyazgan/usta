@@ -470,6 +470,29 @@
       "desc": "P0300 gibi bir kodu yaz, açıklayayım"
     }
   },
+  "symptom": {
+    "title": "Sorunu Anlat",
+    "intro": "Aracındaki sorunu kendi cümlelerinle yaz; büyük ihtimalle neyle ilgili olduğunu ve ne yapman gerektiğini söyleyeyim.",
+    "placeholder": "Örn: Rölantide motor titriyor, gaz verince düzeliyor.",
+    "examplesTitle": "Hızlı örnekler",
+    "examples": {
+      "idle": "Rölantide titriyor",
+      "brake": "Fren pedalı yumuşadı",
+      "start": "Marş basıyor ama çalışmıyor",
+      "noise": "Gaz verince ses geliyor"
+    },
+    "disclaimer": "Bu bir ön değerlendirmedir, kesin teşhis için tamirciye danış.",
+    "diagnose": "Teşhis Et",
+    "another": "Yeni Sorun",
+    "cost": "Tamirciye tahmini: ₺{{low}}–₺{{high}}",
+    "error": {
+      "empty": "Lütfen sorunu birkaç kelimeyle anlat"
+    },
+    "entry": {
+      "title": "Bir sorunu anlat",
+      "desc": "Yazıyla anlat, teşhis edeyim"
+    }
+  },
   "share": {
     "report": {
       "title": "🔧 Usta Raporu",

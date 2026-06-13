@@ -157,6 +157,27 @@ export interface DtcInput {
   user_note?: string;
 }
 
+/** Free-text symptom diagnosis response. */
+export interface SymptomResult {
+  tespit: string;
+  guven: Guven;
+  olasi_nedenler: string[];
+  /** Fault system the symptom maps to (taxonomy) — feeds stats + cost. */
+  ariza_sistem: ArizaSistem;
+  aciliyet: Aciliyet;
+  sonraki_adim: string;
+  guvenlik_uyarisi: string | null;
+  tamirciye_git_onerisi: boolean;
+  session_id: number | null;
+  cost_estimate?: CostEstimate | null;
+}
+
+export interface SymptomInput {
+  vehicle_id: number;
+  /** The user's free-text description of the problem. */
+  description: string;
+}
+
 /** Auth token bundle returned by login/register-then-login/refresh. */
 export interface TokenResponse {
   access_token: string;
@@ -436,6 +457,8 @@ export interface ApiClient {
   diagnoseDashboard(input: DashboardInput): Promise<DashboardResult>;
   /** Explain an OBD-II fault code (DTC) for this vehicle. */
   diagnoseDtc(input: DtcInput): Promise<DtcResult>;
+  /** Diagnose a free-text symptom description for this vehicle. */
+  diagnoseSymptom(input: SymptomInput): Promise<SymptomResult>;
   getTasks(): Promise<Task[]>;
   register(input: AuthInput): Promise<UserOut>;
   login(input: AuthInput): Promise<TokenResponse>;
@@ -633,6 +656,9 @@ export function createApiClient(
     },
     diagnoseDtc(input) {
       return post<DtcResult, DtcInput>('/v1/ai/diagnose/code', input);
+    },
+    diagnoseSymptom(input) {
+      return post<SymptomResult, SymptomInput>('/v1/ai/diagnose/symptom', input);
     },
     async getTasks() {
       const headers = await authHeaders();

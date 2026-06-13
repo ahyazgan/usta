@@ -381,6 +381,34 @@ class DtcDiagnoseResponse(BaseModel):
 
 
 # --------------------------------------------------------------------------- #
+# AI — Belirti-bazlı serbest teşhis (kullanıcı sorunu yazıyla anlatır)
+# --------------------------------------------------------------------------- #
+
+
+class SymptomDiagnoseRequest(BaseModel):
+    vehicle_id: int
+    description: str = Field(min_length=3, max_length=600, description="kullanıcının anlattığı belirti")
+
+
+class SymptomDiagnoseResponse(BaseModel):
+    """Belirti teşhisi yanıtı (kesin teşhis YOK; 'büyük ihtimalle')."""
+
+    tespit: str
+    guven: Guven
+    olasi_nedenler: list[str]
+    # AI'nin belirlediği araç sistemi (taksonomi) — istatistik + fiyat çarkı için.
+    ariza_sistem: ArizaSistem
+    aciliyet: Aciliyet
+    sonraki_adim: str
+    guvenlik_uyarisi: str | None
+    tamirciye_git_onerisi: bool
+    # Token/maliyet loglandığı AISession id'si — 👍/👎 geri bildirimi buna bağlanır.
+    session_id: int | None = None
+    # Fiyat şeffaflığı: tamirciye tahmini maliyet (arıza sistemine göre; yoksa null).
+    cost_estimate: CostEstimateOut | None = None
+
+
+# --------------------------------------------------------------------------- #
 # AI — Ses teşhisi (transkripsiyon YOK; tarif + koşul + araç verisi)
 # --------------------------------------------------------------------------- #
 

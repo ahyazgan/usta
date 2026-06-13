@@ -423,6 +423,25 @@ export default function HomeScreen() {
           <Ionicons name="chevron-forward" size={18} color={theme.colors.textSecondary} />
         </Pressable>
 
+        {/* Belirti-bazlı serbest teşhis (yazıyla anlat) */}
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => {
+            void capture('open_symptom');
+            router.push('/symptom');
+          }}
+          style={({ pressed }) => [styles.priceGuide, pressed && styles.pressed]}
+        >
+          <View style={styles.priceGuideIcon}>
+            <Ionicons name="chatbubble-ellipses-outline" size={20} color={theme.colors.ink} />
+          </View>
+          <View style={styles.priceGuideBody}>
+            <Text style={styles.priceGuideTitle}>{t('symptom.entry.title')}</Text>
+            <Text style={styles.priceGuideDesc}>{t('symptom.entry.desc')}</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={theme.colors.textSecondary} />
+        </Pressable>
+
         {/* Gösterge paneli uyarı ışığı tanıma (kamera tabanlı) */}
         <Pressable
           accessibilityRole="button"

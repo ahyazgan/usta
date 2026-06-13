@@ -470,6 +470,29 @@
       "desc": "Type a code like P0300 and I'll explain"
     }
   },
+  "symptom": {
+    "title": "Describe the Problem",
+    "intro": "Describe the issue with your car in your own words; I'll tell you what it's likely about and what to do.",
+    "placeholder": "e.g. Engine shakes at idle, smooths out when I rev.",
+    "examplesTitle": "Quick examples",
+    "examples": {
+      "idle": "Shakes at idle",
+      "brake": "Brake pedal feels soft",
+      "start": "Cranks but won't start",
+      "noise": "Noise when I accelerate"
+    },
+    "disclaimer": "This is a preliminary assessment — see a mechanic for a definitive diagnosis.",
+    "diagnose": "Diagnose",
+    "another": "New Problem",
+    "cost": "Est. at a mechanic: ₺{{low}}–₺{{high}}",
+    "error": {
+      "empty": "Please describe the problem in a few words"
+    },
+    "entry": {
+      "title": "Describe a problem",
+      "desc": "Tell me in text and I'll diagnose it"
+    }
+  },
   "share": {
     "report": {
       "title": "🔧 Usta Report",

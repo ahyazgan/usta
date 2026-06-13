@@ -19,6 +19,7 @@ from .schemas import (
     DtcDiagnoseResponse,
     ImageDiagnoseResponse,
     SoundDiagnoseResponse,
+    SymptomDiagnoseResponse,
 )
 
 # Aciliyet sıralaması (düşük < orta < yüksek) — en yüksek aciliyeti yeniden hesaplamak için.
@@ -39,9 +40,27 @@ SAFETY_TRIGGER_KEYWORDS: tuple[str, ...] = (
     "basinc",
     "basıncı",
     "basinci",
+    "yağ basıncı",
+    "yag basinci",
     "hararet",
     "fren",
+    "direksiyon",
+    "duman",
+    "yangın",
+    "yangin",
+    "metalik",
     "lpg",
+)
+
+# Fren DIŞI güvenlik-kritik belirtiler — son katmanda HER ZAMAN tamirci + acil.
+# (Model düşük aciliyet verse bile geri düşüş ağı.)
+CRITICAL_SYMPTOM_KEYWORDS: tuple[str, ...] = (
+    "direksiyon",
+    "duman",
+    "yangın",
+    "yangin",
+    "metalik vuruntu",
+    "metalik",
 )
 
 # LPG müdahale tarifi yasağı için kırmızı bayrak kalıpları.
@@ -66,6 +85,8 @@ DEFINITIVE_PHRASES: tuple[str, ...] = (
     "yüzde yüz",
     "yuzde yuz",
     "100%",
+    "kesin teşhis",
+    "kesin teshis",
 )
 
 DEFAULT_SAFETY_WARNING = (
@@ -240,6 +261,7 @@ def enforce_dtc_safety(
     )
 
     data["tespit"] = _ensure_hedge(data["tespit"])
+    data["olasi_nedenler"] = [_ensure_hedge(n) for n in (data.get("olasi_nedenler") or [])]
 
     if _mentions_lpg_intervention(haystack):
         data["guvenlik_uyarisi"] = LPG_SAFETY_WARNING
@@ -252,3 +274,51 @@ def enforce_dtc_safety(
         data["guvenlik_uyarisi"] = DEFAULT_SAFETY_WARNING
 
     return DtcDiagnoseResponse(**data)
+
+
+def enforce_symptom_safety(
+    result: SymptomDiagnoseResponse, *, context: str = ""
+) -> SymptomDiagnoseResponse:
+    """Belirti teşhisi yanıtına güvenlik kurallarını uygula.
+
+    - Kesin teşhis dilini yumuşat.
+    - Fren sistemi veya yüksek aciliyet => tamirci + uyarı zorunlu (güvenlik-kritik).
+    - Güvenlik konusu (hararet/yağ basıncı/fren/akü...) geçiyorsa uyarı zorunlu.
+    - LPG müdahalesi engellenip yetkili servise yönlendirilir.
+    """
+    data = result.model_dump()
+    haystack = " ".join(
+        str(v)
+        for v in (
+            data["tespit"],
+            data["sonraki_adim"],
+            context,
+            *(data.get("olasi_nedenler") or []),
+        )
+        if v
+    )
+
+    # Kesin teşhis dilini yumuşat — tespit + HER olası neden (kullanıcı bunları okur).
+    data["tespit"] = _ensure_hedge(data["tespit"])
+    data["olasi_nedenler"] = [_ensure_hedge(n) for n in (data.get("olasi_nedenler") or [])]
+
+    low = haystack.casefold()
+    has_critical = (
+        data.get("ariza_sistem") == "fren"
+        or any(k in low for k in CRITICAL_SYMPTOM_KEYWORDS)
+    )
+
+    if _mentions_lpg_intervention(haystack):
+        data["guvenlik_uyarisi"] = LPG_SAFETY_WARNING
+        data["tamirciye_git_onerisi"] = True
+    # Fren / fren-dışı kritik belirti (direksiyon/duman/yangın/metalik) / yüksek
+    # aciliyet => HER ZAMAN tamirci + uyarı + aciliyet yükselt (güvenlik backstop).
+    elif has_critical or data["aciliyet"] == Aciliyet.yuksek.value:
+        data["tamirciye_git_onerisi"] = True
+        data["aciliyet"] = Aciliyet.yuksek.value
+        if not data.get("guvenlik_uyarisi"):
+            data["guvenlik_uyarisi"] = DEFAULT_SAFETY_WARNING
+    elif _mentions_safety_topic(haystack) and not data.get("guvenlik_uyarisi"):
+        data["guvenlik_uyarisi"] = DEFAULT_SAFETY_WARNING
+
+    return SymptomDiagnoseResponse(**data)

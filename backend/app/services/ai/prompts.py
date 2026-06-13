@@ -66,3 +66,9 @@ def build_dtc_prompt(vehicle: Vehicle) -> str:
     """Arıza kodu (OBD-II / DTC) açıklama prompt'u (kendi JSON şeması)."""
     base = _read("dtc/_base.md")
     return f"{vehicle_context(vehicle)}\n\n{base}"
+
+
+def build_symptom_prompt(vehicle: Vehicle) -> str:
+    """Belirti-bazlı serbest teşhis prompt'u (kendi JSON şeması)."""
+    base = _read("symptom/_base.md")
+    return f"{vehicle_context(vehicle)}\n\n{base}"

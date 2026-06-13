@@ -89,12 +89,25 @@ DEFAULT_DTC = {
 }
 
 
+DEFAULT_SYMPTOM = {
+    "tespit": "Büyük ihtimalle rölantide düzensiz çalışma var.",
+    "guven": "orta",
+    "olasi_nedenler": ["Eskimiş buji", "Hava kaçağı"],
+    "ariza_sistem": "atesleme",
+    "aciliyet": "orta",
+    "sonraki_adim": "Bujileri kontrol ettir.",
+    "guvenlik_uyarisi": None,
+    "tamirciye_git_onerisi": True,
+}
+
+
 class FakeClaudeClient:
     def __init__(self) -> None:
         self.image_response = dict(DEFAULT_IMAGE)
         self.sound_response = dict(DEFAULT_SOUND)
         self.dashboard_response = dict(DEFAULT_DASHBOARD)
         self.dtc_response = dict(DEFAULT_DTC)
+        self.symptom_response = dict(DEFAULT_SYMPTOM)
         self.tokens_in = 120
         self.tokens_out = 40
         self.calls: list[dict] = []
@@ -106,6 +119,8 @@ class FakeClaudeClient:
             data = self.dashboard_response if "PANO" in (system or "") else self.image_response
         elif "ARIZA KODU" in (system or ""):
             data = self.dtc_response
+        elif "BELİRTİ" in (system or ""):
+            data = self.symptom_response
         else:
             data = self.sound_response
         return ClaudeResult(data=dict(data), tokens_in=self.tokens_in, tokens_out=self.tokens_out)

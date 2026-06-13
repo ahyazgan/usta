@@ -58,7 +58,7 @@ _COLUMN_MIGRATIONS: tuple[tuple[str, str, str], ...] = (
     # tablolarında bu kolonlar eksik kalıp spec INSERT'ini 500'le kırıyordu.
     ("vehicle_specs", "oil_spec", "VARCHAR(60)"),
     ("vehicle_specs", "oil_capacity_l", "FLOAT"),
-    ("vehicle_specs", "oil_drain_bolt_size", "VARCHAR(20)"),
+    ("vehicle_specs", "oil_drain_bolt_size", "VARCHAR(40)"),
     ("vehicle_specs", "oil_drain_location", "VARCHAR(120)"),
     ("vehicle_specs", "oil_filter_part", "VARCHAR(60)"),
     ("vehicle_specs", "air_filter_part", "VARCHAR(60)"),
@@ -67,6 +67,14 @@ _COLUMN_MIGRATIONS: tuple[tuple[str, str, str], ...] = (
     ("vehicle_specs", "battery_spec", "VARCHAR(60)"),
     ("vehicle_specs", "battery_location", "VARCHAR(120)"),
     ("vehicle_specs", "transmission_type", "VARCHAR(40)"),
+)
+
+# Mevcut (eski/dar) Postgres kolonlarını genişlet. SQLite tipsizdir (VARCHAR
+# uzunluğu zorlanmaz) → yalnızca Postgres'te çalışır. ALTER ... TYPE idempotent:
+# zaten geniş bir kolonda no-op. oil_drain_bolt_size eski VARCHAR(20)'de
+# "13mm iç altıgen (allen)" (23) taşıp INSERT'i 500'le kırıyordu.
+_WIDEN_COLUMNS: tuple[tuple[str, str, str], ...] = (
+    ("vehicle_specs", "oil_drain_bolt_size", "VARCHAR(40)"),
 )
 
 
@@ -94,6 +102,14 @@ async def _add_missing_columns() -> None:
             # "duplicate column name" (SQLite) dışındaki hatalar yeniden fırlatılır.
             if "duplicate column" not in str(exc).lower():
                 raise
+
+    # Dar kalmış kolonları genişlet (yalnızca Postgres; SQLite tipsiz).
+    if dialect == "postgresql":
+        for table, column, new_type in _WIDEN_COLUMNS:
+            async with engine.begin() as conn:
+                await conn.execute(
+                    text(f"ALTER TABLE {table} ALTER COLUMN {column} TYPE {new_type}")
+                )
 
 
 async def create_all() -> None:

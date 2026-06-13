@@ -84,7 +84,7 @@ class VehicleSpec(Base):
     )
     oil_spec: Mapped[str | None] = mapped_column(String(60), nullable=True)
     oil_capacity_l: Mapped[float | None] = mapped_column(Float, nullable=True)
-    oil_drain_bolt_size: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    oil_drain_bolt_size: Mapped[str | None] = mapped_column(String(40), nullable=True)
     oil_drain_location: Mapped[str | None] = mapped_column(String(120), nullable=True)
     oil_filter_part: Mapped[str | None] = mapped_column(String(60), nullable=True)
     air_filter_part: Mapped[str | None] = mapped_column(String(60), nullable=True)

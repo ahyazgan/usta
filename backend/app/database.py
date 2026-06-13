@@ -54,6 +54,19 @@ _COLUMN_MIGRATIONS: tuple[tuple[str, str, str], ...] = (
     ("vehicles", "vehicle_type", "VARCHAR(12)"),
     # Teşhis kapanışında beyan edilen tamirci ödemesi (fiyat çarkı).
     ("ai_sessions", "cost_try", "INTEGER"),
+    # Araç teknik özellikleri — model zamanla genişledi; eski (mevcut) Postgres
+    # tablolarında bu kolonlar eksik kalıp spec INSERT'ini 500'le kırıyordu.
+    ("vehicle_specs", "oil_spec", "VARCHAR(60)"),
+    ("vehicle_specs", "oil_capacity_l", "FLOAT"),
+    ("vehicle_specs", "oil_drain_bolt_size", "VARCHAR(20)"),
+    ("vehicle_specs", "oil_drain_location", "VARCHAR(120)"),
+    ("vehicle_specs", "oil_filter_part", "VARCHAR(60)"),
+    ("vehicle_specs", "air_filter_part", "VARCHAR(60)"),
+    ("vehicle_specs", "cabin_filter_part", "VARCHAR(60)"),
+    ("vehicle_specs", "spark_plug_part", "VARCHAR(60)"),
+    ("vehicle_specs", "battery_spec", "VARCHAR(60)"),
+    ("vehicle_specs", "battery_location", "VARCHAR(120)"),
+    ("vehicle_specs", "transmission_type", "VARCHAR(40)"),
 )
 
 

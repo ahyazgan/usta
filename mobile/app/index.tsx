@@ -230,6 +230,21 @@ export default function HomeScreen() {
   const [kmInput, setKmInput] = useState('');
   const [kmSaving, setKmSaving] = useState(false);
 
+  // Bağlanamadı ekranındaki "Tekrar dene" için ayrı loading (cold-start
+  // 60s'ye kadar sürebilir; kullanıcı geri bildirim görmeli).
+  const [retrying, setRetrying] = useState(false);
+  async function handleRetryLogin() {
+    if (retrying) return;
+    setRetrying(true);
+    try {
+      await ensureDemoSession(setTokens);
+    } catch {
+      /* yine başarısız — buton tekrar denenebilir kalır */
+    } finally {
+      setRetrying(false);
+    }
+  }
+
   function handleEditCurrent() {
     if (currentVehicle == null) return;
     router.push({ pathname: '/vehicle-new', params: { id: String(currentVehicle.id) } });
@@ -291,11 +306,22 @@ export default function HomeScreen() {
         <Text style={styles.gatePrompt}>{t('home.connectError')}</Text>
         <Pressable
           accessibilityRole="button"
-          onPress={() => void ensureDemoSession(setTokens)}
-          style={({ pressed }) => [styles.cta, pressed && styles.pressed]}
+          accessibilityState={{ disabled: retrying }}
+          disabled={retrying}
+          onPress={() => void handleRetryLogin()}
+          style={({ pressed }) => [styles.cta, retrying && styles.ctaDisabled, pressed && styles.pressed]}
         >
-          <Ionicons name="refresh" size={20} color={theme.colors.onInk} />
-          <Text style={styles.ctaText}>{t('common.retry')}</Text>
+          {retrying ? (
+            <>
+              <ActivityIndicator color={theme.colors.onInk} />
+              <Text style={styles.ctaText}>{t('home.signingIn')}</Text>
+            </>
+          ) : (
+            <>
+              <Ionicons name="refresh" size={20} color={theme.colors.onInk} />
+              <Text style={styles.ctaText}>{t('common.retry')}</Text>
+            </>
+          )}
         </Pressable>
       </View>
     );
@@ -1245,6 +1271,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.xl,
     backgroundColor: theme.colors.ink,
     borderRadius: theme.radius.md,
+  },
+  ctaDisabled: {
+    opacity: 0.6,
   },
   ctaText: {
     fontFamily: theme.fonts.heading,

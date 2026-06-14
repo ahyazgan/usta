@@ -51,9 +51,17 @@ export default function RootLayout() {
         }
       } else {
         try {
-          await ensureDemoSession(setTokens);
+          // Üst zaman sınırı: cold-start'ta login+register zinciri çok
+          // uzayabilir; bootstrap'ı kilitleme. Süre dolarsa retry ekranı
+          // gösterilir (arka plandaki istek dönerse oturum yine açılır).
+          await Promise.race([
+            ensureDemoSession(setTokens),
+            new Promise((_, reject) =>
+              setTimeout(() => reject(new Error('bootstrap timeout')), 65_000),
+            ),
+          ]);
         } catch {
-          /* ağ hatası — kullanıcı tekrar deneyebilir */
+          /* ağ hatası / zaman aşımı — kullanıcı tekrar deneyebilir */
         }
       }
       if (active) setAuthBootstrapped(true);

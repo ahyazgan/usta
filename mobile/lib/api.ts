@@ -6,6 +6,29 @@
 export const API_BASE_URL: string =
   process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8080';
 
+/**
+ * Client-side request timeout (ms). Without this, a request to a sleeping
+ * (cold-start) Render backend hangs forever — the auto-login `await` never
+ * resolves and the app stays stuck on the "signing in…" spinner. The cap is
+ * generous enough to absorb a cold start (~30–50s) but never infinite, so a
+ * truly dead connection surfaces as ApiError(0) and screens show retry.
+ */
+export const REQUEST_TIMEOUT_MS = 60_000;
+
+/**
+ * Build an abort signal that fires after `ms`. Prefers the native
+ * `AbortSignal.timeout` (Hermes/RN 0.81+) but falls back to a manual
+ * controller so an older JS runtime never throws on a missing static.
+ */
+function timeoutSignal(ms: number): AbortSignal {
+  if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') {
+    return AbortSignal.timeout(ms);
+  }
+  const ctrl = new AbortController();
+  setTimeout(() => ctrl.abort(), ms);
+  return ctrl.signal;
+}
+
 /** Nine-cell grid position of a part within the frame (null = belirsiz). */
 export type Konum =
   | 'sol-ust'
@@ -601,9 +624,13 @@ export function createApiClient(
   ): Promise<TResult> {
     let res: Response;
     try {
-      res = await fetch(`${baseUrl}${path}`, init);
+      res = await fetch(`${baseUrl}${path}`, {
+        ...init,
+        signal: init.signal ?? timeoutSignal(REQUEST_TIMEOUT_MS),
+      });
     } catch (err) {
-      // Network failure / offline — surface as a catchable Error for screens.
+      // Network failure / offline / timeout — surface as a catchable Error
+      // (status 0) so screens can show retry instead of hanging forever.
       throw new ApiError(0, err instanceof Error ? err.message : 'network error');
     }
 
@@ -618,7 +645,10 @@ export function createApiClient(
   async function requestVoid(path: string, init: RequestInit): Promise<void> {
     let res: Response;
     try {
-      res = await fetch(`${baseUrl}${path}`, init);
+      res = await fetch(`${baseUrl}${path}`, {
+        ...init,
+        signal: init.signal ?? timeoutSignal(REQUEST_TIMEOUT_MS),
+      });
     } catch (err) {
       throw new ApiError(0, err instanceof Error ? err.message : 'network error');
     }

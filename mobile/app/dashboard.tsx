@@ -17,6 +17,7 @@ import { FeedbackRow } from '@/components/FeedbackRow';
 import type { Aciliyet, DashboardLight, DashboardRenk } from '@/lib/api';
 import { t } from '@/lib/i18n';
 import { goBack } from '@/lib/nav';
+import { pickFromGallery } from '@/lib/pickImage';
 import { selectCurrentVehicle, useUstaStore } from '@/lib/store';
 import { theme } from '@/lib/theme';
 import { useDashboard } from '@/lib/useDashboard';
@@ -89,6 +90,18 @@ export default function DashboardScreen() {
       return;
     }
     await runDashboard(uri);
+  }
+
+  async function handlePickGallery() {
+    if (loading) return;
+    setCaptureError(null);
+    const picked = await pickFromGallery();
+    if (picked.status === 'denied') {
+      setCaptureError('camera.error.galleryDenied');
+      return;
+    }
+    if (picked.status === 'cancelled') return;
+    await runDashboard(picked.uri);
   }
 
   return (
@@ -225,6 +238,17 @@ export default function DashboardScreen() {
                 <Text style={styles.scanBtnText}>{t('dashboard.scan')}</Text>
               </>
             )}
+          </Pressable>
+        )}
+        {result == null && (
+          <Pressable
+            accessibilityRole="button"
+            disabled={loading}
+            onPress={() => void handlePickGallery()}
+            style={({ pressed }) => [styles.galleryBtn, loading && styles.disabled, pressed && styles.pressed]}
+          >
+            <Ionicons name="images-outline" size={18} color={theme.colors.textPrimary} />
+            <Text style={styles.galleryBtnText}>{t('camera.pickFromGallery')}</Text>
           </Pressable>
         )}
       </View>
@@ -376,6 +400,17 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.ink,
   },
   scanBtnText: { fontFamily: theme.fonts.heading, fontSize: 17, fontWeight: '700', color: theme.colors.onInk },
+  galleryBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.sm,
+    minHeight: theme.touchTarget,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  galleryBtnText: { fontFamily: theme.fonts.body, fontSize: 15, fontWeight: '600', color: theme.colors.textPrimary },
   cta: {
     flexDirection: 'row',
     alignItems: 'center',

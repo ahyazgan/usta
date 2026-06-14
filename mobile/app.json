@@ -50,6 +50,12 @@
       "expo-font",
       "expo-notifications",
       [
+        "expo-image-picker",
+        {
+          "photosPermission": "Usta, daha önce çektiğin uyarı ışığı veya parça fotoğrafını analiz etmek için galerine erişir."
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "image": "./assets/splash.png",

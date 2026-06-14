@@ -433,6 +433,7 @@
     "offline": "Çevrimdışısın — bağlantı bekleniyor",
     "hint": "Parçayı çerçeveye ortala ve Kontrol Et'e bas",
     "gridHint": "Parçayı ızgaranın ortasına hizala",
+    "pickFromGallery": "Galeriden seç",
     "guven": {
       "yuksek": "Yüksek güven",
       "orta": "Orta güven",
@@ -465,6 +466,7 @@
       "noVehicle": "Önce bir araç ekle",
       "generic": "Bir şeyler ters gitti, tekrar dene",
       "captureFailed": "Fotoğraf çekilemedi, tekrar dene",
+      "galleryDenied": "Galeri izni verilmedi — ayarlardan izin ver",
       "aiUnavailable": "Yapay zekâ servisi şu an kullanılamıyor. Lütfen sonra tekrar dene.",
       "busy": "Servis şu an yoğun. Lütfen biraz sonra tekrar dene."
     }

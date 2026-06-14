@@ -433,6 +433,7 @@
     "offline": "You are offline — waiting for connection",
     "hint": "Center the part in the frame and tap Check",
     "gridHint": "Align the part with the center of the grid",
+    "pickFromGallery": "Pick from gallery",
     "guven": {
       "yuksek": "High confidence",
       "orta": "Medium confidence",
@@ -465,6 +466,7 @@
       "noVehicle": "Add a vehicle first",
       "generic": "Something went wrong, try again",
       "captureFailed": "Couldn't take the photo, try again",
+      "galleryDenied": "Gallery permission denied — enable it in settings",
       "aiUnavailable": "The AI service is currently unavailable. Please try again later.",
       "busy": "The service is busy right now. Please try again shortly."
     }

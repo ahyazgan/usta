@@ -20,6 +20,7 @@ import { FeedbackRow } from '@/components/FeedbackRow';
 import { MechanicBriefSheet } from '@/components/MechanicBriefSheet';
 import { i18n, t } from '@/lib/i18n';
 import { type BriefDiag } from '@/lib/mechanicBrief';
+import { pickFromGallery } from '@/lib/pickImage';
 import { selectCurrentVehicle, useUstaStore } from '@/lib/store';
 import { theme } from '@/lib/theme';
 import { useDiagnose } from '@/lib/useDiagnose';
@@ -175,6 +176,18 @@ export default function CameraScreen() {
     await runImageDiagnose(uri);
   }
 
+  async function handlePickGallery() {
+    if (loading) return;
+    setCaptureError(null);
+    const picked = await pickFromGallery();
+    if (picked.status === 'denied') {
+      setCaptureError('camera.error.galleryDenied');
+      return;
+    }
+    if (picked.status === 'cancelled') return;
+    await runImageDiagnose(picked.uri);
+  }
+
   return (
     <View style={[styles.container, { paddingTop: insets.top + theme.spacing.md }]}>
       {/* Görev banner'ı */}
@@ -283,6 +296,23 @@ export default function CameraScreen() {
             </>
           )}
         </Pressable>
+
+        {!result && selectedTask != null && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityState={{ disabled: loading }}
+            disabled={loading}
+            onPress={handlePickGallery}
+            style={({ pressed }) => [
+              styles.galleryButton,
+              loading && styles.checkDisabled,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Ionicons name="images-outline" size={18} color={theme.colors.accent} />
+            <Text style={styles.galleryText}>{t('camera.pickFromGallery')}</Text>
+          </Pressable>
+        )}
 
         <View style={styles.secondaryRow}>
           <Pressable
@@ -579,6 +609,23 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: theme.colors.background,
+  },
+  galleryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.sm,
+    minHeight: theme.touchTarget,
+    marginTop: theme.spacing.md,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.accent,
+  },
+  galleryText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 15,
+    fontWeight: '600',
+    color: theme.colors.accent,
   },
   secondaryRow: {
     flexDirection: 'row',

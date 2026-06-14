@@ -197,3 +197,37 @@ birleştirildi. Bu istisnalar gelecekte YENİDEN UYARILMAMALI:)
   kaçınmak için; güvenlik sorunu değil).
 - Dashboard YÜKSEK bulguları (per-ışık `anlam` hedge, _ensure_hedge kesin-dil
   yumuşatma) DÜZELTİLDİ (commit a97ab4a).
+
+## Denetim (2026-06-14) — Katalog 3. genişletme (~52 yeni araç, JSON'a taşındı)
+Kapsam: backend/app/domain/catalog_data.json'un son ~52 kaydı (index 80+; toplam
+80→132 araç, marka 25→32). Yeni markalar: BYD, Cupra, Jeep, Land Rover, MG,
+Subaru, Tofaş. Görev odağı: yeni EV'ler, LPG araçları, Tofaş eski TR araçları.
+NOT: Veri artık catalog.py değil JSON dosyasında (catalog_data.json).
+
+Sonuç: KRİTİK 0 · YÜKSEK 0 · ORTA 0 → PASS (blok yok).
+
+Doğrulanan güçlü noktalar:
+- Saf EV'ler (Tesla Model Y s3211, MG 4 s3164, BYD Atto 3 s3188): oil/buji/yağ
+  filtresi/hava filtresi alanları DOĞRU şekilde None. battery_spec yüksek voltajı
+  GÜVENLİ etiketliyor ("ana/Blade batarya yüksek voltaj", "12V yardımcı"); HV'ye
+  "kendin müdahale/aç/onar" çağrısı YOK. Tesla Model 3 deseniyle birebir tutarlı.
+- Melez-katalog EV varyantları (Fiat 500 s2237, Hyundai Kona s2386, Peugeot 2008
+  s2584, Citroen C4 s2636, Volvo XC40 s3260, MG ZS s3139): benzin varyantı için
+  oil/buji dolu + battery_spec'te "... yüksek voltaj" etiketi. Önceki denetimde
+  (e-208) kabul edilmiş desen; KRİTİK/YÜKSEK DEĞİL — JSON saf referans katmanı,
+  kullanıcıya doğrudan talimat üretmiyor; gerçek güvenlik son katmanı AI yanıtında
+  enforce_*_safety backstop'u. "kendin müdahale" çağrısı YOK.
+- LPG araçları (Tofaş Şahin/Doğan, Dacia Sandero/Jogger/Logan, Captur, Duster,
+  Fluence, Taliant, Linea, Opel Corsa, Chevrolet Cruze): "lpg" YALNIZCA fuels
+  sınıflandırma etiketi; hiçbir spec'te LPG sistemine müdahale/ayar/açma/onarım
+  TARİFİ YOK. LPG yasağı korunuyor.
+- Tofaş Şahin/Doğan (s3338/s3363, 1990-2002): spec'ler döneme uygun (15W-40/20W-50,
+  klasik filtre, NGK BPR6ES, 45-55Ah). Tehlikeli/yanıltıcı içerik YOK. cabin_filter
+  doğru şekilde None (o dönem aracında yok).
+- Kesin-dil (kesin/%100/kesinlikle) hiçbir yeni spec'te YOK. Parça no'ları tutarlı
+  "örnek:" yer tutuculu.
+
+İZLEME (bulgu DEĞİL, önceki denetimlerle aynı kök, önceliği artıyor):
+- "yüksek voltaj"/"yuksek voltaj" hâlâ SAFETY_TRIGGER_KEYWORDS'te YOK (yalnız "akü"
+  tetikliyor). Katalog artık 9+ saf/melez HV aracı içeriyor (Tesla x2, MG 4/ZS, BYD,
+  + e-varyantlar). EV/HV-özel rehberlik akışı eklenirse bu anahtar EKLENMELİ.

@@ -2083,5 +2083,1305 @@
       "battery_location": "sele altı / yan kapak",
       "transmission_type": "manuel"
     }
+  },
+  {
+    "make": "Volkswagen",
+    "model": "Caddy",
+    "year_min": 2011,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30 (VW 504.00)",
+      "oil_capacity_l": 4.3,
+      "oil_drain_bolt_size": "19mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 04L115562",
+      "air_filter_part": "örnek: 2K0129620",
+      "cabin_filter_part": "örnek: 1T0819644B",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "60-70Ah",
+      "battery_location": "motor bölmesi sol arka",
+      "transmission_type": "manuel / DSG"
+    }
+  },
+  {
+    "make": "Volkswagen",
+    "model": "Transporter",
+    "year_min": 2010,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30 (VW 507.00)",
+      "oil_capacity_l": 6.5,
+      "oil_drain_bolt_size": "19mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 070115562",
+      "air_filter_part": "örnek: 7H0129620",
+      "cabin_filter_part": "örnek: 7H0819631A",
+      "spark_plug_part": null,
+      "battery_spec": "70-95Ah",
+      "battery_location": "koltuk altı",
+      "transmission_type": "manuel / DSG"
+    }
+  },
+  {
+    "make": "Volkswagen",
+    "model": "T-Roc",
+    "year_min": 2017,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30 (VW 504.00)",
+      "oil_capacity_l": 4.3,
+      "oil_drain_bolt_size": "19mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 04E115561H",
+      "air_filter_part": "örnek: 5Q0129620D",
+      "cabin_filter_part": "örnek: 5Q0819669",
+      "spark_plug_part": "örnek: NGK 04E905602D (benzin)",
+      "battery_spec": "60-70Ah (EFB)",
+      "battery_location": "motor bölmesi sol arka",
+      "transmission_type": "manuel / DSG"
+    }
+  },
+  {
+    "make": "Renault",
+    "model": "Kadjar",
+    "year_min": 2015,
+    "year_max": 2022,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-40",
+      "oil_capacity_l": 4.5,
+      "oil_drain_bolt_size": "10mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 152089599R",
+      "air_filter_part": "örnek: 165466455R",
+      "cabin_filter_part": "örnek: 272773016R",
+      "spark_plug_part": "örnek: NGK LZKAR6AP-11 (benzin)",
+      "battery_spec": "60Ah / 540A",
+      "battery_location": "motor bölmesi sağ ön",
+      "transmission_type": "manuel / EDC"
+    }
+  },
+  {
+    "make": "Renault",
+    "model": "Talisman",
+    "year_min": 2016,
+    "year_max": 2022,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-40",
+      "oil_capacity_l": 5.4,
+      "oil_drain_bolt_size": "10mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 152089599R",
+      "air_filter_part": "örnek: 165466455R",
+      "cabin_filter_part": "örnek: 272773016R",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "70Ah",
+      "battery_location": "motor bölmesi sağ ön",
+      "transmission_type": "EDC otomatik"
+    }
+  },
+  {
+    "make": "Fiat",
+    "model": "Doblo",
+    "year_min": 2010,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "dizel",
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-40",
+      "oil_capacity_l": 4.3,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 55256470",
+      "air_filter_part": "örnek: 51897064",
+      "cabin_filter_part": "örnek: 77367464",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "60Ah / 540A",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Fiat",
+    "model": "500",
+    "year_min": 2008,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "hibrit",
+      "elektrik"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-40",
+      "oil_capacity_l": 2.8,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 55256470",
+      "air_filter_part": "örnek: 51897064",
+      "cabin_filter_part": "örnek: 77367464",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "50Ah / 500e yüksek voltaj",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel / otomatik / elektrikli"
+    }
+  },
+  {
+    "make": "Toyota",
+    "model": "C-HR",
+    "year_min": 2016,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "hibrit"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "0W-20",
+      "oil_capacity_l": 4.2,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 04152-YZZA1",
+      "air_filter_part": "örnek: 17801-0T050",
+      "cabin_filter_part": "örnek: 87139-0N010",
+      "spark_plug_part": "örnek: Denso (benzin)",
+      "battery_spec": "45-60Ah / hibrit yardımcı",
+      "battery_location": "motor bölmesi / bagaj (hibrit)",
+      "transmission_type": "e-CVT (hibrit) / CVT"
+    }
+  },
+  {
+    "make": "Toyota",
+    "model": "Auris",
+    "year_min": 2012,
+    "year_max": 2018,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "hibrit",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "0W-20 / 5W-30",
+      "oil_capacity_l": 4.2,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 04152-YZZA1",
+      "air_filter_part": "örnek: 17801-0T050",
+      "cabin_filter_part": "örnek: 87139-0N010",
+      "spark_plug_part": "örnek: Denso (benzin)",
+      "battery_spec": "45-60Ah",
+      "battery_location": "motor bölmesi / bagaj (hibrit)",
+      "transmission_type": "manuel / CVT / e-CVT"
+    }
+  },
+  {
+    "make": "Toyota",
+    "model": "Hilux",
+    "year_min": 2015,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30",
+      "oil_capacity_l": 7.5,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 04152-YZZA6",
+      "air_filter_part": "örnek: 17801-0L040",
+      "cabin_filter_part": "örnek: 87139-0K080",
+      "spark_plug_part": null,
+      "battery_spec": "70-80Ah",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel / otomatik"
+    }
+  },
+  {
+    "make": "Hyundai",
+    "model": "Elantra",
+    "year_min": 2011,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30",
+      "oil_capacity_l": 3.6,
+      "oil_drain_bolt_size": "17mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 26300-35505",
+      "air_filter_part": "örnek: 28113-3X000",
+      "cabin_filter_part": "örnek: 97133-3X000",
+      "spark_plug_part": "örnek: NGK SILZKR6B-10E",
+      "battery_spec": "60Ah / 540A",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel / otomatik"
+    }
+  },
+  {
+    "make": "Hyundai",
+    "model": "Bayon",
+    "year_min": 2021,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30",
+      "oil_capacity_l": 3.6,
+      "oil_drain_bolt_size": "17mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 26300-35505",
+      "air_filter_part": "örnek: 28113-Q5100",
+      "cabin_filter_part": "örnek: 97133-K2000",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "60Ah",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel / DCT"
+    }
+  },
+  {
+    "make": "Hyundai",
+    "model": "Kona",
+    "year_min": 2017,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "hibrit",
+      "elektrik"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30",
+      "oil_capacity_l": 3.6,
+      "oil_drain_bolt_size": "17mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 26300-35505",
+      "air_filter_part": "örnek: 28113-J9000",
+      "cabin_filter_part": "örnek: 97133-J9000",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "60Ah / Kona Electric yüksek voltaj",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "DCT / otomatik / elektrikli"
+    }
+  },
+  {
+    "make": "Kia",
+    "model": "Rio",
+    "year_min": 2011,
+    "year_max": 2023,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30",
+      "oil_capacity_l": 3.3,
+      "oil_drain_bolt_size": "17mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 26300-35505",
+      "air_filter_part": "örnek: 28113-H8100",
+      "cabin_filter_part": "örnek: 97133-H8100",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "55Ah",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel / otomatik"
+    }
+  },
+  {
+    "make": "Kia",
+    "model": "Stonic",
+    "year_min": 2017,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30",
+      "oil_capacity_l": 3.6,
+      "oil_drain_bolt_size": "17mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 26300-35505",
+      "air_filter_part": "örnek: 28113-H8100",
+      "cabin_filter_part": "örnek: 97133-H8100",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "60Ah",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel / DCT"
+    }
+  },
+  {
+    "make": "Kia",
+    "model": "Cerato",
+    "year_min": 2013,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30",
+      "oil_capacity_l": 3.6,
+      "oil_drain_bolt_size": "17mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 26300-35505",
+      "air_filter_part": "örnek: 28113-A7100",
+      "cabin_filter_part": "örnek: 97133-A7000",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "60Ah",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel / otomatik"
+    }
+  },
+  {
+    "make": "Ford",
+    "model": "Courier",
+    "year_min": 2014,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "dizel",
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30",
+      "oil_capacity_l": 4.1,
+      "oil_drain_bolt_size": "13mm iç altıgen (allen)",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 1920QM",
+      "air_filter_part": "örnek: 1848220",
+      "cabin_filter_part": "örnek: 1812519",
+      "spark_plug_part": "örnek: Motorcraft (benzin)",
+      "battery_spec": "60Ah",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Ford",
+    "model": "Puma",
+    "year_min": 2019,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "hibrit"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-20",
+      "oil_capacity_l": 4.3,
+      "oil_drain_bolt_size": "13mm iç altıgen (allen)",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 2207059",
+      "air_filter_part": "örnek: 2244850",
+      "cabin_filter_part": "örnek: 2355514",
+      "spark_plug_part": "örnek: Motorcraft (benzin)",
+      "battery_spec": "60-70Ah (EFB)",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel / otomatik"
+    }
+  },
+  {
+    "make": "Opel",
+    "model": "Insignia",
+    "year_min": 2010,
+    "year_max": 2022,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30 (dexos2)",
+      "oil_capacity_l": 5.5,
+      "oil_drain_bolt_size": "15mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 55594651",
+      "air_filter_part": "örnek: 13272719",
+      "cabin_filter_part": "örnek: 13271190",
+      "spark_plug_part": "örnek: NGK / ACDelco (benzin)",
+      "battery_spec": "70Ah",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel / otomatik"
+    }
+  },
+  {
+    "make": "Opel",
+    "model": "Mokka",
+    "year_min": 2012,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30",
+      "oil_capacity_l": 4.3,
+      "oil_drain_bolt_size": "15mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 55594651",
+      "air_filter_part": "örnek: 13367308",
+      "cabin_filter_part": "örnek: 13356914",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "60-70Ah",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel / otomatik"
+    }
+  },
+  {
+    "make": "Peugeot",
+    "model": "2008",
+    "year_min": 2013,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel",
+      "elektrik"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "0W-30 / 5W-30",
+      "oil_capacity_l": 3.5,
+      "oil_drain_bolt_size": "örnek: Torx / 13mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 1109AY",
+      "air_filter_part": "örnek: 1444TT",
+      "cabin_filter_part": "örnek: 6447XF",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "60Ah (EFB) / e-2008 yüksek voltaj",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel / EAT8 / elektrikli"
+    }
+  },
+  {
+    "make": "Peugeot",
+    "model": "508",
+    "year_min": 2011,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel",
+      "hibrit"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "0W-30 / 5W-30",
+      "oil_capacity_l": 4.25,
+      "oil_drain_bolt_size": "örnek: Torx / 13mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 1109CL",
+      "air_filter_part": "örnek: 1444VR",
+      "cabin_filter_part": "örnek: 6447XR",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "70Ah (EFB)",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "otomatik (EAT8)"
+    }
+  },
+  {
+    "make": "Citroen",
+    "model": "C4",
+    "year_min": 2010,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel",
+      "elektrik"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "0W-30 / 5W-30",
+      "oil_capacity_l": 3.75,
+      "oil_drain_bolt_size": "örnek: Torx / 13mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 1109AY",
+      "air_filter_part": "örnek: 1444TT",
+      "cabin_filter_part": "örnek: 6447XF",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "60Ah / e-C4 yüksek voltaj",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel / EAT8 / elektrikli"
+    }
+  },
+  {
+    "make": "Citroen",
+    "model": "Berlingo",
+    "year_min": 2010,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "dizel",
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30",
+      "oil_capacity_l": 4.25,
+      "oil_drain_bolt_size": "örnek: Torx / 13mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 1109AY",
+      "air_filter_part": "örnek: 1444TT",
+      "cabin_filter_part": "örnek: 6447XF",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "60-70Ah",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel / EAT8"
+    }
+  },
+  {
+    "make": "Dacia",
+    "model": "Jogger",
+    "year_min": 2022,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "lpg",
+      "hibrit"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-40",
+      "oil_capacity_l": 4.2,
+      "oil_drain_bolt_size": "10mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 152089599R",
+      "air_filter_part": "örnek: 165466455R",
+      "cabin_filter_part": "örnek: 272773016R",
+      "spark_plug_part": "örnek: NGK LZKAR6AP-11 (benzin)",
+      "battery_spec": "60Ah",
+      "battery_location": "motor bölmesi sağ ön",
+      "transmission_type": "manuel / otomatik (hibrit)"
+    }
+  },
+  {
+    "make": "Nissan",
+    "model": "X-Trail",
+    "year_min": 2014,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel",
+      "hibrit"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-40",
+      "oil_capacity_l": 4.8,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 15208-65F0E",
+      "air_filter_part": "örnek: 16546-4BA1A",
+      "cabin_filter_part": "örnek: 27277-4BA0A",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "65Ah",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "Xtronic CVT"
+    }
+  },
+  {
+    "make": "Honda",
+    "model": "Jazz",
+    "year_min": 2011,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "hibrit"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "0W-20 / 5W-30",
+      "oil_capacity_l": 3.6,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 15400-RTA-003",
+      "air_filter_part": "örnek: 17220-5R0-008",
+      "cabin_filter_part": "örnek: 80292-T5A-J01",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "45Ah / hibrit yardımcı",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "CVT / e-HEV"
+    }
+  },
+  {
+    "make": "Skoda",
+    "model": "Superb",
+    "year_min": 2010,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30 (VW 504.00)",
+      "oil_capacity_l": 4.6,
+      "oil_drain_bolt_size": "19mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 06L115562B",
+      "air_filter_part": "örnek: 3Q0129620",
+      "cabin_filter_part": "örnek: 3V0819644",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "70-72Ah (EFB)",
+      "battery_location": "motor bölmesi sol arka",
+      "transmission_type": "manuel / DSG"
+    }
+  },
+  {
+    "make": "Skoda",
+    "model": "Fabia",
+    "year_min": 2010,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30 (VW 504.00)",
+      "oil_capacity_l": 3.9,
+      "oil_drain_bolt_size": "19mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 03C115561H",
+      "air_filter_part": "örnek: 6R0129620",
+      "cabin_filter_part": "örnek: 6R0819653",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "51-60Ah",
+      "battery_location": "motor bölmesi sol arka",
+      "transmission_type": "manuel / DSG"
+    }
+  },
+  {
+    "make": "Skoda",
+    "model": "Karoq",
+    "year_min": 2017,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30 (VW 504.00)",
+      "oil_capacity_l": 4.3,
+      "oil_drain_bolt_size": "19mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 04E115561H",
+      "air_filter_part": "örnek: 5Q0129620D",
+      "cabin_filter_part": "örnek: 5Q0819669",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "60-70Ah (EFB)",
+      "battery_location": "motor bölmesi sol arka",
+      "transmission_type": "manuel / DSG"
+    }
+  },
+  {
+    "make": "Audi",
+    "model": "A6",
+    "year_min": 2011,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30 (VW 504.00/507.00)",
+      "oil_capacity_l": 6.3,
+      "oil_drain_bolt_size": "19mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 06L115562B",
+      "air_filter_part": "örnek: 4M0133843",
+      "cabin_filter_part": "örnek: 4M0819439",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "80Ah (AGM)",
+      "battery_location": "bagaj",
+      "transmission_type": "S tronic / tiptronic"
+    }
+  },
+  {
+    "make": "Audi",
+    "model": "Q3",
+    "year_min": 2011,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30 (VW 504.00/507.00)",
+      "oil_capacity_l": 4.6,
+      "oil_drain_bolt_size": "19mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 06L115562B",
+      "air_filter_part": "örnek: 8U0133843",
+      "cabin_filter_part": "örnek: 8U0819439",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "70Ah (AGM)",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "S tronic"
+    }
+  },
+  {
+    "make": "BMW",
+    "model": "2 Serisi",
+    "year_min": 2014,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30 (BMW LL-04)",
+      "oil_capacity_l": 4.5,
+      "oil_drain_bolt_size": "8mm iç altıgen (allen)",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 11428583898",
+      "air_filter_part": "örnek: 13718580427",
+      "cabin_filter_part": "örnek: 64319321046",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "70Ah (AGM)",
+      "battery_location": "bagaj / motor bölmesi",
+      "transmission_type": "manuel / otomatik"
+    }
+  },
+  {
+    "make": "BMW",
+    "model": "4 Serisi",
+    "year_min": 2013,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30 (BMW LL-04)",
+      "oil_capacity_l": 5.2,
+      "oil_drain_bolt_size": "8mm iç altıgen (allen)",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 11428583898",
+      "air_filter_part": "örnek: 13718511668",
+      "cabin_filter_part": "örnek: 64119237555",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "80Ah (AGM)",
+      "battery_location": "bagaj",
+      "transmission_type": "otomatik (ZF 8HP)"
+    }
+  },
+  {
+    "make": "BMW",
+    "model": "X1",
+    "year_min": 2012,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30 (BMW LL-04)",
+      "oil_capacity_l": 5.0,
+      "oil_drain_bolt_size": "8mm iç altıgen (allen)",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 11428583898",
+      "air_filter_part": "örnek: 13718580427",
+      "cabin_filter_part": "örnek: 64319321046",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "70-80Ah (AGM)",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "otomatik"
+    }
+  },
+  {
+    "make": "BMW",
+    "model": "X3",
+    "year_min": 2011,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30 (BMW LL-04)",
+      "oil_capacity_l": 6.5,
+      "oil_drain_bolt_size": "8mm iç altıgen (allen)",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 11428575211",
+      "air_filter_part": "örnek: 13717811026",
+      "cabin_filter_part": "örnek: 64119248294",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "80-90Ah (AGM)",
+      "battery_location": "bagaj",
+      "transmission_type": "otomatik (ZF 8HP)"
+    }
+  },
+  {
+    "make": "Mercedes-Benz",
+    "model": "GLC",
+    "year_min": 2015,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30 (MB 229.51/229.52)",
+      "oil_capacity_l": 6.5,
+      "oil_drain_bolt_size": "13mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: A6541800009",
+      "air_filter_part": "örnek: A6540940404",
+      "cabin_filter_part": "örnek: A2138300118",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "80Ah (AGM)",
+      "battery_location": "motor bölmesi",
+      "transmission_type": "otomatik (9G-Tronic)"
+    }
+  },
+  {
+    "make": "Mercedes-Benz",
+    "model": "B-Serisi",
+    "year_min": 2011,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30 (MB 229.51)",
+      "oil_capacity_l": 5.5,
+      "oil_drain_bolt_size": "13mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: A2701800109",
+      "air_filter_part": "örnek: A2700940204",
+      "cabin_filter_part": "örnek: A2468300018",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "60-70Ah",
+      "battery_location": "motor bölmesi",
+      "transmission_type": "otomatik (7G-DCT)"
+    }
+  },
+  {
+    "make": "Mercedes-Benz",
+    "model": "Vito",
+    "year_min": 2010,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30 (MB 229.51)",
+      "oil_capacity_l": 8.0,
+      "oil_drain_bolt_size": "13mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: A6511800009",
+      "air_filter_part": "örnek: A6510940204",
+      "cabin_filter_part": "örnek: A4478350047",
+      "spark_plug_part": null,
+      "battery_spec": "90-95Ah",
+      "battery_location": "koltuk altı",
+      "transmission_type": "otomatik"
+    }
+  },
+  {
+    "make": "Cupra",
+    "model": "Formentor",
+    "year_min": 2020,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "hibrit"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30 (VW 504.00)",
+      "oil_capacity_l": 4.6,
+      "oil_drain_bolt_size": "19mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 06L115562B",
+      "air_filter_part": "örnek: 5Q0129620E",
+      "cabin_filter_part": "örnek: 5Q0819669",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "70Ah (EFB/AGM)",
+      "battery_location": "motor bölmesi sol arka",
+      "transmission_type": "DSG"
+    }
+  },
+  {
+    "make": "Jeep",
+    "model": "Renegade",
+    "year_min": 2014,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-40",
+      "oil_capacity_l": 4.3,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 68191349AA",
+      "air_filter_part": "örnek: 51897064",
+      "cabin_filter_part": "örnek: 77367464",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "60-70Ah",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel / otomatik"
+    }
+  },
+  {
+    "make": "Jeep",
+    "model": "Compass",
+    "year_min": 2017,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel",
+      "hibrit"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-40",
+      "oil_capacity_l": 4.3,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 68191349AA",
+      "air_filter_part": "örnek: 68249925AA",
+      "cabin_filter_part": "örnek: 68223044AA",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "60-70Ah",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "otomatik"
+    }
+  },
+  {
+    "make": "MG",
+    "model": "ZS",
+    "year_min": 2017,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "elektrik"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30",
+      "oil_capacity_l": 4.0,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 10372000",
+      "air_filter_part": "örnek: 10220377",
+      "cabin_filter_part": "örnek: 10172776",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "60Ah / ZS EV yüksek voltaj",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "otomatik / elektrikli"
+    }
+  },
+  {
+    "make": "MG",
+    "model": "4",
+    "year_min": 2022,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "elektrik"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": null,
+      "oil_capacity_l": null,
+      "oil_drain_bolt_size": null,
+      "oil_drain_location": null,
+      "oil_filter_part": null,
+      "air_filter_part": null,
+      "cabin_filter_part": "örnek: kabin filtresi",
+      "spark_plug_part": null,
+      "battery_spec": "12V yardımcı (ana batarya yüksek voltaj)",
+      "battery_location": "ön/taban (HV batarya)",
+      "transmission_type": "tek vitesli (elektrikli)"
+    }
+  },
+  {
+    "make": "BYD",
+    "model": "Atto 3",
+    "year_min": 2022,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "elektrik"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": null,
+      "oil_capacity_l": null,
+      "oil_drain_bolt_size": null,
+      "oil_drain_location": null,
+      "oil_filter_part": null,
+      "air_filter_part": null,
+      "cabin_filter_part": "örnek: kabin filtresi",
+      "spark_plug_part": null,
+      "battery_spec": "12V yardımcı (Blade batarya yüksek voltaj)",
+      "battery_location": "taban (HV batarya)",
+      "transmission_type": "tek vitesli (elektrikli)"
+    }
+  },
+  {
+    "make": "Tesla",
+    "model": "Model Y",
+    "year_min": 2020,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "elektrik"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": null,
+      "oil_capacity_l": null,
+      "oil_drain_bolt_size": null,
+      "oil_drain_location": null,
+      "oil_filter_part": null,
+      "air_filter_part": null,
+      "cabin_filter_part": "örnek: 1107682-00-A (HEPA/kabin)",
+      "spark_plug_part": null,
+      "battery_spec": "12V yardımcı akü (ana batarya yüksek voltaj)",
+      "battery_location": "ön bagaj (12V) / taban (HV batarya)",
+      "transmission_type": "tek vitesli (elektrikli)"
+    }
+  },
+  {
+    "make": "Subaru",
+    "model": "Forester",
+    "year_min": 2013,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "0W-20 / 5W-30",
+      "oil_capacity_l": 4.8,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 15208AA15A",
+      "air_filter_part": "örnek: 16546AA12A",
+      "cabin_filter_part": "örnek: 72880FL000",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "65Ah",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "Lineartronic CVT"
+    }
+  },
+  {
+    "make": "Volvo",
+    "model": "XC40",
+    "year_min": 2017,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel",
+      "elektrik"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "0W-20 / 0W-30",
+      "oil_capacity_l": 5.5,
+      "oil_drain_bolt_size": "örnek: 13mm / Torx",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 31372212",
+      "air_filter_part": "örnek: 31370161",
+      "cabin_filter_part": "örnek: 31407811",
+      "spark_plug_part": "örnek: Denso (benzin)",
+      "battery_spec": "70-80Ah (AGM) / Recharge yüksek voltaj",
+      "battery_location": "motor bölmesi / bagaj",
+      "transmission_type": "otomatik / elektrikli"
+    }
+  },
+  {
+    "make": "Volvo",
+    "model": "S60",
+    "year_min": 2010,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel",
+      "hibrit"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "0W-20 / 0W-30",
+      "oil_capacity_l": 5.5,
+      "oil_drain_bolt_size": "örnek: 13mm / Torx",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 31372212",
+      "air_filter_part": "örnek: 31370161",
+      "cabin_filter_part": "örnek: 31407811",
+      "spark_plug_part": "örnek: Denso (benzin)",
+      "battery_spec": "70-80Ah (AGM)",
+      "battery_location": "motor bölmesi / bagaj",
+      "transmission_type": "otomatik (Aisin 8AT)"
+    }
+  },
+  {
+    "make": "Land Rover",
+    "model": "Range Rover Evoque",
+    "year_min": 2011,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel",
+      "hibrit"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30",
+      "oil_capacity_l": 5.5,
+      "oil_drain_bolt_size": "örnek: Torx",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: LR025306",
+      "air_filter_part": "örnek: LR029078",
+      "cabin_filter_part": "örnek: LR036369",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "80Ah (AGM)",
+      "battery_location": "bagaj / motor bölmesi",
+      "transmission_type": "otomatik (ZF 9HP)"
+    }
+  },
+  {
+    "make": "Tofaş",
+    "model": "Şahin",
+    "year_min": 1990,
+    "year_max": 2002,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "lpg"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "15W-40 / 20W-50",
+      "oil_capacity_l": 3.5,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: klasik yağ filtresi",
+      "air_filter_part": "örnek: klasik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK BPR6ES (benzin)",
+      "battery_spec": "45-55Ah",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Tofaş",
+    "model": "Doğan",
+    "year_min": 1990,
+    "year_max": 2002,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "lpg"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "15W-40 / 20W-50",
+      "oil_capacity_l": 3.5,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: klasik yağ filtresi",
+      "air_filter_part": "örnek: klasik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK BPR6ES (benzin)",
+      "battery_spec": "45-55Ah",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel"
+    }
   }
 ]

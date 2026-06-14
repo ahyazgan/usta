@@ -285,6 +285,8 @@
       "datePlaceholder": "DD.MM.YYYY",
       "fuel": "Fuel",
       "save": "Save",
+      "moreDetails": "Details (optional)",
+      "moreDetailsHint": "Plate, engine code, mileage and dates — you can add these later too.",
       "specAutoHint": "Specs are auto-filled for known TR vehicles.",
       "validation": "Please enter make, model, year (1950–2100) and fuel type.",
       "dateValidation": "Enter dates as DD.MM.YYYY (e.g. 15.03.2027)."

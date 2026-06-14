@@ -285,6 +285,8 @@
       "datePlaceholder": "GG.AA.YYYY",
       "fuel": "Yakıt",
       "save": "Kaydet",
+      "moreDetails": "Detaylar (isteğe bağlı)",
+      "moreDetailsHint": "Plaka, motor kodu, kilometre ve tarihler — sonra da ekleyebilirsin.",
       "specAutoHint": "Bilinen TR araçları için teknik özellikler otomatik doldurulur.",
       "validation": "Lütfen marka, model, yıl (1950–2100) ve yakıt türünü gir.",
       "dateValidation": "Tarihleri GG.AA.YYYY biçiminde gir (örn. 15.03.2027)."

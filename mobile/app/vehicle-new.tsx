@@ -65,6 +65,9 @@ export default function VehicleNewScreen() {
 
   const [submitting, setSubmitting] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
+  // Yeni araçta opsiyonel alanlar (plaka/motor kodu/km/tarihler) kapalı başlar —
+  // ilk ekleme 4 zorunlu alana iner. Düzenlemede zaten hepsi görünür.
+  const [showOptional, setShowOptional] = useState(isEdit);
 
   // Katalogdaki markalar (türe göre) — "yazmak yerine dokun" hızlı seçim.
   const authToken = useUstaStore((s) => s.authToken);
@@ -290,18 +293,6 @@ export default function VehicleNewScreen() {
           maxLength={4}
         />
 
-        <Text style={styles.label}>{t('vehicle.form.plate')}</Text>
-        <TextInput
-          style={styles.input}
-          value={plate}
-          onChangeText={setPlate}
-          placeholder={t('vehicle.form.platePlaceholder')}
-          placeholderTextColor={theme.colors.textSecondary}
-          autoCapitalize="characters"
-          autoCorrect={false}
-          maxLength={15}
-        />
-
         <Text style={styles.label}>{t('vehicle.form.fuel')}</Text>
         <View style={styles.fuelRow}>
           {FUEL_TYPES.map((fuel) => {
@@ -331,53 +322,89 @@ export default function VehicleNewScreen() {
           })}
         </View>
 
-        <Text style={styles.label}>{t('vehicle.form.engineCode')}</Text>
-        <TextInput
-          style={styles.input}
-          value={engineCode}
-          onChangeText={setEngineCode}
-          placeholder={t('vehicle.form.engineCodePlaceholder')}
-          placeholderTextColor={theme.colors.textSecondary}
-          autoCapitalize="characters"
-          autoCorrect={false}
-        />
+        {/* Opsiyonel alanlar: ilk eklemede katlı, dokununca açılır. */}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityState={{ expanded: showOptional }}
+          onPress={() => setShowOptional((v) => !v)}
+          style={({ pressed }) => [styles.optionalToggle, pressed && styles.pressed]}
+        >
+          <Ionicons
+            name={showOptional ? 'chevron-down' : 'chevron-forward'}
+            size={18}
+            color={theme.colors.textPrimary}
+          />
+          <View style={styles.optionalToggleBody}>
+            <Text style={styles.optionalToggleText}>{t('vehicle.form.moreDetails')}</Text>
+            {!showOptional && (
+              <Text style={styles.optionalToggleHint}>{t('vehicle.form.moreDetailsHint')}</Text>
+            )}
+          </View>
+        </Pressable>
 
-        <Text style={styles.label}>{t('vehicle.form.km')}</Text>
-        <TextInput
-          style={styles.input}
-          value={km}
-          onChangeText={setKm}
-          placeholder={t('vehicle.form.kmPlaceholder')}
-          placeholderTextColor={theme.colors.textSecondary}
-          keyboardType="number-pad"
-        />
-
-        <View style={styles.dateRow}>
-          <View style={styles.dateCol}>
-            <Text style={styles.label}>{t('vehicle.form.muayene')}</Text>
+        {showOptional && (
+          <>
+            <Text style={styles.label}>{t('vehicle.form.plate')}</Text>
             <TextInput
               style={styles.input}
-              value={muayene}
-              onChangeText={setMuayene}
-              placeholder={t('vehicle.form.datePlaceholder')}
+              value={plate}
+              onChangeText={setPlate}
+              placeholder={t('vehicle.form.platePlaceholder')}
               placeholderTextColor={theme.colors.textSecondary}
-              keyboardType="numbers-and-punctuation"
-              maxLength={10}
+              autoCapitalize="characters"
+              autoCorrect={false}
+              maxLength={15}
             />
-          </View>
-          <View style={styles.dateCol}>
-            <Text style={styles.label}>{t('vehicle.form.sigorta')}</Text>
+
+            <Text style={styles.label}>{t('vehicle.form.engineCode')}</Text>
             <TextInput
               style={styles.input}
-              value={sigorta}
-              onChangeText={setSigorta}
-              placeholder={t('vehicle.form.datePlaceholder')}
+              value={engineCode}
+              onChangeText={setEngineCode}
+              placeholder={t('vehicle.form.engineCodePlaceholder')}
               placeholderTextColor={theme.colors.textSecondary}
-              keyboardType="numbers-and-punctuation"
-              maxLength={10}
+              autoCapitalize="characters"
+              autoCorrect={false}
             />
-          </View>
-        </View>
+
+            <Text style={styles.label}>{t('vehicle.form.km')}</Text>
+            <TextInput
+              style={styles.input}
+              value={km}
+              onChangeText={setKm}
+              placeholder={t('vehicle.form.kmPlaceholder')}
+              placeholderTextColor={theme.colors.textSecondary}
+              keyboardType="number-pad"
+            />
+
+            <View style={styles.dateRow}>
+              <View style={styles.dateCol}>
+                <Text style={styles.label}>{t('vehicle.form.muayene')}</Text>
+                <TextInput
+                  style={styles.input}
+                  value={muayene}
+                  onChangeText={setMuayene}
+                  placeholder={t('vehicle.form.datePlaceholder')}
+                  placeholderTextColor={theme.colors.textSecondary}
+                  keyboardType="numbers-and-punctuation"
+                  maxLength={10}
+                />
+              </View>
+              <View style={styles.dateCol}>
+                <Text style={styles.label}>{t('vehicle.form.sigorta')}</Text>
+                <TextInput
+                  style={styles.input}
+                  value={sigorta}
+                  onChangeText={setSigorta}
+                  placeholder={t('vehicle.form.datePlaceholder')}
+                  placeholderTextColor={theme.colors.textSecondary}
+                  keyboardType="numbers-and-punctuation"
+                  maxLength={10}
+                />
+              </View>
+            </View>
+          </>
+        )}
 
         {errorKey && (
           <View style={styles.errorBox}>
@@ -494,6 +521,34 @@ const styles = StyleSheet.create({
     fontFamily: theme.fonts.body,
     fontSize: 16,
     color: theme.colors.textPrimary,
+  },
+  optionalToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    minHeight: theme.touchTarget,
+    marginTop: theme.spacing.lg,
+    paddingHorizontal: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  optionalToggleBody: {
+    flex: 1,
+    paddingVertical: theme.spacing.sm,
+  },
+  optionalToggleText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  optionalToggleHint: {
+    fontFamily: theme.fonts.body,
+    fontSize: 12,
+    color: theme.colors.textSecondary,
+    marginTop: 2,
   },
   dateRow: {
     flexDirection: 'row',

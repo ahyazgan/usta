@@ -146,6 +146,45 @@ DERS (tekrar): safety-auditor subagent hafızayı bazen backend/.claude/memory/'
 yazıyor; kanonik konum .claude/memory/safety-auditor.md (kök) — her denetimden
 sonra yanlış konumu kontrol et ve birleştir.
 
+## Denetim (2026-06-14) — Katalog 2. genişletme (~27 yeni araç)
+Kapsam: backend/app/domain/catalog.py satır 898-1449 ("EK MARKALAR & MODELLER
+(2. genişletme)" → "MOTOSİKLETLER" öncesi). Yeni markalar: Suzuki (Vitara/Swift),
+Mazda (3/CX-5), Seat (Leon/Ibiza), Mitsubishi (Lancer/ASX), Chevrolet (Cruze),
+Mini (Cooper) + mevcut markalara ek modeller (VW Jetta, Renault Fluence/Taliant,
+Fiat Linea, Toyota Yaris, Hyundai i30, Kia Ceed, Ford Fiesta, Opel Corsa,
+Peugeot 208, Citroen C3, Dacia Logan, Nissan Micra, Honda CR-V, BMW 1 Serisi,
+Mercedes GLA, Audi A1).
+
+Sonuç: KRİTİK 0 · YÜKSEK 0 · ORTA 0 → PASS (blok yok).
+
+Doğrulanan güçlü noktalar:
+- LPG araçları (Chevrolet Cruze, Renault Fluence/Taliant, Fiat Linea, Opel Corsa,
+  Dacia Logan): FuelType.lpg YALNIZCA sınıflandırma etiketi; spec içinde LPG
+  sistemine müdahale/ayar/açma/onarım TARİFİ YOK. LPG yasağı korunuyor. (Bu blok
+  saf bildirimsel veri; talimat/komut adımı içermiyor.)
+- Kesin-dil (kesin/%100/kesinlikle) hiçbir yeni spec'te yok.
+- Tehlikeli tamir tarifi yok — alanlar yağ/filtre/buji/akü referans değerleri.
+- Parça no'ları tutarlı şekilde "örnek:" yer tutuculu (bazı bolt size'lar da
+  "örnek: Torx / 13mm" — Peugeot 208/Citroen C3). Modül yorumu (s898-899) tümünün
+  el kitabına karşı doğrulanmasını şart koşuyor.
+
+Değerlendirilen ama bulgu OLMAYAN (kabul edilebilir referans veri):
+- Peugeot 208 (s1288-1307): fuels'da FuelType.elektrik VAR ama oil/buji alanları
+  benzin varyantı için dolu; battery_spec="60Ah (EFB) / e-208 yüksek voltaj".
+  Bu KRİTİK/YÜKSEK DEĞİL — catalog.py saf araç-referans katmanı, kullanıcıya
+  doğrudan talimat üretmiyor. Gerçek güvenlik son katmanı AI yanıtında
+  enforce_image/sound/symptom_safety backstop'u; e-208 kullanıcısı yağ/buji
+  görevi seçerse rehber akışı (guides.py) + AI hedge/uyarı devrede. battery_spec
+  HV'yi açıkça etiketliyor ("yüksek voltaj"), "kendin müdahale et" çağrısı YOK.
+  Tesla Model 3 (önceki denetim) None-alan deseniyle kıyasla 208 melez-katalog
+  satırı; iyileştirme opsiyonel, bloklayıcı değil.
+
+İZLEME (bulgu DEĞİL, önceki denetimle aynı kök):
+- "yüksek voltaj"/"yuksek voltaj" hâlâ SAFETY_TRIGGER_KEYWORDS'te YOK (yalnız
+  "akü" tetikliyor). e-208 / hibrit (Yaris, CR-V, Vitara, Swift) gibi HV içeren
+  araçlara EV/HV-özel rehberlik akışı eklenirse bu anahtar eklenmeli. Katalog
+  genişledikçe HV/hibrit araç sayısı arttı; bu izleme önceliği yükseldi.
+
 ## 2026-06-13 — Dashboard (pano) denetiminden taşınan kabul edilmiş istisnalar
 (İlk denetim backend/ cwd'sinde yapıldığı için ayrı konumda kalmıştı; buraya
 birleştirildi. Bu istisnalar gelecekte YENİDEN UYARILMAMALI:)

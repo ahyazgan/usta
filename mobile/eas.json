@@ -14,13 +14,13 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://REPLACE-with-render-url.onrender.com"
+        "EXPO_PUBLIC_API_URL": "https://usta-backend.onrender.com"
       }
     },
     "production": {
       "autoIncrement": true,
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://REPLACE-with-render-url.onrender.com"
+        "EXPO_PUBLIC_API_URL": "https://usta-backend.onrender.com"
       }
     }
   },

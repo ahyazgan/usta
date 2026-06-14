@@ -3,6 +3,197 @@
     "name": "Usta",
     "tagline": "A master mechanic in your pocket"
   },
+  "tabs": {
+    "home": "Home",
+    "diagnosis": "Diagnose",
+    "maintenance": "Service",
+    "history": "History",
+    "settings": "Profile"
+  },
+  "settings": {
+    "title": "Profile",
+    "account": {
+      "title": "Account",
+      "free": "Free plan",
+      "upgradeDesc": "Unlimited live guide, diagnosis and price data",
+      "premiumActive": "Premium membership",
+      "premiumTag": "Active"
+    },
+    "prefs": {
+      "title": "Preferences",
+      "language": "Language",
+      "notifications": "Notifications",
+      "notificationsDesc": "Inspection/insurance and maintenance reminders"
+    },
+    "privacy": {
+      "title": "Privacy & Legal",
+      "policy": "Privacy Policy",
+      "analytics": "Anonymous usage analytics",
+      "analyticsDesc": "Helps us improve the app (no personal data)"
+    },
+    "actions": {
+      "title": "Account Actions",
+      "logout": "Log out",
+      "delete": "Delete account"
+    },
+    "delete": {
+      "confirmTitle": "Delete account?",
+      "confirmMessage": "Your account and all data (vehicles, diagnoses, logs) will be permanently deleted. This cannot be undone.",
+      "confirm": "Delete"
+    },
+    "about": {
+      "version": "Usta version {{version}}"
+    }
+  },
+  "home": {
+    "greeting": "Hello 👋",
+    "welcome": "Your garage",
+    "triage": {
+      "title": "What do you need today?",
+      "problem": {
+        "title": "Something's wrong",
+        "desc": "Describe or show it, I'll diagnose"
+      },
+      "maintenance": {
+        "title": "Doing maintenance",
+        "desc": "Do it yourself with a step-by-step guide"
+      }
+    },
+    "priceGuide": {
+      "title": "Price Guide",
+      "desc": "What do jobs cost at a mechanic for this car?"
+    },
+    "tasksTitle": "To-do",
+    "tasksEmpty": "Add maintenance entries and your to-dos will appear here.",
+    "allMaintenance": "All →",
+    "shareReport": "Share your Usta Report",
+    "invite": "Invite a friend",
+    "signingIn": "Signing in…",
+    "connectError": "Couldn't reach the server. Check your connection and retry.",
+    "savingsTeaser": "Keep up with upkeep to extend your car's life and avoid surprise costs.",
+    "savings": "You've saved about ₺{{amount}} doing {{count}} maintenance jobs yourself.",
+    "badge": {
+      "ok": "Good",
+      "soon": "Soon",
+      "due": "Due",
+      "unknown": "—"
+    },
+    "taskMeta": {
+      "ok": "Looks healthy",
+      "soon": "Coming up",
+      "due": "It's time",
+      "unknown": "No record"
+    },
+    "kmModal": {
+      "title": "Update mileage",
+      "placeholder": "e.g. 85200"
+    },
+    "dates": {
+      "title": "Calendar",
+      "muayene": "Inspection",
+      "sigorta": "Insurance",
+      "mtv": "MTV (motor vehicle tax)",
+      "mtvHint": "Due — end of January/July",
+      "remaining": "{{days}} days left",
+      "today": "Today!",
+      "overdue": "{{days}} days overdue"
+    }
+  },
+  "maintenance": {
+    "title": "Service",
+    "subtitle": "Pick a task for your car, then verify the right spot with the camera.",
+    "risk": {
+      "dusuk": "Low risk",
+      "orta": "Medium risk",
+      "yuksek": "High risk"
+    }
+  },
+  "live": {
+    "start": "Live Voice Guide",
+    "end": "End",
+    "connecting": "Connecting…",
+    "intro": "Tap Start, point the camera at the part and ask out loud — I'll tell you what it most likely is.",
+    "cameraHint": "Camera permission needed — I'll ask when you tap Start.",
+    "audioNotReady": "Audio module not wired in this build (dev-build required). Video works, audio is silent.",
+    "status": {
+      "connecting": "Connecting",
+      "live": "Live",
+      "closed": "Closed",
+      "error": "Error"
+    },
+    "error": {
+      "start": "Couldn't start the live session.",
+      "premium": "You've used your free live minutes this month — go unlimited with Premium."
+    }
+  },
+  "premium": {
+    "title": "Usta Premium",
+    "tagline": "Your car's master, unlimited in your pocket.",
+    "active": "Premium active 🎉",
+    "free": "You're on the free plan.",
+    "benefit": {
+      "live": "Unlimited live voice guidance",
+      "diagnosis": "Unlimited AI diagnosis",
+      "prices": "Full price data + rip-off shield",
+      "support": "Priority support + new features"
+    },
+    "priceMonthly": "₺149",
+    "perMonth": "/ mo",
+    "priceYearly": "₺999",
+    "perYear": "/ yr",
+    "bestValue": "Best value",
+    "cta": "Go Premium",
+    "comingSoon": "Purchases go live at launch. Preview for now.",
+    "disclaimer": "Cancel anytime. Prices confirmed at the store.",
+    "refresh": "Refresh status"
+  },
+  "prices": {
+    "title": "Price Guide",
+    "subtitle": "Estimated mechanic costs for common jobs on this car. Tap a job to see how it's done.",
+    "seed": "Turkey average",
+    "community": "based on {{count}} users' payments",
+    "disclaimer": "Estimated range; varies by car, city and severity. Get a quote for an exact price."
+  },
+  "guide": {
+    "estMinutes": "~{{min}} min",
+    "stepOf": "Step {{current}} / {{total}}",
+    "toolLabel": "Needed:",
+    "torqueLabel": "Torque:",
+    "verifyCta": "Found the right spot? Point the camera, I'll check.",
+    "estimate": {
+      "title": "At a mechanic",
+      "seed": "Turkey average (estimated range)",
+      "community": "based on {{count}} users' payments"
+    },
+    "prep": {
+      "title": "Prep before you start",
+      "parts": "Parts",
+      "tools": "Tools",
+      "buy": "Buy"
+    },
+    "next": "Done, next ▸",
+    "finish": "Finish & log it",
+    "done": {
+      "title": "Nice work! 🔧",
+      "desc": "{{task}} is done and saved to your history.",
+      "savings": "+₺{{amount}} kept in your pocket",
+      "share": "Share",
+      "cta": "Back to garage"
+    }
+  },
+  "diagnosis": {
+    "title": "What's wrong?",
+    "chatLabel": "Usta says",
+    "intro": "Welcome! Describe the noise — when does it happen, what does it sound like? I'll tell you what it most likely is.",
+    "show": {
+      "title": "Show",
+      "desc": "Point the camera at the part"
+    },
+    "listen": {
+      "title": "Listen",
+      "desc": "Odd noise? Describe it"
+    }
+  },
   "garage": {
     "title": "My Garage",
     "loading": "Loading your garage…",
@@ -32,7 +223,16 @@
       "oil_change": "Oil Change",
       "battery": "Battery",
       "cabin_filter": "Cabin Filter",
-      "spark_plug": "Spark Plugs"
+      "spark_plug": "Spark Plugs",
+      "brake_check": "Brake Check",
+      "air_filter": "Air Filter",
+      "coolant": "Coolant",
+      "tire": "Tire Check",
+      "wiper": "Wiper Blades",
+      "headlight": "Headlight",
+      "chain": "Chain Maintenance",
+      "tire_pressure": "Tire Pressure",
+      "clutch_cable": "Clutch Cable"
     },
     "cta": "Show the Master"
   },
@@ -61,6 +261,10 @@
       "hibrit": "Hybrid",
       "elektrik": "Electric"
     },
+    "type": {
+      "araba": "Car",
+      "motosiklet": "Motorcycle"
+    },
     "form": {
       "title": "Add Vehicle",
       "make": "Make",
@@ -69,14 +273,21 @@
       "modelPlaceholder": "e.g. Clio",
       "year": "Year",
       "yearPlaceholder": "e.g. 2019",
+      "plate": "Plate (optional)",
+      "platePlaceholder": "e.g. 34 ABC 123",
       "engineCode": "Engine code (optional)",
       "engineCodePlaceholder": "e.g. K9K",
+      "type": "Type",
       "km": "Mileage (optional)",
       "kmPlaceholder": "e.g. 138420",
+      "muayene": "Inspection (opt.)",
+      "sigorta": "Insurance (opt.)",
+      "datePlaceholder": "DD.MM.YYYY",
       "fuel": "Fuel",
       "save": "Save",
       "specAutoHint": "Specs are auto-filled for known TR vehicles.",
-      "validation": "Please enter make, model, year (1950–2100) and fuel type."
+      "validation": "Please enter make, model, year (1950–2100) and fuel type.",
+      "dateValidation": "Enter dates as DD.MM.YYYY (e.g. 15.03.2027)."
     },
     "error": {
       "network": "No connection — check your internet",
@@ -124,6 +335,11 @@
     },
     "analyze": "Analyze",
     "analyzing": "Analyzing…",
+    "estimate": {
+      "title": "At a mechanic, roughly",
+      "seed": "Turkey average (estimated range)",
+      "community": "based on {{count}} users' payments"
+    },
     "result": {
       "title": "Diagnosis",
       "tespit": "Finding",
@@ -161,6 +377,7 @@
     "reminders": {
       "title": "Reminders",
       "empty": "No reminders yet",
+      "emptyHint": "Add maintenance entries and km-based reminders will appear here.",
       "remaining": "{{km}} km remaining",
       "dueAt": "at {{km}} km",
       "unknownKm": "Unknown",
@@ -174,14 +391,23 @@
     "logs": {
       "title": "Past Entries",
       "empty": "No entries yet",
+      "emptyHint": "Finish a maintenance guide or add an entry manually below.",
       "kmValue": "{{km}} km",
       "noKm": "No km"
+    },
+    "diagnoses": {
+      "title": "Diagnosis History",
+      "empty": "No AI diagnoses yet",
+      "emptyHint": "Camera verifications and sound diagnoses will be listed here.",
+      "mechanic": "Mechanic"
     },
     "addLog": {
       "title": "Add Entry",
       "taskLabel": "Task",
       "kmLabel": "Mileage",
       "kmPlaceholder": "e.g. 138420",
+      "costLabel": "Cost (TRY, optional)",
+      "costPlaceholder": "e.g. 750",
       "noteLabel": "Note (optional)",
       "notePlaceholder": "A short note",
       "submit": "Save"
@@ -196,6 +422,8 @@
   "camera": {
     "stepBanner": "Step {{current}}/{{total}}",
     "stepTitle": "Find the dipstick and check the level",
+    "taskLabel": "TASK",
+    "guideStep": "Step {{step}}",
     "safetyStrip": "Warning: The engine may be hot. Park on firm ground; if jacked up, support it with axle stands.",
     "check": "Check",
     "analyzing": "Analyzing…",
@@ -204,6 +432,8 @@
     "permissionDenied": "Camera permission denied. Grant access in settings to verify the correct part.",
     "offline": "You are offline — waiting for connection",
     "hint": "Center the part in the frame and tap Check",
+    "gridHint": "Align the part with the center of the grid",
+    "pickFromGallery": "Pick from gallery",
     "guven": {
       "yuksek": "High confidence",
       "orta": "Medium confidence",
@@ -235,9 +465,211 @@
       "noTask": "Select a task first",
       "noVehicle": "Add a vehicle first",
       "generic": "Something went wrong, try again",
+      "captureFailed": "Couldn't take the photo, try again",
+      "galleryDenied": "Gallery permission denied — enable it in settings",
       "aiUnavailable": "The AI service is currently unavailable. Please try again later.",
       "busy": "The service is busy right now. Please try again shortly."
     }
+  },
+  "dashboard": {
+    "title": "Warning Light",
+    "safetyStrip": "Don't shoot while driving. Stop somewhere safe and capture the cluster with the ignition on.",
+    "scan": "Scan Cluster",
+    "retake": "Retake",
+    "noLights": "I couldn't clearly make out a warning light. Try a brighter, sharper photo.",
+    "findMechanic": "Find a Mechanic",
+    "urgency": {
+      "dusuk": "Low",
+      "orta": "Medium",
+      "yuksek": "High"
+    },
+    "entry": {
+      "title": "What does this warning light mean?",
+      "desc": "Snap a photo of the light on your cluster and I'll explain"
+    }
+  },
+  "dtc": {
+    "title": "Fault Code",
+    "intro": "Enter the fault code you read from an OBD-II scanner; I'll explain what it likely means for this vehicle.",
+    "codeLabel": "Fault code",
+    "codePlaceholder": "e.g. P0300",
+    "noteLabel": "Note (optional)",
+    "notePlaceholder": "Add symptoms if any: misfire, light on…",
+    "disclaimer": "The same code can mean different things on different cars. This is preliminary info — see a mechanic for a definitive diagnosis.",
+    "explain": "Explain",
+    "another": "Another Code",
+    "causes": "Likely causes",
+    "drivable": {
+      "yes": "🚗 Likely drivable",
+      "no": "⛔ Don't keep driving",
+      "unknown": "❓ Uncertain"
+    },
+    "error": {
+      "empty": "Enter a valid fault code (e.g. P0300)"
+    },
+    "entry": {
+      "title": "What does this fault code mean?",
+      "desc": "Type a code like P0300 and I'll explain"
+    }
+  },
+  "symptom": {
+    "title": "Describe the Problem",
+    "intro": "Describe the issue with your car in your own words; I'll tell you what it's likely about and what to do.",
+    "placeholder": "e.g. Engine shakes at idle, smooths out when I rev.",
+    "examplesTitle": "Quick examples",
+    "examples": {
+      "idle": "Shakes at idle",
+      "brake": "Brake pedal feels soft",
+      "start": "Cranks but won't start",
+      "noise": "Noise when I accelerate"
+    },
+    "disclaimer": "This is a preliminary assessment — see a mechanic for a definitive diagnosis.",
+    "diagnose": "Diagnose",
+    "another": "New Problem",
+    "cost": "Est. at a mechanic: ₺{{low}}–₺{{high}}",
+    "error": {
+      "empty": "Please describe the problem in a few words"
+    },
+    "entry": {
+      "title": "Describe a problem",
+      "desc": "Tell me in text and I'll diagnose it"
+    }
+  },
+  "fuel": {
+    "title": "Fuel Tracking",
+    "avgConsumption": "Avg. consumption",
+    "consumptionValue": "{{value}} L/100",
+    "totalSpent": "Total spent",
+    "entries": "Fill-ups",
+    "consumptionHint": "Consumption needs at least 2 full-tank fill-ups.",
+    "addTitle": "Add Fill-up",
+    "odometer": "Odometer",
+    "odometerPlaceholder": "e.g. 102500",
+    "liters": "Liters",
+    "litersPlaceholder": "e.g. 42.5",
+    "total": "Amount (₺, optional)",
+    "totalPlaceholder": "e.g. 1800",
+    "fullTank": "Filled to full",
+    "fullTankDesc": "Consumption is computed from full fill-ups",
+    "add": "Save",
+    "historyTitle": "History",
+    "empty": "No fill-ups yet.",
+    "row": {
+      "liters": "{{liters}} L",
+      "km": "{{km}} km"
+    },
+    "error": {
+      "invalid": "Odometer and liters must be valid"
+    },
+    "entry": {
+      "title": "Fuel Tracking",
+      "desc": "Track consumption (L/100km) and spend"
+    }
+  },
+  "share": {
+    "report": {
+      "title": "🔧 Usta Report",
+      "km": "📍 {{km}} km",
+      "maintenance": "✅ Did {{count}} services myself, saved ~₺{{savings}}",
+      "cta": "A master mechanic in your pocket — try Usta: {{link}}"
+    },
+    "invite": "🔧 Try Usta — do car maintenance yourself step by step, verify with AI, save money: {{link}}",
+    "achievement": "🔧 Did the {{task}} job myself, saved ~₺{{savings}} — with Usta!"
+  },
+  "brief": {
+    "cta": "Show a Mechanic",
+    "sheetTitle": "Show a Mechanic",
+    "sheetHint": "Show this summary to your mechanic or share it.",
+    "share": "Share",
+    "findMechanic": "Find a Mechanic",
+    "title": "🔧 USTA PRE-ASSESSMENT",
+    "vehicle": "Vehicle",
+    "engine": "Engine",
+    "task": "Task",
+    "complaint": "Complaint/Finding",
+    "system": "System",
+    "soundType": "Sound type",
+    "confidence": "Confidence",
+    "urgency": "Urgency",
+    "nextStep": "Suggestion",
+    "estimate": "Usta's mechanic estimate",
+    "date": "Date",
+    "kindImage": "Image diagnosis",
+    "kindSound": "Sound diagnosis",
+    "disclaimer": "⚠️ This is an AI PRE-assessment, not a definitive diagnosis. Please do your own check.",
+    "footer": "— Usta app"
+  },
+  "mechanics": {
+    "title": "Find a Mechanic",
+    "verified": "Verified",
+    "call": "Call",
+    "whatsapp": "WhatsApp",
+    "directions": "Directions",
+    "allCities": "All cities",
+    "showAll": "Show all cities",
+    "empty": "Mechanics in your area will be listed here soon.",
+    "disclaimer": "Mechanics are independent; Usta only refers and isn't responsible for the service."
+  },
+  "feedback": {
+    "question": "Was this diagnosis right?",
+    "thanks": "Thanks — recorded 🙌"
+  },
+  "resolution": {
+    "title": "How did it turn out?",
+    "thanks": "Thanks — recorded 🙌",
+    "kendim_cozdum": "Fixed it myself",
+    "tamirci_cozdu": "Mechanic fixed it",
+    "sorun_devam": "Still a problem",
+    "yanlis_teshis": "Wrong diagnosis",
+    "costPrompt": "What did you pay the mechanic? (optional — helps others)",
+    "costPlaceholder": "e.g. 2000",
+    "costSave": "Save",
+    "costSkip": "Skip"
+  },
+  "sistem": {
+    "motor": "Engine",
+    "atesleme": "Ignition",
+    "fren": "Brakes",
+    "elektrik": "Electrical",
+    "lastik": "Tires",
+    "filtre": "Filter",
+    "suspansiyon": "Suspension",
+    "sanziman": "Transmission",
+    "gorus": "Visibility",
+    "diger": "Other"
+  },
+  "privacy": {
+    "title": "Privacy",
+    "intro": "You're in control of your data. With consent off, no analytics are sent. Change it anytime below, or delete all your data.",
+    "analytics": {
+      "title": "Usage analytics",
+      "desc": "Anonymous screen/event data to improve the app. When off, no analytics are sent."
+    },
+    "data": {
+      "title": "Anonymous contribution",
+      "desc": "Your diagnoses feed aggregate fault stats without your identity (e.g. 'this fault is common on that model')."
+    },
+    "stats": {
+      "title": "Community stats",
+      "empty": "Not enough anonymous data yet — it builds up as you use the app.",
+      "count": "{{count}} diagnoses",
+      "accuracy": "{{pct}}% correct"
+    },
+    "delete": {
+      "title": "Delete your data",
+      "desc": "Permanently deletes your account and all vehicle/maintenance/diagnosis data. Cannot be undone.",
+      "button": "Delete all my data",
+      "confirmTitle": "Are you sure?",
+      "confirmMsg": "Your account and all your data will be permanently deleted. This cannot be undone.",
+      "confirm": "Delete",
+      "errorTitle": "Couldn't delete",
+      "errorMsg": "Something went wrong, try again."
+    }
+  },
+  "notifications": {
+    "title": "Usta reminder 🔧",
+    "body": "{{name}} {{label}} is coming up: {{date}} ({{days}} days left).",
+    "mtvBody": "MTV payment deadline is coming up: {{date}} ({{days}} days left)."
   },
   "common": {
     "loading": "Loading…",

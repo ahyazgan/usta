@@ -41,3 +41,11 @@ class AIRateLimited(AIError):
     status_code = 429
     code = "ai_rate_limited"
     default_message = "AI servisi şu an yoğun. Lütfen biraz sonra tekrar dene."
+
+
+class LiveLimitReached(AIError):
+    """Ücretsiz katman aylık canlı süre limiti doldu (premium gerekir)."""
+
+    status_code = 402
+    code = "live_limit_reached"
+    default_message = "Aylık ücretsiz canlı süresi doldu. Premium ile sınırsız."

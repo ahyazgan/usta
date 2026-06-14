@@ -2,9 +2,9 @@
 
 import pytest
 
-from app.domain.enums import FuelType
+from app.domain.enums import FuelType, VehicleType
 from app.domain.pricing import TARGET_COST_PER_DIAGNOSIS_USD, cost_usd, within_budget
-from app.domain.tasks import get_task, get_tasks, tasks_for_fuel
+from app.domain.tasks import get_task, get_tasks, tasks_for_fuel, tasks_for_vehicle
 from app.services.ai.prompts import PROMPTS_DIR
 from app.tools.eval_vision import offline_selfcheck
 
@@ -25,6 +25,49 @@ def test_get_task_lookup():
     assert get_task("battery").risk.value == "yuksek"
     assert get_task("cabin_filter").risk.value == "dusuk"
     assert get_task("olmayan") is None
+
+
+def test_new_tasks_registered_with_expected_risk():
+    # Yeni eklenen görevler kayıt defterinde ve doğru risk seviyesinde.
+    assert get_task("coolant").risk.value == "yuksek"  # basınçlı + sıcak: güvenlik-kritik
+    assert get_task("tire").risk.value == "orta"
+    assert get_task("headlight").risk.value == "orta"
+    assert get_task("wiper").risk.value == "dusuk"
+    # Başlıklar iki dilde de dolu.
+    for tid in ("coolant", "tire", "wiper", "headlight"):
+        task = get_task(tid)
+        assert task.title_tr and task.title_en, f"başlık eksik: {tid}"
+
+
+def test_tasks_by_vehicle_type():
+    """Motosiklet: polen/silecek YOK, zincir VAR; araba: tersi."""
+    moto = {t.id for t in tasks_for_vehicle(FuelType.benzin, VehicleType.motosiklet)}
+    car = {t.id for t in tasks_for_vehicle(FuelType.benzin, VehicleType.araba)}
+
+    assert {"chain", "tire_pressure", "clutch_cable"} <= moto  # moto-özel görevler
+    assert "cabin_filter" not in moto
+    assert "wiper" not in moto
+    # Ortak görevler motosiklette de var.
+    assert {"oil_change", "brake_check", "tire", "battery"} <= moto
+
+    assert {"chain", "tire_pressure", "clutch_cable"} & car == set()  # arabada yok
+    assert {"cabin_filter", "wiper"} <= car
+
+    # None (eski kayıt) = araba kabul edilir.
+    assert tasks_for_vehicle(FuelType.benzin, None) == tasks_for_vehicle(
+        FuelType.benzin, VehicleType.araba
+    )
+
+
+def test_new_tasks_fuel_applicability():
+    elektrik = {t.id for t in tasks_for_fuel(FuelType.elektrik)}
+    benzin = {t.id for t in tasks_for_fuel(FuelType.benzin)}
+    # Lastik/silecek/far her araçta var (elektrik dahil).
+    assert {"tire", "wiper", "headlight"} <= elektrik
+    assert {"tire", "wiper", "headlight"} <= benzin
+    # Motor soğutma sıvısı yanmalı motorlarda var; elektrikte farklı sistem.
+    assert "coolant" in benzin
+    assert "coolant" not in elektrik
 
 
 def test_tasks_for_fuel_filters_by_applicability():
@@ -65,6 +108,28 @@ async def test_vehicle_tasks_endpoint_respects_fuel(client):
     ids = {t["id"] for t in r.json()}
     assert "spark_plug" not in ids
     assert "oil_change" in ids
+
+
+@pytest.mark.asyncio
+async def test_vehicle_tasks_endpoint_respects_type(client):
+    headers = await register_and_login(client, "vtype@usta.app")
+    moto = await client.post(
+        "/v1/vehicles",
+        json={"make": "Honda", "model": "CB125", "year": 2021,
+              "fuel_type": "benzin", "vehicle_type": "motosiklet"},
+        headers=headers,
+    )
+    assert moto.status_code == 201
+    assert moto.json()["vehicle_type"] == "motosiklet"
+    mid = moto.json()["id"]
+
+    ids = {t["id"] for t in (await client.get(f"/v1/vehicles/{mid}/tasks", headers=headers)).json()}
+    assert "chain" in ids
+    assert "cabin_filter" not in ids and "wiper" not in ids
+
+    # Zincir rehberi motosiklette 200; araba-only silecek motosiklette 404.
+    assert (await client.get(f"/v1/vehicles/{mid}/tasks/chain/guide", headers=headers)).status_code == 200
+    assert (await client.get(f"/v1/vehicles/{mid}/tasks/wiper/guide", headers=headers)).status_code == 404
 
 
 @pytest.mark.asyncio

@@ -34,6 +34,23 @@ def _sound_payload(vehicle_id: int) -> dict:
     }
 
 
+def _dashboard_payload(vehicle_id: int) -> dict:
+    return {
+        "vehicle_id": vehicle_id,
+        "frame_base64": FRAME_B64,
+        "media_type": "image/jpeg",
+        "user_note": "Panoda ne yanıyor?",
+    }
+
+
+def _dtc_payload(vehicle_id: int) -> dict:
+    return {"vehicle_id": vehicle_id, "code": "p0300", "user_note": "Motor teklemesi var"}
+
+
+def _symptom_payload(vehicle_id: int) -> dict:
+    return {"vehicle_id": vehicle_id, "description": "Rölantide motor titriyor"}
+
+
 # --------------------------------------------------------------------------- #
 # Görüntü teşhisi
 # --------------------------------------------------------------------------- #
@@ -53,6 +70,11 @@ async def test_image_diagnose_happy(client, fake_claude):
     # Vision modeli sonnet olmalı (Opus yasak).
     assert "opus" not in fake_claude.calls[0]["model"].lower()
     assert "sonnet" in fake_claude.calls[0]["model"].lower()
+    # Fiyat şeffaflığı: teşhis yanıtı tamirci maliyet tahmini içerir.
+    ce = body["cost_estimate"]
+    assert ce is not None
+    assert ce["low_try"] > 0 and ce["high_try"] >= ce["low_try"]
+    assert ce["source"] in {"seed", "community"} and ce["currency"] == "TRY"
 
 
 @pytest.mark.asyncio
@@ -172,6 +194,373 @@ async def test_image_lpg_intervention_blocked(client, fake_claude):
 
 
 # --------------------------------------------------------------------------- #
+# Gösterge paneli uyarı ışığı tanıma
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.asyncio
+async def test_dashboard_diagnose_happy(client, fake_claude):
+    headers = await register_and_login(client, "pano1@usta.app")
+    vehicle = await create_vehicle(client, headers)
+
+    r = await client.post(
+        "/v1/ai/diagnose/dashboard", json=_dashboard_payload(vehicle["id"]), headers=headers
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert "büyük ihtimalle" in body["tespit"].casefold()
+    assert body["guven"] in {"yuksek", "orta", "dusuk"}
+    assert isinstance(body["isiklar"], list) and len(body["isiklar"]) >= 1
+    light = body["isiklar"][0]
+    assert light["renk"] in {"kirmizi", "sari", "yesil", "mavi", "bilinmiyor"}
+    assert light["aciliyet"] in {"dusuk", "orta", "yuksek"}
+    assert body["en_yuksek_aciliyet"] in {"dusuk", "orta", "yuksek"}
+    # Vision modeli sonnet olmalı (Opus yasak).
+    assert "opus" not in fake_claude.calls[0]["model"].lower()
+    assert "sonnet" in fake_claude.calls[0]["model"].lower()
+
+
+@pytest.mark.asyncio
+async def test_dashboard_requires_auth_401(client):
+    r = await client.post("/v1/ai/diagnose/dashboard", json=_dashboard_payload(1))
+    assert r.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_dashboard_validation_422(client):
+    headers = await register_and_login(client, "pano2@usta.app")
+    # frame_base64 eksik
+    r = await client.post(
+        "/v1/ai/diagnose/dashboard", json={"vehicle_id": 1}, headers=headers
+    )
+    assert r.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_dashboard_other_vehicle_403(client):
+    owner = await register_and_login(client, "panoowner@usta.app")
+    vehicle = await create_vehicle(client, owner)
+    intruder = await register_and_login(client, "panointruder@usta.app")
+    r = await client.post(
+        "/v1/ai/diagnose/dashboard", json=_dashboard_payload(vehicle["id"]), headers=intruder
+    )
+    assert r.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_dashboard_red_light_forces_mechanic(client, fake_claude):
+    """KIRMIZI ışık => her zaman tamirci + güvenlik uyarısı, aciliyet yükselir."""
+    headers = await register_and_login(client, "pano3@usta.app")
+    vehicle = await create_vehicle(client, headers)
+
+    fake_claude.dashboard_response = {
+        "tespit": "Büyük ihtimalle kırmızı yağ basıncı ışığı yanıyor.",
+        "guven": "orta",
+        "isiklar": [
+            {
+                "isim": "Yağ basıncı uyarısı",
+                "renk": "kirmizi",
+                "anlam": "Büyük ihtimalle yağ basıncı düşük.",
+                "aciliyet": "dusuk",  # model yanlış verse de sistem yükseltmeli
+                "ne_yapmali": "Devam et.",
+            }
+        ],
+        "en_yuksek_aciliyet": "dusuk",  # sistem yeniden hesaplamalı
+        "guvenlik_uyarisi": None,
+        "sonraki_adim": "Sürmeye devam et.",
+        "tamirciye_git_onerisi": False,
+    }
+    r = await client.post(
+        "/v1/ai/diagnose/dashboard", json=_dashboard_payload(vehicle["id"]), headers=headers
+    )
+    body = r.json()
+    assert body["tamirciye_git_onerisi"] is True
+    assert body["guvenlik_uyarisi"], "kırmızı ışıkta güvenlik uyarısı zorunlu"
+
+
+@pytest.mark.asyncio
+async def test_dashboard_hedge_phrase_enforced(client, fake_claude):
+    """Kesin teşhis dili geldiğinde 'büyük ihtimalle' eklenmeli."""
+    headers = await register_and_login(client, "pano4@usta.app")
+    vehicle = await create_vehicle(client, headers)
+
+    fake_claude.dashboard_response = {
+        "tespit": "Motor arıza ışığı kesinlikle ateşleme arızası.",
+        "guven": "yuksek",
+        "isiklar": [],
+        "en_yuksek_aciliyet": "dusuk",
+        "guvenlik_uyarisi": None,
+        "sonraki_adim": "Tekrar dene.",
+        "tamirciye_git_onerisi": False,
+    }
+    r = await client.post(
+        "/v1/ai/diagnose/dashboard", json=_dashboard_payload(vehicle["id"]), headers=headers
+    )
+    assert "büyük ihtimalle" in r.json()["tespit"].casefold()
+
+
+@pytest.mark.asyncio
+async def test_dashboard_per_light_anlam_hedged(client, fake_claude):
+    """Her ışığın `anlam`'ı da hedge'lenmeli; kesin dil ('kesinlikle') yumuşatılmalı."""
+    headers = await register_and_login(client, "pano5@usta.app")
+    vehicle = await create_vehicle(client, headers)
+
+    fake_claude.dashboard_response = {
+        "tespit": "Büyük ihtimalle bir uyarı ışığı yanıyor.",
+        "guven": "orta",
+        "isiklar": [
+            {
+                "isim": "ABS uyarısı",
+                "renk": "sari",
+                "anlam": "Kesinlikle ABS arızası var.",  # kesin dil — yumuşatılmalı
+                "aciliyet": "orta",
+                "ne_yapmali": "Kontrol ettir.",
+            }
+        ],
+        "en_yuksek_aciliyet": "orta",
+        "guvenlik_uyarisi": None,
+        "sonraki_adim": "Tamirciye uğra.",
+        "tamirciye_git_onerisi": True,
+    }
+    r = await client.post(
+        "/v1/ai/diagnose/dashboard", json=_dashboard_payload(vehicle["id"]), headers=headers
+    )
+    anlam = r.json()["isiklar"][0]["anlam"].casefold()
+    assert "büyük ihtimalle" in anlam
+    assert "kesinlikle" not in anlam
+
+
+# --------------------------------------------------------------------------- #
+# Arıza kodu (OBD-II / DTC) açıklama
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.asyncio
+async def test_dtc_diagnose_happy(client, fake_claude):
+    headers = await register_and_login(client, "dtc1@usta.app")
+    vehicle = await create_vehicle(client, headers)
+
+    r = await client.post("/v1/ai/diagnose/code", json=_dtc_payload(vehicle["id"]), headers=headers)
+    assert r.status_code == 200
+    body = r.json()
+    assert "büyük ihtimalle" in body["tespit"].casefold()
+    assert body["guven"] in {"yuksek", "orta", "dusuk"}
+    assert body["aciliyet"] in {"dusuk", "orta", "yuksek"}
+    assert isinstance(body["olasi_nedenler"], list) and len(body["olasi_nedenler"]) >= 1
+    assert "baslik" in body and body["kod"]
+    # Metin analizi → sonnet (Opus yasak).
+    assert "opus" not in fake_claude.calls[0]["model"].lower()
+    assert "sonnet" in fake_claude.calls[0]["model"].lower()
+
+
+@pytest.mark.asyncio
+async def test_dtc_requires_auth_401(client):
+    r = await client.post("/v1/ai/diagnose/code", json=_dtc_payload(1))
+    assert r.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_dtc_validation_422(client):
+    headers = await register_and_login(client, "dtc2@usta.app")
+    # code eksik
+    r = await client.post("/v1/ai/diagnose/code", json={"vehicle_id": 1}, headers=headers)
+    assert r.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_dtc_other_vehicle_403(client):
+    owner = await register_and_login(client, "dtcowner@usta.app")
+    vehicle = await create_vehicle(client, owner)
+    intruder = await register_and_login(client, "dtcintruder@usta.app")
+    r = await client.post("/v1/ai/diagnose/code", json=_dtc_payload(vehicle["id"]), headers=intruder)
+    assert r.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_dtc_rate_limit_429(client):
+    headers = await register_and_login(client, "dtc3@usta.app")
+    vehicle = await create_vehicle(client, headers)
+
+    async def _always_limited():
+        from fastapi import HTTPException, status
+
+        raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail="limit")
+
+    app.dependency_overrides[enforce_rate_limit] = _always_limited
+    try:
+        r = await client.post("/v1/ai/diagnose/code", json=_dtc_payload(vehicle["id"]), headers=headers)
+        assert r.status_code == 429
+    finally:
+        app.dependency_overrides.pop(enforce_rate_limit, None)
+
+
+@pytest.mark.asyncio
+async def test_dtc_not_drivable_forces_mechanic(client, fake_claude):
+    """surulebilir_mi=False => tamirci + güvenlik uyarısı zorunlu."""
+    headers = await register_and_login(client, "dtc4@usta.app")
+    vehicle = await create_vehicle(client, headers)
+
+    fake_claude.dtc_response = {
+        "tespit": "Büyük ihtimalle ciddi bir ateşleme sorunu.",
+        "guven": "orta",
+        "kod": "P0301",
+        "baslik": "1. silindir ateşleme teklemesi",
+        "olasi_nedenler": ["Buji", "Bobin"],
+        "aciliyet": "dusuk",  # tutarsız; sistem yükseltmeli değil ama surulebilir False
+        "surulebilir_mi": False,
+        "sonraki_adim": "Devam et.",
+        "guvenlik_uyarisi": None,
+        "tamirciye_git_onerisi": False,
+    }
+    r = await client.post("/v1/ai/diagnose/code", json=_dtc_payload(vehicle["id"]), headers=headers)
+    body = r.json()
+    assert body["tamirciye_git_onerisi"] is True
+    assert body["guvenlik_uyarisi"], "sürülemez kodda güvenlik uyarısı zorunlu"
+
+
+@pytest.mark.asyncio
+async def test_dtc_hararet_triggers_warning(client, fake_claude):
+    """'hararet' geçen yanıtta uyarı boşsa sistem doldurmalı (tetikleyici kelime)."""
+    headers = await register_and_login(client, "dtc5@usta.app")
+    vehicle = await create_vehicle(client, headers)
+
+    fake_claude.dtc_response = {
+        "tespit": "Büyük ihtimalle soğutma sıcaklığı sensörüyle ilgili bir kod.",
+        "guven": "orta",
+        "kod": "P0118",
+        "baslik": "Motor hararet sensörü yüksek sinyal",
+        "olasi_nedenler": ["Hararet sensörü arızası", "Kablo/konnektör"],
+        "aciliyet": "orta",
+        "surulebilir_mi": True,
+        "sonraki_adim": "Hararet göstergesini izle; yükselirse dur.",
+        "guvenlik_uyarisi": None,
+        "tamirciye_git_onerisi": True,
+    }
+    r = await client.post("/v1/ai/diagnose/code", json=_dtc_payload(vehicle["id"]), headers=headers)
+    assert r.json()["guvenlik_uyarisi"], "hararet geçen yanıtta güvenlik uyarısı zorunlu"
+
+
+# --------------------------------------------------------------------------- #
+# Belirti-bazlı serbest teşhis
+# --------------------------------------------------------------------------- #
+
+
+@pytest.mark.asyncio
+async def test_symptom_diagnose_happy(client, fake_claude):
+    headers = await register_and_login(client, "sym1@usta.app")
+    vehicle = await create_vehicle(client, headers)
+
+    r = await client.post("/v1/ai/diagnose/symptom", json=_symptom_payload(vehicle["id"]), headers=headers)
+    assert r.status_code == 200
+    body = r.json()
+    assert "büyük ihtimalle" in body["tespit"].casefold()
+    assert body["guven"] in {"yuksek", "orta", "dusuk"}
+    assert isinstance(body["olasi_nedenler"], list) and len(body["olasi_nedenler"]) >= 1
+    assert body["ariza_sistem"] in {
+        "motor", "atesleme", "fren", "elektrik", "lastik",
+        "filtre", "suspansiyon", "sanziman", "gorus", "diger",
+    }
+    # Fiyat şeffaflığı: belirti teşhisi de tamirci maliyet tahmini içerir.
+    assert body["cost_estimate"] is not None
+    assert body["cost_estimate"]["high_try"] >= body["cost_estimate"]["low_try"] > 0
+    assert "sonnet" in fake_claude.calls[0]["model"].lower()
+
+
+@pytest.mark.asyncio
+async def test_symptom_requires_auth_401(client):
+    r = await client.post("/v1/ai/diagnose/symptom", json=_symptom_payload(1))
+    assert r.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_symptom_validation_422(client):
+    headers = await register_and_login(client, "sym2@usta.app")
+    # description eksik
+    r = await client.post("/v1/ai/diagnose/symptom", json={"vehicle_id": 1}, headers=headers)
+    assert r.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_symptom_other_vehicle_403(client):
+    owner = await register_and_login(client, "symowner@usta.app")
+    vehicle = await create_vehicle(client, owner)
+    intruder = await register_and_login(client, "symintruder@usta.app")
+    r = await client.post("/v1/ai/diagnose/symptom", json=_symptom_payload(vehicle["id"]), headers=intruder)
+    assert r.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_symptom_brake_forces_mechanic(client, fake_claude):
+    """Fren sistemi (güvenlik-kritik) => her zaman tamirci + uyarı."""
+    headers = await register_and_login(client, "sym3@usta.app")
+    vehicle = await create_vehicle(client, headers)
+
+    fake_claude.symptom_response = {
+        "tespit": "Büyük ihtimalle fren basıncı kaybı.",
+        "guven": "orta",
+        "olasi_nedenler": ["Hidrolik kaçağı"],
+        "ariza_sistem": "fren",
+        "aciliyet": "dusuk",  # model düşük verse de fren => tamirci
+        "sonraki_adim": "Devam et.",
+        "guvenlik_uyarisi": None,
+        "tamirciye_git_onerisi": False,
+    }
+    r = await client.post("/v1/ai/diagnose/symptom", json=_symptom_payload(vehicle["id"]), headers=headers)
+    body = r.json()
+    assert body["tamirciye_git_onerisi"] is True
+    assert body["guvenlik_uyarisi"], "fren belirtisinde güvenlik uyarısı zorunlu"
+
+
+@pytest.mark.asyncio
+async def test_symptom_critical_nonbrake_forces_mechanic(client, fake_claude):
+    """Fren-dışı kritik belirti (duman) düşük aciliyet + diger sistem gelse de
+    son katman tamirci + uyarı + yüksek aciliyet zorlamalı."""
+    headers = await register_and_login(client, "sym4@usta.app")
+    vehicle = await create_vehicle(client, headers)
+
+    fake_claude.symptom_response = {
+        "tespit": "Büyük ihtimalle kaputtan hafif bir durum var.",
+        "guven": "orta",
+        "olasi_nedenler": ["Belirsiz"],
+        "ariza_sistem": "diger",  # fren değil
+        "aciliyet": "dusuk",       # model düşük verse de duman => kritik
+        "sonraki_adim": "Devam et.",
+        "guvenlik_uyarisi": None,
+        "tamirciye_git_onerisi": False,
+    }
+    r = await client.post(
+        "/v1/ai/diagnose/symptom",
+        json={"vehicle_id": vehicle["id"], "description": "Motordan duman geliyor"},
+        headers=headers,
+    )
+    body = r.json()
+    assert body["tamirciye_git_onerisi"] is True
+    assert body["aciliyet"] == "yuksek"
+    assert body["guvenlik_uyarisi"], "kritik belirtide güvenlik uyarısı zorunlu"
+
+
+@pytest.mark.asyncio
+async def test_symptom_causes_hedged(client, fake_claude):
+    """olasi_nedenler'deki kesin dil yumuşatılmalı."""
+    headers = await register_and_login(client, "sym5@usta.app")
+    vehicle = await create_vehicle(client, headers)
+
+    fake_claude.symptom_response = {
+        "tespit": "Büyük ihtimalle ateşleme sorunu.",
+        "guven": "orta",
+        "olasi_nedenler": ["Kesinlikle buji arızası"],  # kesin dil
+        "ariza_sistem": "atesleme",
+        "aciliyet": "orta",
+        "sonraki_adim": "Kontrol ettir.",
+        "guvenlik_uyarisi": None,
+        "tamirciye_git_onerisi": True,
+    }
+    r = await client.post("/v1/ai/diagnose/symptom", json=_symptom_payload(vehicle["id"]), headers=headers)
+    nedenler = " ".join(r.json()["olasi_nedenler"]).casefold()
+    assert "büyük ihtimalle" in nedenler and "kesinlikle" not in nedenler
+
+
+# --------------------------------------------------------------------------- #
 # Ses teşhisi
 # --------------------------------------------------------------------------- #
 
@@ -183,9 +572,13 @@ async def test_sound_diagnose_happy(client, fake_claude):
 
     r = await client.post("/v1/ai/diagnose/sound", json=_sound_payload(vehicle["id"]), headers=headers)
     assert r.status_code == 200
-    assert r.json()["ses_kategorisi"] in {
+    body = r.json()
+    assert body["ses_kategorisi"] in {
         "tikirti", "kayis_sesi", "metalik_vuruntu", "islik", "egzoz_patlamasi", "normal", "belirsiz",
     }
+    # Fiyat şeffaflığı: ses teşhisi de tamirci maliyet tahmini içerir.
+    assert body["cost_estimate"] is not None
+    assert body["cost_estimate"]["high_try"] >= body["cost_estimate"]["low_try"] > 0
 
 
 @pytest.mark.asyncio

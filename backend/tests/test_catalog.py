@@ -3,7 +3,7 @@
 import pytest
 
 from app.domain.catalog import find_spec
-from app.domain.enums import FuelType
+from app.domain.enums import FuelType, VehicleType
 
 from .conftest import register_and_login
 
@@ -30,6 +30,51 @@ def test_find_spec_case_insensitive():
 
 def test_find_spec_unknown_returns_none():
     assert find_spec("Tesla", "Model S", 2022, fuel_type=FuelType.elektrik) is None
+
+
+def test_find_spec_motorcycle_catalog():
+    """Motosiklet katalogdan spec dolar; arabaymış gibi sorgulanınca eşleşmez."""
+    moto = find_spec(
+        "Honda", "CB125", 2021, fuel_type=FuelType.benzin,
+        engine_code="JC64", vehicle_type=VehicleType.motosiklet,
+    )
+    assert moto is not None
+    assert moto.oil_spec == "10W-30"
+    assert moto.cabin_filter_part is None  # motosiklette kabin filtresi yok
+    assert moto.spark_plug_part  # buji var
+    # Tür araba (varsayılan) ise CB125 araba değil -> None.
+    assert find_spec("Honda", "CB125", 2021, fuel_type=FuelType.benzin) is None
+
+
+@pytest.mark.asyncio
+async def test_catalog_brands_endpoint(client):
+    headers = await register_and_login(client, "brands@usta.app")
+    cars = (await client.get("/v1/catalog/brands?vehicle_type=araba", headers=headers)).json()
+    motos = (await client.get("/v1/catalog/brands?vehicle_type=motosiklet", headers=headers)).json()
+    assert "Fiat" in cars and "Volkswagen" in cars
+    assert "Fiat" not in motos  # araba markası moto listesinde yok
+    assert "Yamaha" in motos and "Bajaj" in motos
+    assert cars == sorted(cars)  # alfabetik
+    # vehicle_type yoksa araba varsayılır.
+    assert (await client.get("/v1/catalog/brands", headers=headers)).json() == cars
+
+
+@pytest.mark.asyncio
+async def test_catalog_brands_requires_auth_401(client):
+    assert (await client.get("/v1/catalog/brands")).status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_create_motorcycle_autofills_spec(client):
+    headers = await register_and_login(client, "moto-cat@usta.app")
+    payload = {
+        "make": "Yamaha", "model": "YBR125", "year": 2018,
+        "fuel_type": "benzin", "vehicle_type": "motosiklet",
+    }
+    r = await client.post("/v1/vehicles", json=payload, headers=headers)
+    assert r.status_code == 201
+    spec = r.json()["spec"]
+    assert spec is not None and spec["oil_spec"] == "10W-40"
 
 
 def test_find_spec_out_of_year_range_none():

@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -12,135 +12,293 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import type { Aciliyet, KayitKosulu, SoundDiagnoseResult } from '@/lib/api';
+import { BottomTabBar } from '@/components/BottomTabBar';
+import { FeedbackRow } from '@/components/FeedbackRow';
+import { MechanicBriefSheet } from '@/components/MechanicBriefSheet';
+import type { Guven, KayitKosulu } from '@/lib/api';
 import { t } from '@/lib/i18n';
+import { type BriefDiag } from '@/lib/mechanicBrief';
 import { theme } from '@/lib/theme';
 import { useSoundDiagnose } from '@/lib/useSoundDiagnose';
+import { useVehicles } from '@/lib/useVehicles';
 
-const CONDITIONS: KayitKosulu[] = [
-  'rolanti',
-  'gazda',
-  'soguk_motor',
-  'seyirde',
-];
+const CONDITIONS: KayitKosulu[] = ['rolanti', 'gazda', 'soguk_motor', 'seyirde'];
 
-/** Urgency color — NEVER green; secondary/amber/red by level. */
-function urgencyColor(aciliyet: Aciliyet): string {
-  if (aciliyet === 'yuksek') return theme.colors.danger;
-  if (aciliyet === 'orta') return theme.colors.accent;
-  return theme.colors.textSecondary;
+/** Sohbet balonu türleri (mockup ekran 3). */
+interface Msg {
+  id: number;
+  kind: 'usta' | 'user' | 'warning' | 'price';
+  text: string;
+  /** Usta balonunda güven satırı. */
+  conf?: Guven;
+  /** Usta balonunda küçük meta satırı (kategori · aciliyet). */
+  meta?: string;
+  /** 'price' balonu: tamirci maliyet aralığı + kaynak notu. */
+  priceLow?: number;
+  priceHigh?: number;
+  priceNote?: string;
 }
 
-function ResultPanel({ result }: { result: SoundDiagnoseResult }) {
-  const urgency = urgencyColor(result.aciliyet);
+function ModeCard({
+  icon,
+  title,
+  desc,
+  active,
+  onPress,
+}: {
+  icon: keyof typeof Ionicons.glyphMap;
+  title: string;
+  desc: string;
+  active: boolean;
+  onPress: () => void;
+}) {
   return (
-    <View style={styles.resultPanel}>
-      <Text style={styles.resultTitle}>{t('sound.result.title')}</Text>
-
-      <View style={styles.resultRow}>
-        <Text style={styles.resultLabel}>{t('sound.result.kategori')}</Text>
-        <Text style={styles.resultValue}>
-          {t(`sound.kategori.${result.ses_kategorisi}`)}
-        </Text>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ selected: active }}
+      onPress={onPress}
+      style={({ pressed }) => [styles.modeCard, active && styles.modeCardActive, pressed && styles.pressed]}
+    >
+      <View style={[styles.modeIcon, active && styles.modeIconActive]}>
+        <Ionicons name={icon} size={22} color={active ? theme.colors.onInk : theme.colors.ink} />
       </View>
+      <Text style={styles.modeTitle}>{title}</Text>
+      <Text style={styles.modeDesc}>{desc}</Text>
+    </Pressable>
+  );
+}
 
-      <View style={styles.resultRow}>
-        <Text style={styles.resultLabel}>{t('sound.result.tespit')}</Text>
-        <Text style={styles.resultValue}>{result.tespit}</Text>
+function Bubble({ msg }: { msg: Msg }) {
+  if (msg.kind === 'warning') {
+    return (
+      <View style={styles.warnBubble}>
+        <Ionicons name="warning" size={16} color={theme.colors.urgentSoftText} />
+        <Text style={styles.warnBubbleText}>{msg.text}</Text>
       </View>
-
-      <View style={styles.resultRow}>
-        <Text style={styles.resultLabel}>{t('sound.result.guven')}</Text>
-        <Text style={styles.resultValue}>
-          {t(`camera.guven.${result.guven}`)}
-        </Text>
-      </View>
-
-      <View style={styles.resultRow}>
-        <Text style={styles.resultLabel}>{t('sound.result.aciliyet')}</Text>
-        <View style={[styles.urgencyBadge, { borderColor: urgency }]}>
-          <Text style={[styles.urgencyText, { color: urgency }]}>
-            {t(`sound.aciliyet.${result.aciliyet}`)}
+    );
+  }
+  if (msg.kind === 'price') {
+    return (
+      <View style={styles.priceBubble}>
+        <View style={styles.priceIcon}>
+          <Ionicons name="pricetags" size={18} color={theme.colors.ink} />
+        </View>
+        <View style={styles.priceBody}>
+          <Text style={styles.priceLabel}>{t('sound.estimate.title')}</Text>
+          <Text style={styles.priceRange}>
+            ~{(msg.priceLow ?? 0).toLocaleString('tr-TR')}–
+            {(msg.priceHigh ?? 0).toLocaleString('tr-TR')} ₺
           </Text>
+          {msg.priceNote != null && <Text style={styles.priceNote}>{msg.priceNote}</Text>}
         </View>
       </View>
-
-      <View style={styles.resultRow}>
-        <Text style={styles.resultLabel}>{t('sound.result.sonrakiAdim')}</Text>
-        <Text style={styles.resultValue}>{result.sonraki_adim}</Text>
-      </View>
-
-      {result.guvenlik_uyarisi != null && (
-        <View style={styles.warningBox}>
-          <Ionicons name="warning" size={18} color={theme.colors.background} />
-          <Text style={styles.warningText}>{result.guvenlik_uyarisi}</Text>
+    );
+  }
+  const isUsta = msg.kind === 'usta';
+  return (
+    <View style={[styles.bubble, isUsta ? styles.bubbleUsta : styles.bubbleUser]}>
+      <Text style={isUsta ? styles.bubbleUstaText : styles.bubbleUserText}>{msg.text}</Text>
+      {isUsta && (msg.conf != null || msg.meta != null) && (
+        <View style={styles.confRow}>
+          <View style={styles.confDot} />
+          <Text style={styles.confText}>
+            {[msg.conf != null ? t(`camera.guven.${msg.conf}`) : null, msg.meta]
+              .filter(Boolean)
+              .join(' · ')}
+          </Text>
         </View>
       )}
     </View>
   );
 }
 
-export default function SoundScreen() {
+let nextId = 1;
+
+export default function DiagnosisScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { currentVehicle } = useVehicles();
   const { loading, error, result, runSoundDiagnose } = useSoundDiagnose();
 
   const [description, setDescription] = useState('');
   const [condition, setCondition] = useState<KayitKosulu>('rolanti');
+  const [messages, setMessages] = useState<Msg[]>([
+    { id: 0, kind: 'usta', text: t('diagnosis.intro') },
+  ]);
+  const [showMechanic, setShowMechanic] = useState(false);
+  const [briefOpen, setBriefOpen] = useState(false);
+  const scrollRef = useRef<ScrollView>(null);
+
+  const briefDiag: BriefDiag | null = result
+    ? {
+        kindLabel: t('brief.kindSound'),
+        tespit: result.tespit,
+        sesKategoriLabel: t(`sound.kategori.${result.ses_kategorisi}`),
+        guven: result.guven,
+        aciliyet: result.aciliyet,
+        sonrakiAdim: result.sonraki_adim,
+        guvenlikUyarisi: result.guvenlik_uyarisi,
+        sessionId: result.session_id ?? undefined,
+        costLow: result.cost_estimate?.low_try ?? undefined,
+        costHigh: result.cost_estimate?.high_try ?? undefined,
+      }
+    : null;
+
+  // Yeni teşhis sonucu geldiğinde usta balonları olarak akışa ekle.
+  useEffect(() => {
+    if (result == null) return;
+    const additions: Msg[] = [
+      {
+        id: nextId++,
+        kind: 'usta',
+        text: result.tespit,
+        conf: result.guven,
+        meta: `${t(`sound.kategori.${result.ses_kategorisi}`)} · ${t(
+          `sound.aciliyet.${result.aciliyet}`,
+        )}`,
+      },
+    ];
+    if (result.guvenlik_uyarisi != null && result.guvenlik_uyarisi.length > 0) {
+      additions.push({ id: nextId++, kind: 'warning', text: result.guvenlik_uyarisi });
+    }
+    additions.push({ id: nextId++, kind: 'usta', text: result.sonraki_adim });
+    // Fiyat şeffaflığı: tamirciye tahmini maliyet (kazıklanma kaygısına anlık cevap).
+    if (result.cost_estimate != null) {
+      const ce = result.cost_estimate;
+      additions.push({
+        id: nextId++,
+        kind: 'price',
+        text: '',
+        priceLow: ce.low_try,
+        priceHigh: ce.high_try,
+        priceNote:
+          ce.source === 'community'
+            ? t('sound.estimate.community', { count: ce.sample_size })
+            : t('sound.estimate.seed'),
+      });
+    }
+    setMessages((m) => [...m, ...additions]);
+    setShowMechanic(result.tamirciye_git_onerisi === true);
+  }, [result]);
+
+  // Akış uzadıkça en alta kay.
+  useEffect(() => {
+    const id = setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 80);
+    return () => clearTimeout(id);
+  }, [messages, loading]);
+
+  function handleSend() {
+    const text = description.trim();
+    if (text.length === 0 || loading) return;
+    setMessages((m) => [
+      ...m,
+      {
+        id: nextId++,
+        kind: 'user',
+        text: `${text} (${t(`sound.condition.${condition}`)})`,
+      },
+    ]);
+    setDescription('');
+    void runSoundDiagnose(text, condition);
+  }
 
   return (
-    <View
-      style={[styles.container, { paddingTop: insets.top + theme.spacing.lg }]}
-    >
-      <View style={styles.headerRow}>
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => router.back()}
-          style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
-        >
-          <Ionicons
-            name="chevron-back"
-            size={22}
-            color={theme.colors.textPrimary}
-          />
-          <Text style={styles.backText}>{t('common.back')}</Text>
-        </Pressable>
+    <View style={[styles.container, { paddingTop: insets.top + theme.spacing.md }]}>
+      <View style={styles.header}>
+        <Text style={styles.title}>{t('diagnosis.title')}</Text>
+        {currentVehicle && (
+          <View style={styles.carTag}>
+            <Ionicons name="car-sport" size={13} color={theme.colors.textSecondary} />
+            <Text style={styles.carTagText}>
+              {currentVehicle.make} {currentVehicle.model}
+            </Text>
+          </View>
+        )}
       </View>
 
+      {/* Göster / Dinlet modları */}
+      <View style={styles.modeGrid}>
+        <ModeCard
+          icon="camera"
+          title={t('diagnosis.show.title')}
+          desc={t('diagnosis.show.desc')}
+          active={false}
+          onPress={() => router.replace('/maintenance')}
+        />
+        <ModeCard
+          icon="pulse"
+          title={t('diagnosis.listen.title')}
+          desc={t('diagnosis.listen.desc')}
+          active
+          onPress={() => undefined}
+        />
+      </View>
+
+      {/* Sohbet akışı */}
       <ScrollView
-        contentContainerStyle={styles.scroll}
+        ref={scrollRef}
+        style={styles.chat}
+        contentContainerStyle={styles.chatContent}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
-        <Text style={styles.title}>{t('sound.title')}</Text>
+        <Text style={styles.chatLabel}>{t('diagnosis.chatLabel')}</Text>
+        {messages.map((msg) => (
+          <Bubble key={msg.id} msg={msg} />
+        ))}
+        {loading && (
+          <View style={[styles.bubble, styles.bubbleUsta, styles.typing]}>
+            <ActivityIndicator size="small" color={theme.colors.onInk} />
+            <Text style={styles.bubbleUstaText}>{t('sound.analyzing')}</Text>
+          </View>
+        )}
+        {error && (
+          <View style={styles.errorRow}>
+            <Ionicons name="alert-circle" size={16} color={theme.colors.dangerBright} />
+            <Text style={styles.errorText}>{t(error)}</Text>
+          </View>
+        )}
+        {/* Veri çarkı: son teşhis doğru çıktı mı? */}
+        {result?.session_id != null && currentVehicle != null && !loading && (
+          <View style={styles.feedbackWrap}>
+            <FeedbackRow
+              key={result.session_id}
+              vehicleId={currentVehicle.id}
+              sessionId={result.session_id}
+            />
+          </View>
+        )}
+        {result != null && currentVehicle != null && !loading && (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setBriefOpen(true)}
+            style={({ pressed }) => [styles.briefButton, pressed && styles.pressed]}
+          >
+            <Ionicons name="construct-outline" size={16} color={theme.colors.ink} />
+            <Text style={styles.briefButtonText}>{t('brief.cta')}</Text>
+          </Pressable>
+        )}
+        {showMechanic && (
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => setBriefOpen(true)}
+            style={({ pressed }) => [styles.mechanicButton, pressed && styles.pressed]}
+          >
+            <Ionicons name="construct" size={16} color={theme.colors.onInk} />
+            <Text style={styles.mechanicText}>{t('common.goToMechanic')}</Text>
+          </Pressable>
+        )}
+      </ScrollView>
 
-        <View style={styles.recordedHint}>
-          <Ionicons
-            name="information-circle"
-            size={18}
-            color={theme.colors.textSecondary}
-          />
-          <Text style={styles.recordedHintText}>{t('sound.recordedHint')}</Text>
-        </View>
-
-        <Text style={styles.label}>{t('sound.descriptionLabel')}</Text>
-        <TextInput
-          style={styles.textArea}
-          value={description}
-          onChangeText={setDescription}
-          placeholder={t('sound.descriptionPlaceholder')}
-          placeholderTextColor={theme.colors.textSecondary}
-          multiline
-          textAlignVertical="top"
-        />
-
-        <Text style={styles.label}>{t('sound.conditionLabel')}</Text>
-        <View style={styles.conditionRow}>
+      {/* Yazma alanı */}
+      <View style={styles.composer}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.conditionRow}
+        >
           {CONDITIONS.map((c) => {
             const selected = condition === c;
-            const color = selected
-              ? theme.colors.accent
-              : theme.colors.textSecondary;
             return (
               <Pressable
                 key={c}
@@ -149,281 +307,364 @@ export default function SoundScreen() {
                 onPress={() => setCondition(c)}
                 style={({ pressed }) => [
                   styles.conditionChip,
-                  { borderColor: color },
                   selected && styles.conditionChipSelected,
                   pressed && styles.pressed,
                 ]}
               >
-                <Text style={[styles.conditionLabel, { color }]}>
+                <Text style={[styles.conditionLabel, selected && styles.conditionLabelSelected]}>
                   {t(`sound.condition.${c}`)}
                 </Text>
               </Pressable>
             );
           })}
-        </View>
-
-        {error && (
-          <View style={styles.errorBox}>
-            <Ionicons
-              name="alert-circle"
-              size={18}
-              color={theme.colors.danger}
-            />
-            <Text style={styles.errorText}>{t(error)}</Text>
-          </View>
-        )}
-
-        {result && <ResultPanel result={result} />}
-
-        {result?.tamirciye_git_onerisi === true && (
+        </ScrollView>
+        <View style={styles.inputRow}>
+          <TextInput
+            style={styles.input}
+            value={description}
+            onChangeText={setDescription}
+            placeholder={t('sound.descriptionPlaceholder')}
+            placeholderTextColor={theme.colors.textSecondary}
+            multiline
+            onSubmitEditing={handleSend}
+          />
           <Pressable
             accessibilityRole="button"
-            onPress={() => router.back()}
+            accessibilityState={{ disabled: loading || description.trim().length === 0 }}
+            disabled={loading || description.trim().length === 0}
+            onPress={handleSend}
             style={({ pressed }) => [
-              styles.mechanicButton,
+              styles.send,
+              (loading || description.trim().length === 0) && styles.sendDisabled,
               pressed && styles.pressed,
             ]}
           >
-            <Ionicons
-              name="construct"
-              size={18}
-              color={theme.colors.background}
-            />
-            <Text style={styles.mechanicText}>{t('common.goToMechanic')}</Text>
+            <Ionicons name="arrow-up" size={20} color={theme.colors.onInk} />
           </Pressable>
-        )}
-      </ScrollView>
-
-      <View
-        style={[
-          styles.footer,
-          { paddingBottom: insets.bottom + theme.spacing.lg },
-        ]}
-      >
-        <Pressable
-          accessibilityRole="button"
-          accessibilityState={{ disabled: loading }}
-          disabled={loading}
-          onPress={() => void runSoundDiagnose(description, condition)}
-          style={({ pressed }) => [
-            styles.analyzeButton,
-            loading && styles.analyzeDisabled,
-            pressed && styles.pressed,
-          ]}
-        >
-          {loading ? (
-            <>
-              <ActivityIndicator color={theme.colors.background} />
-              <Text style={styles.analyzeText}>{t('sound.analyzing')}</Text>
-            </>
-          ) : (
-            <>
-              <Ionicons name="pulse" size={22} color={theme.colors.background} />
-              <Text style={styles.analyzeText}>{t('sound.analyze')}</Text>
-            </>
-          )}
-        </Pressable>
+        </View>
       </View>
+
+      <MechanicBriefSheet
+        visible={briefOpen}
+        vehicle={currentVehicle}
+        diag={briefDiag}
+        onClose={() => setBriefOpen(false)}
+      />
+
+      <BottomTabBar active="diagnosis" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.background,
+  container: { flex: 1, backgroundColor: theme.colors.background },
+  header: {
     paddingHorizontal: theme.spacing.lg,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    minHeight: theme.touchTarget,
-    paddingRight: theme.spacing.md,
-  },
-  backText: {
-    fontFamily: theme.fonts.body,
-    fontSize: 15,
-    fontWeight: '600',
-    color: theme.colors.textPrimary,
-  },
-  scroll: {
-    paddingBottom: theme.spacing.xxl,
+    paddingBottom: theme.spacing.sm,
+    gap: theme.spacing.xs,
   },
   title: {
     fontFamily: theme.fonts.heading,
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: '700',
     color: theme.colors.textPrimary,
-    marginBottom: theme.spacing.md,
+    letterSpacing: -0.3,
   },
-  recordedHint: {
+  carTag: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: theme.spacing.sm,
+    alignSelf: 'flex-start',
+    gap: theme.spacing.xs,
     backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.sm,
+    borderRadius: theme.radius.pill,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    padding: theme.spacing.md,
-    marginBottom: theme.spacing.lg,
+    paddingVertical: 3,
+    paddingHorizontal: theme.spacing.md,
   },
-  recordedHintText: {
+  carTagText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 12,
+    fontWeight: '500',
+    color: theme.colors.textSecondary,
+  },
+  modeGrid: {
+    flexDirection: 'row',
+    gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.sm,
+  },
+  modeCard: {
+    flex: 1,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.lg,
+    borderWidth: 1.5,
+    borderColor: theme.colors.border,
+    padding: theme.spacing.md,
+    alignItems: 'center',
+    gap: 2,
+  },
+  modeCardActive: { borderColor: theme.colors.ink },
+  modeIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 2,
+  },
+  modeIconActive: { backgroundColor: theme.colors.ink },
+  modeTitle: {
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    fontWeight: '700',
+    color: theme.colors.textPrimary,
+  },
+  modeDesc: {
+    fontFamily: theme.fonts.body,
+    fontSize: 10,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 14,
+  },
+  chat: { flex: 1 },
+  chatContent: {
+    paddingHorizontal: theme.spacing.lg,
+    paddingBottom: theme.spacing.md,
+  },
+  chatLabel: {
+    fontFamily: theme.fonts.body,
+    fontSize: 11,
+    fontWeight: '600',
+    color: theme.colors.textSecondary,
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+    marginBottom: theme.spacing.sm,
+  },
+  bubble: {
+    borderRadius: theme.radius.lg,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+    marginBottom: theme.spacing.sm,
+    maxWidth: '90%',
+  },
+  bubbleUsta: {
+    backgroundColor: theme.colors.ink,
+    borderBottomLeftRadius: 4,
+    alignSelf: 'flex-start',
+  },
+  bubbleUser: {
+    backgroundColor: theme.colors.border,
+    borderBottomRightRadius: 4,
+    alignSelf: 'flex-end',
+  },
+  bubbleUstaText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    lineHeight: 20,
+    color: theme.colors.onInk,
+  },
+  bubbleUserText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 13,
+    lineHeight: 20,
+    color: theme.colors.textPrimary,
+  },
+  confRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.xs,
+    marginTop: theme.spacing.sm,
+  },
+  confDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: theme.colors.successBright,
+  },
+  confText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 10,
+    color: theme.colors.onInkMuted,
+  },
+  warnBubble: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: theme.spacing.sm,
+    backgroundColor: theme.colors.urgentSoftBg,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
+    maxWidth: '95%',
+    alignSelf: 'flex-start',
+  },
+  warnBubbleText: {
     flex: 1,
     fontFamily: theme.fonts.body,
     fontSize: 12,
-    color: theme.colors.textSecondary,
+    lineHeight: 18,
+    color: theme.colors.urgentSoftText,
   },
-  label: {
-    fontFamily: theme.fonts.body,
-    fontSize: 13,
-    color: theme.colors.textSecondary,
-    marginBottom: theme.spacing.sm,
-    marginTop: theme.spacing.md,
-  },
-  textArea: {
-    minHeight: 96,
+  priceBubble: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.md,
     backgroundColor: theme.colors.surface,
-    borderRadius: theme.radius.md,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    padding: theme.spacing.lg,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
+    maxWidth: '95%',
+    alignSelf: 'flex-start',
+  },
+  priceIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  priceBody: { flex: 1, gap: 2 },
+  priceLabel: {
     fontFamily: theme.fonts.body,
-    fontSize: 16,
+    fontSize: 11,
+    fontWeight: '700',
+    color: theme.colors.textSecondary,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  priceRange: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 19,
+    fontWeight: '700',
     color: theme.colors.textPrimary,
   },
-  conditionRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: theme.spacing.sm,
-  },
-  conditionChip: {
-    minHeight: theme.touchTarget,
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderRadius: theme.radius.pill,
-    paddingHorizontal: theme.spacing.lg,
-  },
-  conditionChipSelected: {
-    backgroundColor: theme.colors.surface,
-  },
-  conditionLabel: {
+  priceNote: {
     fontFamily: theme.fonts.body,
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: 11,
+    color: theme.colors.textSecondary,
   },
-  errorBox: {
+  typing: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing.sm,
-    marginTop: theme.spacing.lg,
+  },
+  errorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    paddingVertical: theme.spacing.sm,
   },
   errorText: {
     flex: 1,
     fontFamily: theme.fonts.body,
-    fontSize: 14,
-    color: theme.colors.danger,
+    fontSize: 13,
+    color: theme.colors.dangerBright,
   },
-  resultPanel: {
+  feedbackWrap: {
     backgroundColor: theme.colors.surface,
     borderRadius: theme.radius.md,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    padding: theme.spacing.lg,
-    marginTop: theme.spacing.lg,
-  },
-  resultTitle: {
-    fontFamily: theme.fonts.heading,
-    fontSize: 18,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
+    padding: theme.spacing.md,
+    marginTop: theme.spacing.xs,
     marginBottom: theme.spacing.sm,
   },
-  resultRow: {
-    marginTop: theme.spacing.md,
-  },
-  resultLabel: {
-    fontFamily: theme.fonts.body,
-    fontSize: 12,
-    color: theme.colors.textSecondary,
-  },
-  resultValue: {
-    fontFamily: theme.fonts.body,
-    fontSize: 15,
-    color: theme.colors.textPrimary,
-    marginTop: 2,
-  },
-  urgencyBadge: {
-    alignSelf: 'flex-start',
-    borderWidth: 1,
-    borderRadius: theme.radius.pill,
-    paddingVertical: theme.spacing.xs,
-    paddingHorizontal: theme.spacing.md,
-    marginTop: theme.spacing.xs,
-  },
-  urgencyText: {
-    fontFamily: theme.fonts.body,
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  warningBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.sm,
-    backgroundColor: theme.colors.warning,
-    borderRadius: theme.radius.sm,
-    paddingVertical: theme.spacing.md,
-    paddingHorizontal: theme.spacing.md,
-    marginTop: theme.spacing.lg,
-  },
-  warningText: {
-    flex: 1,
-    fontFamily: theme.fonts.body,
-    fontSize: 13,
-    fontWeight: '600',
-    color: theme.colors.background,
-  },
-  mechanicButton: {
-    minHeight: theme.touchTarget,
-    borderRadius: theme.radius.md,
-    backgroundColor: theme.colors.accent,
+  briefButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: theme.spacing.sm,
-    marginTop: theme.spacing.lg,
+    minHeight: 48,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.ink,
+    marginTop: theme.spacing.sm,
+  },
+  briefButtonText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 15,
+    fontWeight: '700',
+    color: theme.colors.ink,
+  },
+  mechanicButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.sm,
+    minHeight: 48,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.colors.ink,
+    marginTop: theme.spacing.sm,
   },
   mechanicText: {
     fontFamily: theme.fonts.heading,
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
-    color: theme.colors.background,
+    color: theme.colors.onInk,
   },
-  footer: {
-    paddingTop: theme.spacing.md,
-  },
-  analyzeButton: {
-    minHeight: theme.touchTarget,
-    backgroundColor: theme.colors.accent,
-    borderRadius: theme.radius.md,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+  composer: {
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+    paddingTop: theme.spacing.sm,
+    paddingBottom: theme.spacing.sm,
     gap: theme.spacing.sm,
   },
-  analyzeDisabled: {
-    opacity: 0.5,
+  conditionRow: {
+    gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.lg,
   },
-  analyzeText: {
-    fontFamily: theme.fonts.heading,
-    fontSize: 18,
+  conditionChip: {
+    minHeight: 36,
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: theme.radius.pill,
+    paddingHorizontal: theme.spacing.md,
+    backgroundColor: theme.colors.surface,
+  },
+  conditionChipSelected: {
+    backgroundColor: theme.colors.ink,
+    borderColor: theme.colors.ink,
+  },
+  conditionLabel: {
+    fontFamily: theme.fonts.body,
+    fontSize: 12,
     fontWeight: '700',
-    color: theme.colors.background,
+    color: theme.colors.textSecondary,
   },
-  pressed: {
-    opacity: 0.85,
+  conditionLabelSelected: { color: theme.colors.onInk },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.lg,
   },
+  input: {
+    flex: 1,
+    minHeight: 44,
+    maxHeight: 110,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.lg,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.md,
+    fontFamily: theme.fonts.body,
+    fontSize: 14,
+    color: theme.colors.textPrimary,
+  },
+  send: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: theme.colors.ink,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sendDisabled: { opacity: 0.4 },
+  pressed: { opacity: 0.85 },
 });

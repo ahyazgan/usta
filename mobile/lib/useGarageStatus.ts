@@ -28,6 +28,8 @@ export interface GarageChips {
 
 export interface UseGarageStatus {
   chips: GarageChips;
+  /** Tüm km-bazlı hatırlatıcılar (ana sayfa "Yapılacaklar" listesi için). */
+  reminders: Reminder[];
   loading: boolean;
 }
 
@@ -53,6 +55,7 @@ export function useGarageStatus(vehicleId: number | null): UseGarageStatus {
   const authToken = useUstaStore((s) => s.authToken);
 
   const [chips, setChips] = useState<GarageChips>(NEUTRAL_CHIPS);
+  const [reminders, setReminders] = useState<Reminder[]>([]);
   const [loading, setLoading] = useState(false);
 
   const client = useMemo(
@@ -63,20 +66,23 @@ export function useGarageStatus(vehicleId: number | null): UseGarageStatus {
   const load = useCallback(async () => {
     if (vehicleId == null) {
       setChips(NEUTRAL_CHIPS);
+      setReminders([]);
       return;
     }
     setLoading(true);
     try {
-      const reminders = await client.getReminders(vehicleId);
+      const fetched = await client.getReminders(vehicleId);
+      setReminders(fetched);
       setChips({
-        oil: toChipState(findStatus(reminders, 'oil_change')),
-        filter: toChipState(findStatus(reminders, 'cabin_filter')),
+        oil: toChipState(findStatus(fetched, 'oil_change')),
+        filter: toChipState(findStatus(fetched, 'cabin_filter')),
         // Battery has no km interval — always neutral.
         battery: 'unknown',
       });
     } catch {
       // Never crash the garage — fall back to neutral chips.
       setChips(NEUTRAL_CHIPS);
+      setReminders([]);
     } finally {
       setLoading(false);
     }
@@ -86,7 +92,7 @@ export function useGarageStatus(vehicleId: number | null): UseGarageStatus {
     void load();
   }, [load]);
 
-  return { chips, loading };
+  return { chips, reminders, loading };
 }
 
 export default useGarageStatus;

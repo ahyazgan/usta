@@ -11,9 +11,15 @@ from dataclasses import dataclass
 from .enums import ReminderStatus
 
 # Görev -> servis aralığı (km). Sadece km bazlı görevler.
+# (battery/wiper/headlight zaman/duruma bağlıdır; km hatırlatıcısı üretilmez.)
 TASK_INTERVALS_KM: dict[str, int] = {
     "oil_change": 15_000,
     "cabin_filter": 15_000,
+    "air_filter": 30_000,
+    "spark_plug": 60_000,
+    "coolant": 60_000,
+    "brake_check": 20_000,  # kontrol aralığı (değişim değil)
+    "tire": 10_000,  # rotasyon/kontrol aralığı
 }
 
 # Kalan km bu eşiğin altındaysa "yaklaşıyor".

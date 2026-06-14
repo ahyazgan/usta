@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Usta — Yönetim Paneli</title>
+<style>
+  :root {
+    --bg:#16181D; --surface:#1D2026; --border:#2A2D34; --amber:#FF8A00;
+    --ok:#22C55E; --text:#F2F3F5; --muted:#8B8E96;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+  .wrap { max-width:980px; margin:0 auto; padding:24px 16px 64px; }
+  header { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:20px; }
+  h1 { font-size:22px; margin:0; letter-spacing:-.3px; }
+  h1 span { color:var(--amber); }
+  .bar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  input { background:var(--surface); border:1px solid var(--border); color:var(--text);
+    border-radius:10px; padding:10px 12px; font-size:14px; width:240px; }
+  button { background:var(--amber); color:#1a1a1a; border:none; border-radius:10px;
+    padding:10px 16px; font-size:14px; font-weight:700; cursor:pointer; }
+  button.ghost { background:transparent; color:var(--muted); border:1px solid var(--border); }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin-bottom:20px; }
+  .kpi { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; }
+  .kpi .label { color:var(--muted); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; }
+  .kpi .val { font-size:30px; font-weight:800; margin-top:6px; }
+  .kpi .sub { color:var(--muted); font-size:12px; margin-top:4px; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:16px; }
+  .card h2 { font-size:14px; margin:0 0 12px; color:var(--amber); text-transform:uppercase; letter-spacing:.5px; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th,td { text-align:left; padding:8px 6px; border-bottom:1px solid var(--border); }
+  th { color:var(--muted); font-size:11px; text-transform:uppercase; font-weight:700; }
+  td.num, th.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .chip { display:inline-block; background:rgba(255,138,0,.12); color:var(--amber);
+    border-radius:999px; padding:2px 10px; font-size:12px; font-weight:700; margin:2px 4px 2px 0; }
+  .muted { color:var(--muted); }
+  .err { color:#EF4444; font-size:13px; }
+  .empty { color:var(--muted); font-size:13px; padding:8px 6px; }
+  footer { color:var(--muted); font-size:11px; margin-top:24px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Usta <span>·</span> Yönetim Paneli</h1>
+    <div class="bar">
+      <input id="token" type="password" placeholder="Admin token" autocomplete="off" />
+      <button onclick="load()">Yükle</button>
+      <button class="ghost" onclick="logout()">Çıkış</button>
+    </div>
+  </header>
+
+  <div id="err" class="err"></div>
+
+  <div class="grid" id="kpis"></div>
+  <div class="card"><h2>Tamirci Yönlendirmeleri — Kanal</h2><div id="channels"></div></div>
+  <div class="card"><h2>En Çok Lead Alan Tamirciler</h2><div id="mechs"></div></div>
+  <div class="card"><h2>En Çok İstenen Parçalar (Satın Al niyeti)</h2><div id="parts"></div></div>
+  <footer id="ts"></footer>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const TKEY = 'usta_admin_token';
+
+function logout(){ localStorage.removeItem(TKEY); $('token').value=''; clear(); $('err').textContent='Çıkış yapıldı.'; }
+function clear(){ $('kpis').innerHTML=''; $('channels').innerHTML=''; $('mechs').innerHTML=''; $('parts').innerHTML=''; $('ts').textContent=''; }
+
+function kpi(label,val,sub){ return `<div class="kpi"><div class="label">${label}</div><div class="val">${val}</div>${sub?`<div class="sub">${sub}</div>`:''}</div>`; }
+
+function rows(arr, cols, empty){
+  if(!arr || !arr.length) return `<div class="empty">${empty}</div>`;
+  const head = '<tr>' + cols.map(c=>`<th class="${c.num?'num':''}">${c.h}</th>`).join('') + '</tr>';
+  const body = arr.map(o => '<tr>' + cols.map(c=>`<td class="${c.num?'num':''}">${o[c.k] ?? '—'}</td>`).join('') + '</tr>').join('');
+  return `<table>${head}${body}</table>`;
+}
+
+async function load(){
+  const token = $('token').value.trim() || localStorage.getItem(TKEY) || '';
+  if(!token){ $('err').textContent='Admin token gir.'; return; }
+  $('err').textContent=''; localStorage.setItem(TKEY, token); $('token').value=token;
+  try {
+    const r = await fetch('/v1/admin/stats', { headers: { 'X-Admin-Token': token } });
+    if(r.status===403){ $('err').textContent='Geçersiz token.'; clear(); return; }
+    if(r.status===503){ $('err').textContent='Admin paneli yapılandırılmamış (USTA_ADMIN_TOKEN yok).'; clear(); return; }
+    if(!r.ok){ $('err').textContent='Hata: '+r.status; return; }
+    render(await r.json());
+  } catch(e){ $('err').textContent='Bağlantı hatası.'; }
+}
+
+function render(d){
+  const ml=d.mechanic_leads, pi=d.part_intents, lv=d.live, us=d.users;
+  const conv = us.total ? Math.round(100*us.premium/us.total) : 0;
+  const mins = Math.round((lv.total_seconds||0)/60);
+  $('kpis').innerHTML =
+    kpi('Tamirci Lead', ml.total, `son 30g: ${ml.last_30_days}`) +
+    kpi('Parça Niyeti', pi.total, `son 30g: ${pi.last_30_days}`) +
+    kpi('Canlı Dakika', mins, `${lv.sessions} oturum`) +
+    kpi('Kullanıcı', us.total, `premium: ${us.premium} (%${conv})`);
+  $('channels').innerHTML = Object.keys(ml.by_channel||{}).length
+    ? Object.entries(ml.by_channel).map(([k,v])=>`<span class="chip">${k}: ${v}</span>`).join('')
+    : '<div class="empty">Henüz yönlendirme yok.</div>';
+  $('mechs').innerHTML = rows(ml.top_mechanics, [{h:'Tamirci',k:'name'},{h:'Şehir',k:'city'},{h:'Lead',k:'leads',num:true}], 'Henüz lead yok.');
+  $('parts').innerHTML = rows(pi.top_parts, [{h:'Parça',k:'part'},{h:'Niyet',k:'intents',num:true}], 'Henüz parça niyeti yok.');
+  $('ts').textContent = 'Güncellendi: ' + new Date().toLocaleString('tr-TR');
+}
+
+// Kayıtlı token varsa otomatik yükle.
+window.addEventListener('load', () => { if(localStorage.getItem(TKEY)) load(); });
+</script>
+</body>
+</html>

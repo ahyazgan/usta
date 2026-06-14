@@ -10,12 +10,9 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#16181D"
-    },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.usta.app",
@@ -30,7 +27,11 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#16181D"
-      }
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -41,12 +42,39 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Usta kamerayı doğru parçayı bulduğunu doğrulamak için kullanır."
+          "cameraPermission": "Usta kamerayı doğru parçayı bulduğunu doğrulamak için kullanır.",
+          "microphonePermission": "Usta mikrofonu canlı sesli rehberlik için kullanır.",
+          "recordAudioAndroid": true
+        }
+      ],
+      "expo-font",
+      "expo-notifications",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Usta, daha önce çektiğin uyarı ışığı veya parça fotoğrafını analiz etmek için galerine erişir."
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#16181D"
         }
       ]
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "78ea62dc-1ba8-426b-8c56-0da737951693"
+      }
+    },
+    "owner": "ahyazgan"
   }
 }

@@ -15,7 +15,9 @@ from ...domain.enums import AIKind
 from ...domain.models import AISession, User, Vehicle
 from ...domain.safety import enforce_image_safety
 from ...domain.schemas import ImageDiagnoseRequest, ImageDiagnoseResponse
+from ...domain.taxonomy import sistem_for_task
 from .claude_client import ClaudeClient
+from .cost import build_cost_estimate
 from .prompts import build_vision_prompt
 
 
@@ -47,21 +49,36 @@ async def diagnose_image(
 
     result = await claude.complete_json(model=model, system=system, content=content)
 
-    # Token loglama (maliyet denetimi).
-    db.add(
-        AISession(
-            user_id=user.id,
-            vehicle_id=vehicle.id,
-            kind=AIKind.image,
-            model=model,
-            tokens_in=result.tokens_in,
-            tokens_out=result.tokens_out,
-        )
+    # Token + teşhis özeti loglama (maliyet denetimi + "Teşhis Geçmişi").
+    session = AISession(
+        user_id=user.id,
+        vehicle_id=vehicle.id,
+        kind=AIKind.image,
+        model=model,
+        tokens_in=result.tokens_in,
+        tokens_out=result.tokens_out,
+        task=payload.task,
     )
-    await db.commit()
 
     try:
         parsed = ImageDiagnoseResponse(**result.data)
     except ValidationError as exc:
+        # Şema bozuk olsa da token maliyetini kaybetme.
+        db.add(session)
+        await db.commit()
         raise AIUpstreamError("AI yanıtı beklenen şemada değil.") from exc
-    return enforce_image_safety(parsed, context=payload.user_note or "")
+
+    final = enforce_image_safety(parsed, context=payload.user_note or "")
+    # Özet, güvenlik kuralları zorlandıktan SONRAKİ metinden yazılır.
+    session.tespit = final.tespit[:500]
+    session.guven = final.guven.value
+    session.tamirciye_git = final.tamirciye_git_onerisi
+    session.kategori = payload.task  # görüntüde kategori = görev id'si
+    session.ariza_sistem = sistem_for_task(payload.task).value
+    db.add(session)
+    await db.commit()
+    await db.refresh(session)
+    # Fiyat şeffaflığı: tamirciye tahmini maliyet (arıza sistemine göre).
+    cost = await build_cost_estimate(db, session.ariza_sistem, vehicle.vehicle_type)
+    # 👍/👎 geri bildirimi bu id'ye bağlanır.
+    return final.model_copy(update={"session_id": session.id, "cost_estimate": cost})

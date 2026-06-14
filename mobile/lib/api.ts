@@ -583,6 +583,8 @@ export interface ApiClient {
   deleteAccount(): Promise<void>;
   /** Known catalog brands for a vehicle type (form quick-pick). */
   getCatalogBrands(vehicleType: VehicleType): Promise<string[]>;
+  /** Known catalog models for a brand + vehicle type (form quick-pick). */
+  getCatalogModels(make: string, vehicleType: VehicleType): Promise<string[]>;
   listVehicles(): Promise<Vehicle[]>;
   createVehicle(input: VehicleCreateInput): Promise<Vehicle>;
   getVehicle(id: number): Promise<Vehicle>;
@@ -891,6 +893,14 @@ export function createApiClient(
     async getCatalogBrands(vehicleType) {
       const headers = await authHeaders();
       return request<string[]>(`/v1/catalog/brands?vehicle_type=${vehicleType}`, {
+        method: 'GET',
+        headers,
+      });
+    },
+    async getCatalogModels(make, vehicleType) {
+      const headers = await authHeaders();
+      const q = `make=${encodeURIComponent(make)}&vehicle_type=${vehicleType}`;
+      return request<string[]>(`/v1/catalog/models?${q}`, {
         method: 'GET',
         headers,
       });

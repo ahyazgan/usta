@@ -65,6 +65,43 @@ async def test_catalog_brands_requires_auth_401(client):
 
 
 @pytest.mark.asyncio
+async def test_catalog_models_endpoint(client):
+    headers = await register_and_login(client, "models@usta.app")
+    # Renault'un birden çok modeli var (Clio, Megane, Symbol).
+    renault = (
+        await client.get("/v1/catalog/models?make=Renault&vehicle_type=araba", headers=headers)
+    ).json()
+    assert "Clio" in renault and "Megane" in renault
+    assert renault == sorted(renault)  # alfabetik
+    assert len(renault) == len(set(renault))  # tekilleştirilmiş
+    # Harf duyarsız.
+    assert (
+        await client.get("/v1/catalog/models?make=renault&vehicle_type=araba", headers=headers)
+    ).json() == renault
+    # Tür ayrımı: Honda araba (Civic) vs motosiklet (CB125, PCX125...).
+    honda_moto = (
+        await client.get("/v1/catalog/models?make=Honda&vehicle_type=motosiklet", headers=headers)
+    ).json()
+    assert "CB125" in honda_moto and "Civic" not in honda_moto
+    # Bilinmeyen marka -> boş liste (hata değil).
+    assert (
+        await client.get("/v1/catalog/models?make=Tesla&vehicle_type=araba", headers=headers)
+    ).json() == []
+
+
+@pytest.mark.asyncio
+async def test_catalog_models_requires_auth_401(client):
+    assert (await client.get("/v1/catalog/models?make=Renault")).status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_catalog_models_missing_make_422(client):
+    headers = await register_and_login(client, "models422@usta.app")
+    # make zorunlu query param -> eksikse 422.
+    assert (await client.get("/v1/catalog/models", headers=headers)).status_code == 422
+
+
+@pytest.mark.asyncio
 async def test_create_motorcycle_autofills_spec(client):
     headers = await register_and_login(client, "moto-cat@usta.app")
     payload = {

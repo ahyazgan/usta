@@ -91,6 +91,29 @@ export default function VehicleNewScreen() {
     };
   }, [client, vehicleType]);
 
+  // Seçili markanın katalog modelleri — "yazmak yerine dokun". Marka boşken
+  // ya da katalogda yoksa boş kalır (kullanıcı yine elle yazabilir).
+  const [models, setModels] = useState<string[]>([]);
+  const makeTrimmed = make.trim();
+  useEffect(() => {
+    let active = true;
+    if (makeTrimmed.length === 0) {
+      setModels([]);
+      return;
+    }
+    client
+      .getCatalogModels(makeTrimmed, vehicleType)
+      .then((m) => {
+        if (active) setModels(m);
+      })
+      .catch(() => {
+        if (active) setModels([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, [client, makeTrimmed, vehicleType]);
+
   async function handleSave() {
     if (submitting) return;
     const parsedYear = Number(year.trim());
@@ -255,7 +278,12 @@ export default function VehicleNewScreen() {
                   key={b}
                   accessibilityRole="button"
                   accessibilityState={{ selected }}
-                  onPress={() => setMake(b)}
+                  onPress={() => {
+                    // Marka değişince eski modeli temizle (yanlış marka-model
+                    // eşleşmesini önle); aynı markaya tekrar basarsa korunur.
+                    if (b.toLowerCase() !== make.trim().toLowerCase()) setModel('');
+                    setMake(b);
+                  }}
                   style={({ pressed }) => [
                     styles.brandChip,
                     selected && styles.brandChipSelected,
@@ -281,6 +309,35 @@ export default function VehicleNewScreen() {
           placeholderTextColor={theme.colors.textSecondary}
           autoCapitalize="words"
         />
+        {models.length > 0 && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={styles.brandRow}
+          >
+            {models.map((m) => {
+              const selected = model.trim().toLowerCase() === m.toLowerCase();
+              return (
+                <Pressable
+                  key={m}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
+                  onPress={() => setModel(m)}
+                  style={({ pressed }) => [
+                    styles.brandChip,
+                    selected && styles.brandChipSelected,
+                    pressed && styles.pressed,
+                  ]}
+                >
+                  <Text style={[styles.brandChipText, selected && styles.brandChipTextSelected]}>
+                    {m}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+        )}
 
         <Text style={styles.label}>{t('vehicle.form.year')}</Text>
         <TextInput

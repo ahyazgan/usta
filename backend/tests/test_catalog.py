@@ -85,7 +85,7 @@ async def test_catalog_models_endpoint(client):
     assert "CB125" in honda_moto and "Civic" not in honda_moto
     # Bilinmeyen marka -> boş liste (hata değil).
     assert (
-        await client.get("/v1/catalog/models?make=Tesla&vehicle_type=araba", headers=headers)
+        await client.get("/v1/catalog/models?make=Bilinmeyen&vehicle_type=araba", headers=headers)
     ).json() == []
 
 

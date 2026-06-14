@@ -123,6 +123,29 @@ Bulgular:
 
 ---
 
+## Denetim (2026-06-14) — Katalog genişletme (premium + SUV + Tesla)
+Kapsam: backend/app/domain/catalog.py'ye eklenen ~22 yeni araç (BMW 3/5/X5,
+Mercedes-Benz C/E/A, Audi A3/A4/Q5, Volvo XC60, SUV'lar Tucson/Sportage/Duster/
+Tiguan/Passat/Juke/RAV4/Kuga/Captur/3008 + Tesla Model 3 elektrikli).
+
+Sonuç: KRİTİK 0 · YÜKSEK 0 · ORTA 0 → PASS (blok yok).
+
+Doğrulanan güçlü noktalar:
+- LPG araçları (Duster, Captur): FuelType.lpg yalnızca sınıflandırma; spec'te LPG
+  müdahale/ayar/onarım tarifi YOK. LPG yasağı korunuyor.
+- Tesla Model 3: oil/buji/hava-yağ filtresi alanları doğru şekilde None (EV'de
+  yağ değişimi/buji yok). battery yüksek voltaj GÜVENLİ temsil edilmiş; HV'ye
+  "kendin müdahale" çağrısı yok.
+- Yeni spec'lerde kesin-dil (kesin/%100) yok; parça no'ları "örnek:" yer tutuculu.
+
+İzleme (bulgu DEĞİL): Tesla "yüksek voltaj/HV batarya" ifadesi SAFETY_TRIGGER_
+KEYWORDS'te yok (yalnız "akü" tetikliyor). EV'ye özel rehberlik akışları eklenirse
+"yüksek voltaj"/"yuksek voltaj" anahtarı eklenmeli.
+
+DERS (tekrar): safety-auditor subagent hafızayı bazen backend/.claude/memory/'ye
+yazıyor; kanonik konum .claude/memory/safety-auditor.md (kök) — her denetimden
+sonra yanlış konumu kontrol et ve birleştir.
+
 ## 2026-06-13 — Dashboard (pano) denetiminden taşınan kabul edilmiş istisnalar
 (İlk denetim backend/ cwd'sinde yapıldığı için ayrı konumda kalmıştı; buraya
 birleştirildi. Bu istisnalar gelecekte YENİDEN UYARILMAMALI:)

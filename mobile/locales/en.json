@@ -48,20 +48,15 @@
   "home": {
     "greeting": "Hello 👋",
     "welcome": "Your garage",
-    "triage": {
-      "title": "What do you need today?",
-      "problem": {
-        "title": "Something's wrong",
-        "desc": "Describe or show it, I'll diagnose"
-      },
-      "maintenance": {
-        "title": "Doing maintenance",
-        "desc": "Do it yourself with a step-by-step guide"
-      }
-    },
-    "priceGuide": {
-      "title": "Price Guide",
-      "desc": "What do jobs cost at a mechanic for this car?"
+    "toolsTitle": "What do you want to do?",
+    "tools": {
+      "symptom": "Describe issue",
+      "sound": "Sound check",
+      "dashboard": "Warning light",
+      "dtc": "Fault code",
+      "prices": "Price guide",
+      "fuel": "Fuel tracking",
+      "maintenance": "Maintenance guide"
     },
     "tasksTitle": "To-do",
     "tasksEmpty": "Add maintenance entries and your to-dos will appear here.",

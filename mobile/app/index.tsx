@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { AiToolsGrid, type AiTool } from '@/components/AiToolsGrid';
 import { BottomTabBar } from '@/components/BottomTabBar';
 import { BrandBadge } from '@/components/BrandBadge';
 import { type Reminder, type Vehicle } from '@/lib/api';
@@ -167,40 +168,6 @@ function TaskRow({ reminder, onPress }: { reminder: Reminder; onPress: () => voi
 }
 
 /** Triyaj girişi — "Neyin var?": sorun → teşhis, planlı → bakım. */
-function TriageHero({
-  onProblem,
-  onMaintenance,
-}: {
-  onProblem: () => void;
-  onMaintenance: () => void;
-}) {
-  return (
-    <View style={styles.triage}>
-      <Text style={styles.triageTitle}>{t('home.triage.title')}</Text>
-      <View style={styles.triageRow}>
-        <Pressable
-          accessibilityRole="button"
-          onPress={onProblem}
-          style={({ pressed }) => [styles.triageCard, styles.triageProblem, pressed && styles.pressed]}
-        >
-          <Ionicons name="pulse" size={26} color={theme.colors.onInk} />
-          <Text style={styles.triageProblemTitle}>{t('home.triage.problem.title')}</Text>
-          <Text style={styles.triageProblemDesc}>{t('home.triage.problem.desc')}</Text>
-        </Pressable>
-        <Pressable
-          accessibilityRole="button"
-          onPress={onMaintenance}
-          style={({ pressed }) => [styles.triageCard, styles.triageMaint, pressed && styles.pressed]}
-        >
-          <Ionicons name="construct" size={26} color={theme.colors.ink} />
-          <Text style={styles.triageMaintTitle}>{t('home.triage.maintenance.title')}</Text>
-          <Text style={styles.triageMaintDesc}>{t('home.triage.maintenance.desc')}</Text>
-        </Pressable>
-      </View>
-    </View>
-  );
-}
-
 export default function HomeScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -425,117 +392,79 @@ export default function HomeScreen() {
     .sort((a, b) => STATUS_PRIORITY[a.status] - STATUS_PRIORITY[b.status])
     .slice(0, 4);
 
+  // AI & yardımcı araçlar — ana sayfadaki kompakt ızgara. Sıra: en sık
+  // kullanılan teşhis araçları önce.
+  const aiTools: AiTool[] = [
+    {
+      key: 'symptom',
+      icon: 'chatbubble-ellipses-outline',
+      labelKey: 'home.tools.symptom',
+      onPress: () => {
+        void capture('open_symptom');
+        router.push('/symptom');
+      },
+    },
+    {
+      key: 'sound',
+      icon: 'pulse-outline',
+      labelKey: 'home.tools.sound',
+      onPress: () => {
+        void capture('triage_problem');
+        router.push('/sound');
+      },
+    },
+    {
+      key: 'dashboard',
+      icon: 'warning-outline',
+      labelKey: 'home.tools.dashboard',
+      tint: theme.colors.warningBright,
+      onPress: () => {
+        void capture('open_dashboard');
+        router.push('/dashboard');
+      },
+    },
+    {
+      key: 'dtc',
+      icon: 'barcode-outline',
+      labelKey: 'home.tools.dtc',
+      onPress: () => {
+        void capture('open_fault_code');
+        router.push('/fault-code');
+      },
+    },
+    {
+      key: 'maintenance',
+      icon: 'construct-outline',
+      labelKey: 'home.tools.maintenance',
+      onPress: () => {
+        void capture('triage_maintenance');
+        router.replace('/maintenance');
+      },
+    },
+    {
+      key: 'prices',
+      icon: 'pricetags-outline',
+      labelKey: 'home.tools.prices',
+      onPress: () => {
+        void capture('open_prices');
+        router.push('/prices');
+      },
+    },
+    {
+      key: 'fuel',
+      icon: 'water-outline',
+      labelKey: 'home.tools.fuel',
+      onPress: () => {
+        void capture('open_fuel');
+        router.push('/fuel');
+      },
+    },
+  ];
+
   return (
     <View style={[styles.container, { paddingTop: insets.top + theme.spacing.md }]}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {header}
-
-        {/* Triyaj: derde göre giriş */}
-        <TriageHero
-          onProblem={() => {
-            void capture('triage_problem');
-            router.push('/sound');
-          }}
-          onMaintenance={() => {
-            void capture('triage_maintenance');
-            router.replace('/maintenance');
-          }}
-        />
-
-        {/* Fiyat şeffaflığı vitrini */}
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => {
-            void capture('open_prices');
-            router.push('/prices');
-          }}
-          style={({ pressed }) => [styles.priceGuide, pressed && styles.pressed]}
-        >
-          <View style={styles.priceGuideIcon}>
-            <Ionicons name="pricetags" size={20} color={theme.colors.ink} />
-          </View>
-          <View style={styles.priceGuideBody}>
-            <Text style={styles.priceGuideTitle}>{t('home.priceGuide.title')}</Text>
-            <Text style={styles.priceGuideDesc}>{t('home.priceGuide.desc')}</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={18} color={theme.colors.textSecondary} />
-        </Pressable>
-
-        {/* Belirti-bazlı serbest teşhis (yazıyla anlat) */}
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => {
-            void capture('open_symptom');
-            router.push('/symptom');
-          }}
-          style={({ pressed }) => [styles.priceGuide, pressed && styles.pressed]}
-        >
-          <View style={styles.priceGuideIcon}>
-            <Ionicons name="chatbubble-ellipses-outline" size={20} color={theme.colors.ink} />
-          </View>
-          <View style={styles.priceGuideBody}>
-            <Text style={styles.priceGuideTitle}>{t('symptom.entry.title')}</Text>
-            <Text style={styles.priceGuideDesc}>{t('symptom.entry.desc')}</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={18} color={theme.colors.textSecondary} />
-        </Pressable>
-
-        {/* Gösterge paneli uyarı ışığı tanıma (kamera tabanlı) */}
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => {
-            void capture('open_dashboard');
-            router.push('/dashboard');
-          }}
-          style={({ pressed }) => [styles.priceGuide, pressed && styles.pressed]}
-        >
-          <View style={styles.priceGuideIcon}>
-            <Ionicons name="warning-outline" size={20} color={theme.colors.warningBright} />
-          </View>
-          <View style={styles.priceGuideBody}>
-            <Text style={styles.priceGuideTitle}>{t('dashboard.entry.title')}</Text>
-            <Text style={styles.priceGuideDesc}>{t('dashboard.entry.desc')}</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={18} color={theme.colors.textSecondary} />
-        </Pressable>
-
-        {/* Arıza kodu (OBD-II) açıklama */}
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => {
-            void capture('open_fault_code');
-            router.push('/fault-code');
-          }}
-          style={({ pressed }) => [styles.priceGuide, pressed && styles.pressed]}
-        >
-          <View style={styles.priceGuideIcon}>
-            <Ionicons name="barcode-outline" size={20} color={theme.colors.ink} />
-          </View>
-          <View style={styles.priceGuideBody}>
-            <Text style={styles.priceGuideTitle}>{t('dtc.entry.title')}</Text>
-            <Text style={styles.priceGuideDesc}>{t('dtc.entry.desc')}</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={18} color={theme.colors.textSecondary} />
-        </Pressable>
-
-        {/* Yakıt & masraf takibi */}
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => {
-            void capture('open_fuel');
-            router.push('/fuel');
-          }}
-          style={({ pressed }) => [styles.priceGuide, pressed && styles.pressed]}
-        >
-          <View style={styles.priceGuideIcon}>
-            <Ionicons name="water-outline" size={20} color={theme.colors.ink} />
-          </View>
-          <View style={styles.priceGuideBody}>
-            <Text style={styles.priceGuideTitle}>{t('fuel.entry.title')}</Text>
-            <Text style={styles.priceGuideDesc}>{t('fuel.entry.desc')}</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={18} color={theme.colors.textSecondary} />
-        </Pressable>
 
         {vehicles.length > 1 && (
           <ScrollView
@@ -633,6 +562,10 @@ export default function HomeScreen() {
             <Ionicons name="trash-outline" size={16} color={theme.colors.dangerBright} />
           </Pressable>
         </View>
+
+        {/* AI & yardımcı araçlar — kompakt ızgara */}
+        <Text style={[styles.sectionTitle, styles.toolsHeading]}>{t('home.toolsTitle')}</Text>
+        <AiToolsGrid tools={aiTools} />
 
         {/* Yapılacaklar */}
         <View style={styles.sectionHeader}>
@@ -834,97 +767,6 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     textAlign: 'center',
     marginBottom: theme.spacing.sm,
-  },
-  triage: {
-    paddingHorizontal: theme.spacing.lg,
-    marginBottom: theme.spacing.lg,
-  },
-  triageTitle: {
-    fontFamily: theme.fonts.heading,
-    fontSize: 16,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: theme.spacing.md,
-  },
-  triageRow: {
-    flexDirection: 'row',
-    gap: theme.spacing.md,
-  },
-  triageCard: {
-    flex: 1,
-    borderRadius: theme.radius.lg,
-    padding: theme.spacing.lg,
-    gap: 4,
-    minHeight: 120,
-    justifyContent: 'center',
-  },
-  triageProblem: {
-    backgroundColor: theme.colors.ink,
-  },
-  triageProblemTitle: {
-    fontFamily: theme.fonts.heading,
-    fontSize: 17,
-    fontWeight: '700',
-    color: theme.colors.onInk,
-    marginTop: theme.spacing.sm,
-  },
-  triageProblemDesc: {
-    fontFamily: theme.fonts.body,
-    fontSize: 12,
-    color: theme.colors.onInkMuted,
-    lineHeight: 16,
-  },
-  triageMaint: {
-    backgroundColor: theme.colors.surface,
-    borderWidth: 1.5,
-    borderColor: theme.colors.border,
-  },
-  triageMaintTitle: {
-    fontFamily: theme.fonts.heading,
-    fontSize: 17,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
-    marginTop: theme.spacing.sm,
-  },
-  triageMaintDesc: {
-    fontFamily: theme.fonts.body,
-    fontSize: 12,
-    color: theme.colors.textSecondary,
-    lineHeight: 16,
-  },
-  priceGuide: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: theme.spacing.md,
-    marginHorizontal: theme.spacing.lg,
-    marginTop: theme.spacing.md,
-    backgroundColor: theme.colors.surface,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.md,
-  },
-  priceGuideIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: theme.radius.md,
-    backgroundColor: theme.colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  priceGuideBody: { flex: 1, gap: 2 },
-  priceGuideTitle: {
-    fontFamily: theme.fonts.body,
-    fontSize: 15,
-    fontWeight: '700',
-    color: theme.colors.textPrimary,
-  },
-  priceGuideDesc: {
-    fontFamily: theme.fonts.body,
-    fontSize: 12,
-    color: theme.colors.textSecondary,
   },
   switcherRow: {
     gap: theme.spacing.sm,
@@ -1150,6 +992,10 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+  },
+  toolsHeading: {
+    marginTop: theme.spacing.xl,
+    marginBottom: theme.spacing.md,
   },
   sectionLink: {
     fontFamily: theme.fonts.body,

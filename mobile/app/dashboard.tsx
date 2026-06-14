@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { CameraGrid } from '@/components/CameraGrid';
 import { FeedbackRow } from '@/components/FeedbackRow';
 import type { Aciliyet, DashboardLight, DashboardRenk } from '@/lib/api';
 import { t } from '@/lib/i18n';
@@ -65,6 +66,8 @@ export default function DashboardScreen() {
   const cameraRef = useRef<CameraView>(null);
   const vehicle = useUstaStore(selectCurrentVehicle);
   const { loading, error, result, runDashboard, reset } = useDashboard();
+  // Local: a failed takePictureAsync never reaches the diagnose hook.
+  const [captureError, setCaptureError] = useState<string | null>(null);
 
   const granted = permission?.granted === true;
   const canAskAgain = permission?.canAskAgain !== false;
@@ -72,9 +75,20 @@ export default function DashboardScreen() {
   async function handleScan() {
     const camera = cameraRef.current;
     if (!camera || loading) return;
-    const photo = await camera.takePictureAsync();
-    if (!photo?.uri) return;
-    await runDashboard(photo.uri);
+    setCaptureError(null);
+    let uri: string | undefined;
+    try {
+      const photo = await camera.takePictureAsync({ quality: 0.6, skipProcessing: true });
+      uri = photo?.uri;
+    } catch {
+      setCaptureError('camera.error.captureFailed');
+      return;
+    }
+    if (!uri) {
+      setCaptureError('camera.error.captureFailed');
+      return;
+    }
+    await runDashboard(uri);
   }
 
   return (
@@ -105,7 +119,10 @@ export default function DashboardScreen() {
           {permission == null ? (
             <ActivityIndicator color={theme.colors.ink} />
           ) : granted ? (
-            <CameraView ref={cameraRef} style={styles.camera} facing="back" />
+            <>
+              <CameraView ref={cameraRef} style={styles.camera} facing="back" />
+              <CameraGrid />
+            </>
           ) : canAskAgain ? (
             <>
               <Ionicons name="camera-outline" size={64} color={theme.colors.textSecondary} />
@@ -174,7 +191,9 @@ export default function DashboardScreen() {
 
       {/* Alt eylem */}
       <View style={[styles.footer, { paddingBottom: insets.bottom + theme.spacing.md }]}>
-        {error != null && <Text style={styles.errorText}>{t(error)}</Text>}
+        {(captureError ?? error) != null && (
+          <Text style={styles.errorText}>{t(captureError ?? error!)}</Text>
+        )}
         {result != null ? (
           <Pressable
             accessibilityRole="button"

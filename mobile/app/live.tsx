@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { CameraGrid } from '@/components/CameraGrid';
 import { isAudioBridgeReady } from '@/lib/live/audioBridge';
 import { goBack } from '@/lib/nav';
 import { theme } from '@/lib/theme';
@@ -103,7 +104,10 @@ export default function LiveScreen() {
       {/* Kamera önizleme */}
       <View style={styles.cameraWrap}>
         {permission?.granted === true ? (
-          <CameraView ref={cameraRef} style={styles.camera} facing="back" />
+          <>
+            <CameraView ref={cameraRef} style={styles.camera} facing="back" />
+            <CameraGrid />
+          </>
         ) : (
           <View style={styles.cameraPlaceholder}>
             <Ionicons name="camera-outline" size={48} color={theme.colors.onInkMuted} />

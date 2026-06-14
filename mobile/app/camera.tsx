@@ -15,6 +15,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { CameraGrid } from '@/components/CameraGrid';
 import { FeedbackRow } from '@/components/FeedbackRow';
 import { MechanicBriefSheet } from '@/components/MechanicBriefSheet';
 import { i18n, t } from '@/lib/i18n';
@@ -128,6 +129,9 @@ export default function CameraScreen() {
   const currentVehicle = useUstaStore(selectCurrentVehicle);
   const { loading, error, result, runImageDiagnose } = useDiagnose();
   const [briefOpen, setBriefOpen] = useState(false);
+  // Local: a failed takePictureAsync (camera busy / hardware) never reaches
+  // the diagnose hook, so surface it here in the same error slot.
+  const [captureError, setCaptureError] = useState<string | null>(null);
 
   const briefDiag: BriefDiag | null = result
     ? {
@@ -155,9 +159,20 @@ export default function CameraScreen() {
   async function handleCheck() {
     const camera = cameraRef.current;
     if (!camera || loading) return;
-    const photo = await camera.takePictureAsync();
-    if (!photo?.uri) return;
-    await runImageDiagnose(photo.uri);
+    setCaptureError(null);
+    let uri: string | undefined;
+    try {
+      const photo = await camera.takePictureAsync({ quality: 0.6, skipProcessing: true });
+      uri = photo?.uri;
+    } catch {
+      setCaptureError('camera.error.captureFailed');
+      return;
+    }
+    if (!uri) {
+      setCaptureError('camera.error.captureFailed');
+      return;
+    }
+    await runImageDiagnose(uri);
   }
 
   return (
@@ -191,7 +206,10 @@ export default function CameraScreen() {
         {permission == null ? (
           <ActivityIndicator color={theme.colors.accent} />
         ) : granted ? (
-          <CameraView ref={cameraRef} style={styles.camera} facing="back" />
+          <>
+            <CameraView ref={cameraRef} style={styles.camera} facing="back" />
+            <CameraGrid />
+          </>
         ) : canAskAgain ? (
           <>
             <Ionicons name="camera-outline" size={72} color={theme.colors.textSecondary} />
@@ -224,10 +242,10 @@ export default function CameraScreen() {
         contentContainerStyle={styles.feedbackContent}
         showsVerticalScrollIndicator={false}
       >
-        {error ? (
+        {error || captureError ? (
           <View style={styles.errorBox}>
             <Ionicons name="cloud-offline" size={18} color={theme.colors.warning} />
-            <Text style={styles.errorText}>{t(error)}</Text>
+            <Text style={styles.errorText}>{t(captureError ?? error!)}</Text>
           </View>
         ) : result ? (
           <ResultPanel
@@ -236,7 +254,7 @@ export default function CameraScreen() {
             onShowMechanic={() => setBriefOpen(true)}
           />
         ) : granted ? (
-          <Text style={styles.feedbackHint}>{t('camera.hint')}</Text>
+          <Text style={styles.feedbackHint}>{t('camera.gridHint')}</Text>
         ) : null}
       </ScrollView>
 

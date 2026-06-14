@@ -3383,5 +3383,1768 @@
       "battery_location": "motor bölmesi sol ön",
       "transmission_type": "manuel"
     }
+  },
+  {
+    "make": "Honda",
+    "model": "CB125F",
+    "year_min": 2015,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-30",
+      "oil_capacity_l": 1.1,
+      "oil_drain_bolt_size": "12mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CPR6EA-9",
+      "battery_spec": "12V 3.5Ah (YTZ4V)",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Honda",
+    "model": "CB125R",
+    "year_min": 2018,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-30",
+      "oil_capacity_l": 1.2,
+      "oil_drain_bolt_size": "12mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CPR8EA-9",
+      "battery_spec": "12V",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Honda",
+    "model": "CBF150",
+    "year_min": 2010,
+    "year_max": 2018,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-30",
+      "oil_capacity_l": 1.0,
+      "oil_drain_bolt_size": "12mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CPR7EA-9",
+      "battery_spec": "12V 4Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Honda",
+    "model": "CBR250R",
+    "year_min": 2011,
+    "year_max": 2018,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-30",
+      "oil_capacity_l": 1.4,
+      "oil_drain_bolt_size": "12mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK SIMR8A9",
+      "battery_spec": "12V 6Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Honda",
+    "model": "Activa",
+    "year_min": 2012,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-30",
+      "oil_capacity_l": 0.8,
+      "oil_drain_bolt_size": "12mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CPR6EA-9S",
+      "battery_spec": "12V 4Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "otomatik (CVT)"
+    }
+  },
+  {
+    "make": "Honda",
+    "model": "Spacy",
+    "year_min": 2010,
+    "year_max": 2018,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-30",
+      "oil_capacity_l": 0.8,
+      "oil_drain_bolt_size": "12mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CPR6EA-9",
+      "battery_spec": "12V 4Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "otomatik (CVT)"
+    }
+  },
+  {
+    "make": "Honda",
+    "model": "Forza 250",
+    "year_min": 2018,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-30",
+      "oil_capacity_l": 1.7,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CPR8EA-9",
+      "battery_spec": "12V 8Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "otomatik (CVT)"
+    }
+  },
+  {
+    "make": "Honda",
+    "model": "Africa Twin",
+    "year_min": 2016,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 4.8,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CPR8EB-9",
+      "battery_spec": "12V 11Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Honda",
+    "model": "CB500F",
+    "year_min": 2013,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-30 (JASO MA2)",
+      "oil_capacity_l": 3.2,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CPR8EA-9",
+      "battery_spec": "12V 7Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Honda",
+    "model": "CB650R",
+    "year_min": 2019,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-30 (JASO MA2)",
+      "oil_capacity_l": 2.7,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CPR9EA-9",
+      "battery_spec": "12V 8Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Yamaha",
+    "model": "Crypton",
+    "year_min": 2008,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 0.9,
+      "oil_drain_bolt_size": "17mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR6HSA",
+      "battery_spec": "12V 4Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Yamaha",
+    "model": "Cygnus",
+    "year_min": 2010,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 0.9,
+      "oil_drain_bolt_size": "12mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR7HSA",
+      "battery_spec": "12V 6Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "otomatik (CVT)"
+    }
+  },
+  {
+    "make": "Yamaha",
+    "model": "XMAX 250",
+    "year_min": 2014,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 1.7,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CPR8EA-9",
+      "battery_spec": "12V 8Ah (YTZ8V)",
+      "battery_location": "sele altı",
+      "transmission_type": "otomatik (CVT)"
+    }
+  },
+  {
+    "make": "Yamaha",
+    "model": "XMAX 125",
+    "year_min": 2017,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 1.1,
+      "oil_drain_bolt_size": "12mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CPR8EA-9",
+      "battery_spec": "12V 6Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "otomatik (CVT)"
+    }
+  },
+  {
+    "make": "Yamaha",
+    "model": "Tracer 700",
+    "year_min": 2016,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 3.0,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK LMAR8A-9",
+      "battery_spec": "12V 8Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Yamaha",
+    "model": "Tracer 900",
+    "year_min": 2015,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 3.4,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR9EK",
+      "battery_spec": "12V 8Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Yamaha",
+    "model": "MT-07",
+    "year_min": 2014,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 3.0,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK LMAR8A-9",
+      "battery_spec": "12V 8Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Yamaha",
+    "model": "MT-09",
+    "year_min": 2013,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 3.4,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR9EK",
+      "battery_spec": "12V 8Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Yamaha",
+    "model": "R25",
+    "year_min": 2014,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 2.4,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR9E",
+      "battery_spec": "12V (GTZ8V)",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Suzuki",
+    "model": "GSX-R150",
+    "year_min": 2017,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 1.1,
+      "oil_drain_bolt_size": "12mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR8E",
+      "battery_spec": "12V 5Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Suzuki",
+    "model": "GSX-S150",
+    "year_min": 2017,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 1.1,
+      "oil_drain_bolt_size": "12mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR8E",
+      "battery_spec": "12V 5Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Suzuki",
+    "model": "V-Strom 250",
+    "year_min": 2017,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 1.6,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR8E",
+      "battery_spec": "12V 7Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Suzuki",
+    "model": "Address 110",
+    "year_min": 2015,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 0.9,
+      "oil_drain_bolt_size": "12mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR6HSA",
+      "battery_spec": "12V 4Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "otomatik (CVT)"
+    }
+  },
+  {
+    "make": "Suzuki",
+    "model": "Burgman 400",
+    "year_min": 2017,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 1.6,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR7E",
+      "battery_spec": "12V 10Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "otomatik (CVT)"
+    }
+  },
+  {
+    "make": "Kawasaki",
+    "model": "Ninja 250",
+    "year_min": 2013,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 1.7,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR9EIA-9",
+      "battery_spec": "12V 6Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Kawasaki",
+    "model": "Ninja 400",
+    "year_min": 2018,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 1.9,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR9EIA-9",
+      "battery_spec": "12V 8Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Kawasaki",
+    "model": "Z250",
+    "year_min": 2013,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 1.7,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR9EIA-9",
+      "battery_spec": "12V 6Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Kawasaki",
+    "model": "Z900",
+    "year_min": 2017,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 3.3,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR9EIA-9",
+      "battery_spec": "12V 8Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Kawasaki",
+    "model": "Versys 650",
+    "year_min": 2010,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 2.4,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR9EIA-9",
+      "battery_spec": "12V 10Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "KTM",
+    "model": "Duke 200",
+    "year_min": 2012,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-50 (JASO MA2)",
+      "oil_capacity_l": 1.3,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK LKAR8A-9",
+      "battery_spec": "12V 8Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "KTM",
+    "model": "Duke 390",
+    "year_min": 2013,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-50 (JASO MA2)",
+      "oil_capacity_l": 1.5,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK LKAR8A-9",
+      "battery_spec": "12V 8Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "KTM",
+    "model": "Adventure 390",
+    "year_min": 2020,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-50 (JASO MA2)",
+      "oil_capacity_l": 1.5,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK LKAR8A-9",
+      "battery_spec": "12V 8Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Vespa",
+    "model": "Primavera 125",
+    "year_min": 2014,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-40 (JASO MA2)",
+      "oil_capacity_l": 1.0,
+      "oil_drain_bolt_size": "12mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR8EB",
+      "battery_spec": "12V 7Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "otomatik (CVT)"
+    }
+  },
+  {
+    "make": "Vespa",
+    "model": "GTS 300",
+    "year_min": 2010,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-40 (JASO MA2)",
+      "oil_capacity_l": 1.4,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR8EB",
+      "battery_spec": "12V 10Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "otomatik (CVT)"
+    }
+  },
+  {
+    "make": "Piaggio",
+    "model": "Liberty 125",
+    "year_min": 2010,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-40 (JASO MA2)",
+      "oil_capacity_l": 1.0,
+      "oil_drain_bolt_size": "12mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR8EB",
+      "battery_spec": "12V 7Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "otomatik (CVT)"
+    }
+  },
+  {
+    "make": "Piaggio",
+    "model": "Medley 125",
+    "year_min": 2016,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-40 (JASO MA2)",
+      "oil_capacity_l": 1.1,
+      "oil_drain_bolt_size": "12mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR8EB",
+      "battery_spec": "12V 8Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "otomatik (CVT)"
+    }
+  },
+  {
+    "make": "Benelli",
+    "model": "TRK 502",
+    "year_min": 2017,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 3.0,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR8E",
+      "battery_spec": "12V 10Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Benelli",
+    "model": "Leoncino 250",
+    "year_min": 2018,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 1.5,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR8E",
+      "battery_spec": "12V 7Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Aprilia",
+    "model": "SR 150",
+    "year_min": 2016,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 0.9,
+      "oil_drain_bolt_size": "12mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR7HSA",
+      "battery_spec": "12V 5Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "otomatik (CVT)"
+    }
+  },
+  {
+    "make": "BMW",
+    "model": "G 310 R",
+    "year_min": 2016,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-40 (JASO MA2)",
+      "oil_capacity_l": 1.5,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK LMAR8A-9",
+      "battery_spec": "12V 8Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "BMW",
+    "model": "F 750 GS",
+    "year_min": 2018,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-40 (JASO MA2)",
+      "oil_capacity_l": 3.0,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK LMAR8A-9",
+      "battery_spec": "12V 12Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "BMW",
+    "model": "R 1250 GS",
+    "year_min": 2019,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-40 (JASO MA2)",
+      "oil_capacity_l": 4.0,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK MAR9A-J",
+      "battery_spec": "12V 12Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Husqvarna",
+    "model": "Svartpilen 250",
+    "year_min": 2020,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-50 (JASO MA2)",
+      "oil_capacity_l": 1.5,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK LKAR8A-9",
+      "battery_spec": "12V 8Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "SYM",
+    "model": "Symphony 125",
+    "year_min": 2010,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 0.9,
+      "oil_drain_bolt_size": "12mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR7HSA",
+      "battery_spec": "12V 5Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "otomatik (CVT)"
+    }
+  },
+  {
+    "make": "SYM",
+    "model": "Jet 14",
+    "year_min": 2018,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 0.9,
+      "oil_drain_bolt_size": "12mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR7HSA",
+      "battery_spec": "12V 5Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "otomatik (CVT)"
+    }
+  },
+  {
+    "make": "Kymco",
+    "model": "Agility 125",
+    "year_min": 2010,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 0.9,
+      "oil_drain_bolt_size": "12mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR7HSA",
+      "battery_spec": "12V 5Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "otomatik (CVT)"
+    }
+  },
+  {
+    "make": "Kymco",
+    "model": "People S 150",
+    "year_min": 2010,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 1.0,
+      "oil_drain_bolt_size": "12mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR7HSA",
+      "battery_spec": "12V 6Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "otomatik (CVT)"
+    }
+  },
+  {
+    "make": "CFMoto",
+    "model": "250 NK",
+    "year_min": 2018,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 1.7,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR8E",
+      "battery_spec": "12V 7Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "CFMoto",
+    "model": "650 MT",
+    "year_min": 2018,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 2.7,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR8E",
+      "battery_spec": "12V 10Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Bajaj",
+    "model": "Dominar 400",
+    "year_min": 2017,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-50 (JASO MA2)",
+      "oil_capacity_l": 1.3,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR8EK",
+      "battery_spec": "12V 8Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "TVS",
+    "model": "Apache RTR 200",
+    "year_min": 2016,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 1.1,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK uygun",
+      "battery_spec": "12V 5Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Mondial",
+    "model": "Drift 125",
+    "year_min": 2015,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 1.0,
+      "oil_drain_bolt_size": "17mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK C7HSA",
+      "battery_spec": "12V 4Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Mondial",
+    "model": "150 MG",
+    "year_min": 2012,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 1.1,
+      "oil_drain_bolt_size": "17mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK C7HSA",
+      "battery_spec": "12V 5Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Arora",
+    "model": "Cappadocia 250",
+    "year_min": 2015,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 1.5,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK uygun",
+      "battery_spec": "12V 7Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Arora",
+    "model": "AR 125",
+    "year_min": 2012,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 1.0,
+      "oil_drain_bolt_size": "17mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK C7HSA",
+      "battery_spec": "12V 4Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Falcon",
+    "model": "Sertao 250",
+    "year_min": 2014,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 1.5,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK uygun",
+      "battery_spec": "12V 7Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Daelim",
+    "model": "Daystar 125",
+    "year_min": 2010,
+    "year_max": 2022,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 1.1,
+      "oil_drain_bolt_size": "17mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK CR7HSA",
+      "battery_spec": "12V 5Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Bisan",
+    "model": "Moped 50",
+    "year_min": 2010,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 0.8,
+      "oil_drain_bolt_size": "17mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK C7HSA",
+      "battery_spec": "12V 4Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Yuki",
+    "model": "YK 125",
+    "year_min": 2012,
+    "year_max": 2024,
+    "vehicle_type": "motosiklet",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "10W-40 (JASO MA2)",
+      "oil_capacity_l": 1.0,
+      "oil_drain_bolt_size": "17mm",
+      "oil_drain_location": "motor karteri altı tahliye cıvatası",
+      "oil_filter_part": "örnek: elek tip / model-spesifik",
+      "air_filter_part": "örnek: model-spesifik hava filtresi",
+      "cabin_filter_part": null,
+      "spark_plug_part": "örnek: NGK C7HSA",
+      "battery_spec": "12V 4Ah",
+      "battery_location": "sele altı",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Renault",
+    "model": "Megane Sedan",
+    "year_min": 2016,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30",
+      "oil_capacity_l": 4.8,
+      "oil_drain_bolt_size": "8mm iç altıgen (allen)",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 8200768927",
+      "air_filter_part": "örnek: 165461376R",
+      "cabin_filter_part": "örnek: 272773016R",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "70Ah",
+      "battery_location": "motor bölmesi sağ ön",
+      "transmission_type": "manuel / EDC"
+    }
+  },
+  {
+    "make": "Renault",
+    "model": "Latitude",
+    "year_min": 2011,
+    "year_max": 2016,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-40",
+      "oil_capacity_l": 5.4,
+      "oil_drain_bolt_size": "8mm iç altıgen (allen)",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 8200768927",
+      "air_filter_part": "örnek: 8200431051",
+      "cabin_filter_part": "örnek: 272773016R",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "70Ah",
+      "battery_location": "motor bölmesi sağ ön",
+      "transmission_type": "otomatik"
+    }
+  },
+  {
+    "make": "Fiat",
+    "model": "Egea Cross",
+    "year_min": 2020,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-40",
+      "oil_capacity_l": 3.0,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 55256470",
+      "air_filter_part": "örnek: 51897064",
+      "cabin_filter_part": "örnek: 77367464",
+      "spark_plug_part": "örnek: NGK DCPR7E-N-10 (benzin)",
+      "battery_spec": "60Ah",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel / otomatik"
+    }
+  },
+  {
+    "make": "Fiat",
+    "model": "Fiorino",
+    "year_min": 2008,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "dizel",
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-40",
+      "oil_capacity_l": 3.8,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 55256470",
+      "air_filter_part": "örnek: 51897064",
+      "cabin_filter_part": "örnek: 77367464",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "60Ah",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel"
+    }
+  },
+  {
+    "make": "Toyota",
+    "model": "Corolla Cross",
+    "year_min": 2021,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "hibrit"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "0W-16 / 0W-20",
+      "oil_capacity_l": 4.2,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 04152-YZZA6",
+      "air_filter_part": "örnek: 17801-25020",
+      "cabin_filter_part": "örnek: 87139-0N010",
+      "spark_plug_part": "örnek: Denso (benzin)",
+      "battery_spec": "45-60Ah / hibrit yardımcı",
+      "battery_location": "motor bölmesi / bagaj (hibrit)",
+      "transmission_type": "e-CVT (hibrit) / CVT"
+    }
+  },
+  {
+    "make": "Toyota",
+    "model": "Camry",
+    "year_min": 2018,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "hibrit"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "0W-16 / 0W-20",
+      "oil_capacity_l": 4.8,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 04152-YZZA6",
+      "air_filter_part": "örnek: 17801-0H080",
+      "cabin_filter_part": "örnek: 87139-06040",
+      "spark_plug_part": "örnek: Denso (benzin)",
+      "battery_spec": "45-60Ah / hibrit yardımcı",
+      "battery_location": "motor bölmesi / bagaj (hibrit)",
+      "transmission_type": "e-CVT (hibrit) / otomatik"
+    }
+  },
+  {
+    "make": "Hyundai",
+    "model": "i10",
+    "year_min": 2014,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "lpg"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30",
+      "oil_capacity_l": 3.3,
+      "oil_drain_bolt_size": "17mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 26300-02503",
+      "air_filter_part": "örnek: 28113-B9000",
+      "cabin_filter_part": "örnek: 97133-1J000",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "45Ah",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel / otomatik"
+    }
+  },
+  {
+    "make": "Kia",
+    "model": "Picanto",
+    "year_min": 2011,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "lpg"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30",
+      "oil_capacity_l": 3.3,
+      "oil_drain_bolt_size": "17mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 26300-02503",
+      "air_filter_part": "örnek: 28113-1Y100",
+      "cabin_filter_part": "örnek: 97133-1Y000",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "45Ah",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel / otomatik"
+    }
+  },
+  {
+    "make": "Nissan",
+    "model": "Note",
+    "year_min": 2013,
+    "year_max": 2021,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30 / 5W-40",
+      "oil_capacity_l": 3.4,
+      "oil_drain_bolt_size": "14mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 15208-65F0E",
+      "air_filter_part": "örnek: 16546-1HK0A",
+      "cabin_filter_part": "örnek: 27277-1HB0A",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "45-55Ah",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel / CVT"
+    }
+  },
+  {
+    "make": "Peugeot",
+    "model": "Partner",
+    "year_min": 2010,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "dizel",
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30",
+      "oil_capacity_l": 4.25,
+      "oil_drain_bolt_size": "örnek: Torx / 13mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 1109AY",
+      "air_filter_part": "örnek: 1444TT",
+      "cabin_filter_part": "örnek: 6447XF",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "60-70Ah",
+      "battery_location": "motor bölmesi sol ön",
+      "transmission_type": "manuel / EAT8"
+    }
+  },
+  {
+    "make": "Skoda",
+    "model": "Scala",
+    "year_min": 2019,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30 (VW 504.00)",
+      "oil_capacity_l": 4.0,
+      "oil_drain_bolt_size": "19mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 04E115561H",
+      "air_filter_part": "örnek: 2Q0129620",
+      "cabin_filter_part": "örnek: 5Q0819669",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "60Ah (EFB)",
+      "battery_location": "motor bölmesi sol arka",
+      "transmission_type": "manuel / DSG"
+    }
+  },
+  {
+    "make": "Seat",
+    "model": "Arona",
+    "year_min": 2017,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30 (VW 504.00)",
+      "oil_capacity_l": 4.0,
+      "oil_drain_bolt_size": "19mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 04E115561H",
+      "air_filter_part": "örnek: 2Q0129620",
+      "cabin_filter_part": "örnek: 5Q0819669",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "60Ah (EFB)",
+      "battery_location": "motor bölmesi sol arka",
+      "transmission_type": "manuel / DSG"
+    }
+  },
+  {
+    "make": "Mercedes-Benz",
+    "model": "CLA",
+    "year_min": 2013,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30 (MB 229.51)",
+      "oil_capacity_l": 5.5,
+      "oil_drain_bolt_size": "13mm",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: A2701800109",
+      "air_filter_part": "örnek: A2700940204",
+      "cabin_filter_part": "örnek: A2468300018",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "60-70Ah (AGM)",
+      "battery_location": "motor bölmesi",
+      "transmission_type": "otomatik (7G-DCT)"
+    }
+  },
+  {
+    "make": "BMW",
+    "model": "X2",
+    "year_min": 2018,
+    "year_max": 2024,
+    "vehicle_type": "araba",
+    "fuels": [
+      "benzin",
+      "dizel"
+    ],
+    "engine_codes": [],
+    "spec": {
+      "oil_spec": "5W-30 (BMW LL-04)",
+      "oil_capacity_l": 5.0,
+      "oil_drain_bolt_size": "8mm iç altıgen (allen)",
+      "oil_drain_location": "yağ karteri alt orta",
+      "oil_filter_part": "örnek: 11428583898",
+      "air_filter_part": "örnek: 13718580427",
+      "cabin_filter_part": "örnek: 64319321046",
+      "spark_plug_part": "örnek: NGK (benzin)",
+      "battery_spec": "70Ah (AGM)",
+      "battery_location": "bagaj / motor bölmesi",
+      "transmission_type": "otomatik"
+    }
   }
 ]

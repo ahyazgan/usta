@@ -231,3 +231,42 @@ Doğrulanan güçlü noktalar:
 - "yüksek voltaj"/"yuksek voltaj" hâlâ SAFETY_TRIGGER_KEYWORDS'te YOK (yalnız "akü"
   tetikliyor). Katalog artık 9+ saf/melez HV aracı içeriyor (Tesla x2, MG 4/ZS, BYD,
   + e-varyantlar). EV/HV-özel rehberlik akışı eklenirse bu anahtar EKLENMELİ.
+
+## Denetim (2026-06-14) — Katalog 4. genişletme (74 yeni: 60 MOTOSİKLET + 14 araba)
+Kapsam: catalog_data.json'a scripts/add_vehicles2.py ile eklenen 74 kayıt
+(toplam motosiklet 72, LPG arabalar Hyundai i10 s4979 / Kia Picanto s5004,
+Yamaha PW50 2T moped s3845). Tetiklenen akış: api/maintenance.py fill_template
+(guides.py:448) → spec değerleri oil_change adımlarına gömülüyor.
+
+Sonuç: KRİTİK 0 · YÜKSEK 1 · ORTA 1 → PASS-with-fix (PW50 yağ rehberi düzeltilmeli).
+
+Doğrulanan güçlü noktalar:
+- Tüm 72 motosiklette cabin_filter_part=None (script zorluyor); cabin_filter görevi
+  zaten _CAR_ONLY (tasks.py:63) → motosiklete teklif edilmiyor. Tutarlı, bulgu yok.
+- Motosiklet oil_drain_location="motor karteri altı tahliye cıvatası" doğru.
+- LPG arabalar (i10, Picanto): "lpg" YALNIZCA fuels sınıflandırma etiketi; spec'te
+  LPG sistemine müdahale/ayar/açma/onarım TARİFİ YOK. LPG yasağı korunuyor.
+- Kesin-dil (kesin/%100/kesinlikle) hiçbir yeni spec'te YOK. Parça no'ları "örnek:"
+  yer tutuculu. JASO MA2 motosiklet yağ spec'i tutarlı (4T motosikletler).
+
+BULGULAR:
+1. [YÜKSEK] Yamaha PW50 (catalog_data.json:3853-3865) — 2 zamanlı moped, oil_spec=
+   "2T yağ (karışım)", oil_capacity_l=0.0, oil_drain_bolt_size="—". oil_change görevi
+   _ALL_COMBUSTION'a uygulanıyor (tasks.py:37-38), motosiklet türü kısıtı YOK → PW50
+   kullanıcısına oil_change rehberi TEKLİF EDİLİR. fill_template (guides.py:456) fallback
+   koşulu `value not in (None, "")` → 0.0 ve "—" "dolu değer" sayılır, fallback'e DÜŞMEZ.
+   Sonuç: rehber "yaklaşık 0.0 L yağ doldur" ve "— lokma anahtarıyla tahliye tıpasını sök"
+   üretir. 2 zamanlı motorda yağ tahliyesi YOKTUR, yağ benzinle karışıma girer. Kullanıcıyı
+   var olmayan bir karter tahliyesi yapmaya / 0.0 L yağ doldurmaya yönlendirir = yanıltıcı
+   ve potansiyel motor hasarı. Fix (biri): (a) 2T araçlarda oil_change'i uygulanamaz say
+   (örn. spec'e is_two_stroke bayrağı veya oil_capacity_l==0 ise 404/ayrı 2T rehberi), VEYA
+   (b) fill_template fallback'ini 0.0/"—" gibi placeholder'ları da fallback'e düşürecek
+   şekilde sıkılaştır + 2T'ye özel "karışım oranı" rehberi ekle. Tek başına spec düzeltmesi
+   yetmez; render mantığı 0.0'ı kelimesi kelimesine basıyor.
+2. [ORTA] Genel render kırılganlığı (guides.py:456) — oil_capacity_l==0.0 ve sentinel
+   string "—" tüm araçlar için fallback'i atlatır. Şu an yalnız PW50 etkili ama gelecekte
+   0.0/"—" girilen her kayıt aynı kusuru yaşar. fill_template'e sayısal 0 ve "—"/"-" gibi
+   yer tutucuları boş sayacak koruma eklenmeli (regresyon testi ile).
+
+Not: Bu denetim subagent cwd'si backend/ olsa da hafıza KÖK .claude/memory/'ye yazıldı;
+backend/.claude/memory OLUŞTURULMADI (talimata uygun).

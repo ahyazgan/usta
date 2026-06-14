@@ -11,7 +11,36 @@ from __future__ import annotations
 
 import pytest
 
+from app.domain.guides import _is_blank_value, fill_template
+
 from .conftest import create_vehicle, register_and_login
+
+
+def test_is_blank_value_treats_zero_and_dashes_as_blank():
+    # None/boş/sıfır/yalnızca-tire → boş (yer tutucu).
+    assert _is_blank_value(None)
+    assert _is_blank_value("")
+    assert _is_blank_value("   ")
+    assert _is_blank_value(0)
+    assert _is_blank_value(0.0)
+    assert _is_blank_value("—")
+    assert _is_blank_value("-")
+    assert _is_blank_value("–")
+    # Gerçek değerler → boş DEĞİL.
+    assert not _is_blank_value("5W-30")
+    assert not _is_blank_value(3.5)
+    assert not _is_blank_value("14mm")
+
+
+def test_fill_template_uses_fallback_for_zero_and_dash():
+    """0.0 / '—' gibi yer tutucular yanıltıcı talimat basmamalı; fallback gelmeli."""
+    tpl = "Yağı doldur ({oil_capacity_l} L), {oil_drain_bolt_size} ile tıpayı sök."
+    out = fill_template(tpl, {"oil_capacity_l": 0.0, "oil_drain_bolt_size": "—"}, "tr")
+    assert "0.0" not in out
+    assert "—" not in out
+    # Gerçek değer aynen geçer.
+    out2 = fill_template(tpl, {"oil_capacity_l": 3.5, "oil_drain_bolt_size": "14mm"}, "tr")
+    assert "3.5" in out2 and "14mm" in out2
 
 
 # =========================================================================== #

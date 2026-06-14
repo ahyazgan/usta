@@ -445,6 +445,19 @@ def get_guide(task_id: str) -> TaskGuide | None:
     return GUIDES.get(task_id)
 
 
+def _is_blank_value(value: object) -> bool:
+    """Bir spec değeri yer tutucu/boş mu? None, boş string, sayısal sıfır ve yalnızca
+    tire/çizgi içeren string'ler (örn. "—", "-") boş sayılır — aksi halde "0.0 L yağ
+    koy" / "— anahtarıyla sök" gibi yanıltıcı talimatlar basılır (safety-auditor)."""
+    if value is None:
+        return True
+    if isinstance(value, (int, float)):
+        return value == 0
+    if isinstance(value, str):
+        return value.strip().strip("-—–") == ""
+    return False
+
+
 def fill_template(text: str, spec_values: dict[str, object], lang: str) -> str:
     """`{anahtar}` yer tutucularını spec'ten doldurur; yoksa genel ifade kullanır."""
     fallbacks = _FALLBACKS_TR if lang == "tr" else _FALLBACKS_EN
@@ -453,5 +466,5 @@ def fill_template(text: str, spec_values: dict[str, object], lang: str) -> str:
         token = "{" + key + "}"
         if token in out:
             value = spec_values.get(key)
-            out = out.replace(token, str(value) if value not in (None, "") else fallback)
+            out = out.replace(token, fallback if _is_blank_value(value) else str(value))
     return out

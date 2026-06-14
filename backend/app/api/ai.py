@@ -8,13 +8,25 @@ from ..core.rate_limit import enforce_rate_limit
 from ..database import get_db
 from ..domain.models import User
 from ..domain.schemas import (
+    DashboardDiagnoseRequest,
+    DashboardDiagnoseResponse,
+    DtcDiagnoseRequest,
+    DtcDiagnoseResponse,
     ImageDiagnoseRequest,
     ImageDiagnoseResponse,
     SoundDiagnoseRequest,
     SoundDiagnoseResponse,
+    SymptomDiagnoseRequest,
+    SymptomDiagnoseResponse,
 )
 from ..services import vehicle_service
-from ..services.ai import audio_service, vision_service
+from ..services.ai import (
+    audio_service,
+    dashboard_service,
+    dtc_service,
+    symptom_service,
+    vision_service,
+)
 from ..services.ai.claude_client import ClaudeClient, get_claude_client
 
 router = APIRouter(
@@ -46,5 +58,44 @@ async def diagnose_sound(
 ) -> SoundDiagnoseResponse:
     vehicle = await vehicle_service.get_owned(db, user.id, payload.vehicle_id)
     return await audio_service.diagnose_sound(
+        db=db, claude=claude, user=user, vehicle=vehicle, payload=payload
+    )
+
+
+@router.post("/diagnose/dashboard", response_model=DashboardDiagnoseResponse)
+async def diagnose_dashboard(
+    payload: DashboardDiagnoseRequest,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+    claude: ClaudeClient = Depends(get_claude_client),
+) -> DashboardDiagnoseResponse:
+    vehicle = await vehicle_service.get_owned(db, user.id, payload.vehicle_id)
+    return await dashboard_service.diagnose_dashboard(
+        db=db, claude=claude, user=user, vehicle=vehicle, payload=payload
+    )
+
+
+@router.post("/diagnose/code", response_model=DtcDiagnoseResponse)
+async def diagnose_code(
+    payload: DtcDiagnoseRequest,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+    claude: ClaudeClient = Depends(get_claude_client),
+) -> DtcDiagnoseResponse:
+    vehicle = await vehicle_service.get_owned(db, user.id, payload.vehicle_id)
+    return await dtc_service.diagnose_dtc(
+        db=db, claude=claude, user=user, vehicle=vehicle, payload=payload
+    )
+
+
+@router.post("/diagnose/symptom", response_model=SymptomDiagnoseResponse)
+async def diagnose_symptom(
+    payload: SymptomDiagnoseRequest,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+    claude: ClaudeClient = Depends(get_claude_client),
+) -> SymptomDiagnoseResponse:
+    vehicle = await vehicle_service.get_owned(db, user.id, payload.vehicle_id)
+    return await symptom_service.diagnose_symptom(
         db=db, claude=claude, user=user, vehicle=vehicle, payload=payload
     )

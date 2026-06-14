@@ -1,7 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter } from 'expo-router';
-import { useRef } from 'react';
+
+import { goBack } from '@/lib/nav';
+import { useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -13,14 +15,21 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { t } from '@/lib/i18n';
-import { useUstaStore } from '@/lib/store';
+import { CameraGrid } from '@/components/CameraGrid';
+import { FeedbackRow } from '@/components/FeedbackRow';
+import { MechanicBriefSheet } from '@/components/MechanicBriefSheet';
+import { i18n, t } from '@/lib/i18n';
+import { type BriefDiag } from '@/lib/mechanicBrief';
+import { pickFromGallery } from '@/lib/pickImage';
+import { selectCurrentVehicle, useUstaStore } from '@/lib/store';
 import { theme } from '@/lib/theme';
 import { useDiagnose } from '@/lib/useDiagnose';
-import type { DiagnoseResult, Konum } from '@/lib/api';
+import type { DiagnoseResult, Konum, Task } from '@/lib/api';
 
-const CURRENT_STEP = 3;
-const TOTAL_STEPS = 7;
+/** Localized task title for the banner. */
+function taskTitle(task: Task): string {
+  return i18n.locale === 'en' ? task.title_en : task.title_tr;
+}
 
 /** Localized direction text for a 3x3 grid location code. */
 function konumText(konum: Konum): string | null {
@@ -28,7 +37,15 @@ function konumText(konum: Konum): string | null {
   return t(`camera.konum.${konum.replace('-', '_')}`);
 }
 
-function ResultPanel({ result }: { result: DiagnoseResult }) {
+function ResultPanel({
+  result,
+  vehicleId,
+  onShowMechanic,
+}: {
+  result: DiagnoseResult;
+  vehicleId: number | null;
+  onShowMechanic: () => void;
+}) {
   // Banner color is the ONLY place green may appear: dogru_yer_mi === true.
   let bannerStyle: ViewStyle = styles.bannerNeutral;
   let bannerText = t('camera.result.uncertain');
@@ -80,6 +97,24 @@ function ResultPanel({ result }: { result: DiagnoseResult }) {
           <Text style={styles.warningText}>{result.guvenlik_uyarisi}</Text>
         </View>
       )}
+
+      {/* Triyaj köprüsü: kendin yapmayacaksan tamirciye göster */}
+      <Pressable
+        accessibilityRole="button"
+        onPress={onShowMechanic}
+        style={({ pressed }) => [styles.mechanicBrief, pressed && styles.pressed]}
+      >
+        <Ionicons name="construct-outline" size={18} color={theme.colors.ink} />
+        <Text style={styles.mechanicBriefText}>{t('brief.cta')}</Text>
+        <Ionicons name="chevron-forward" size={16} color={theme.colors.textSecondary} />
+      </Pressable>
+
+      {/* Veri çarkı: teşhis doğru çıktı mı? */}
+      {vehicleId != null && result.session_id != null && (
+        <View style={styles.feedbackWrap}>
+          <FeedbackRow vehicleId={vehicleId} sessionId={result.session_id} />
+        </View>
+      )}
     </View>
   );
 }
@@ -91,31 +126,86 @@ export default function CameraScreen() {
   const cameraRef = useRef<CameraView>(null);
 
   const selectedTask = useUstaStore((s) => s.selectedTask);
+  const guideProgress = useUstaStore((s) => s.guideProgress);
+  const currentVehicle = useUstaStore(selectCurrentVehicle);
   const { loading, error, result, runImageDiagnose } = useDiagnose();
+  const [briefOpen, setBriefOpen] = useState(false);
+  // Local: a failed takePictureAsync (camera busy / hardware) never reaches
+  // the diagnose hook, so surface it here in the same error slot.
+  const [captureError, setCaptureError] = useState<string | null>(null);
 
-  const progress = CURRENT_STEP / TOTAL_STEPS;
+  const briefDiag: BriefDiag | null = result
+    ? {
+        kindLabel: t('brief.kindImage'),
+        tespit: result.tespit,
+        taskLabel: selectedTask ? taskTitle(selectedTask) : undefined,
+        guven: result.guven,
+        sonrakiAdim: result.sonraki_adim,
+        guvenlikUyarisi: result.guvenlik_uyarisi,
+        sessionId: result.session_id ?? undefined,
+        costLow: result.cost_estimate?.low_try ?? undefined,
+        costHigh: result.cost_estimate?.high_try ?? undefined,
+      }
+    : null;
+
+  // Rehberden gelindiyse kaldığı adım (1 bazlı) banner'da görünür.
+  const guideStep =
+    selectedTask != null && guideProgress[selectedTask.id] != null
+      ? guideProgress[selectedTask.id] + 1
+      : null;
+
   const granted = permission?.granted === true;
   const canAskAgain = permission?.canAskAgain !== false;
 
   async function handleCheck() {
     const camera = cameraRef.current;
     if (!camera || loading) return;
-    const photo = await camera.takePictureAsync();
-    if (!photo?.uri) return;
-    await runImageDiagnose(photo.uri);
+    setCaptureError(null);
+    let uri: string | undefined;
+    try {
+      const photo = await camera.takePictureAsync({ quality: 0.6, skipProcessing: true });
+      uri = photo?.uri;
+    } catch {
+      setCaptureError('camera.error.captureFailed');
+      return;
+    }
+    if (!uri) {
+      setCaptureError('camera.error.captureFailed');
+      return;
+    }
+    await runImageDiagnose(uri);
+  }
+
+  async function handlePickGallery() {
+    if (loading) return;
+    setCaptureError(null);
+    const picked = await pickFromGallery();
+    if (picked.status === 'denied') {
+      setCaptureError('camera.error.galleryDenied');
+      return;
+    }
+    if (picked.status === 'cancelled') return;
+    await runImageDiagnose(picked.uri);
   }
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + theme.spacing.md }]}>
-      {/* Step banner + progress */}
+      {/* Görev banner'ı */}
       <View style={styles.banner}>
-        <Text style={styles.bannerStep}>
-          {t('camera.stepBanner', { current: CURRENT_STEP, total: TOTAL_STEPS })}
-        </Text>
-        <Text style={styles.bannerTitle}>{t('camera.stepTitle')}</Text>
-        <View style={styles.progressTrack}>
-          <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
+        <View style={styles.bannerTopRow}>
+          <Text style={styles.bannerStep}>{t('camera.taskLabel')}</Text>
+          {guideStep != null && (
+            <View style={styles.stepChip}>
+              <Text style={styles.stepChipText}>
+                {t('camera.guideStep', { step: guideStep })}
+              </Text>
+            </View>
+          )}
         </View>
+        <Text style={styles.bannerTitle}>
+          {selectedTask ? taskTitle(selectedTask) : t('camera.stepTitle')}
+        </Text>
+        <Text style={styles.bannerHint}>{t('camera.hint')}</Text>
       </View>
 
       {/* Persistent safety strip */}
@@ -129,7 +219,10 @@ export default function CameraScreen() {
         {permission == null ? (
           <ActivityIndicator color={theme.colors.accent} />
         ) : granted ? (
-          <CameraView ref={cameraRef} style={styles.camera} facing="back" />
+          <>
+            <CameraView ref={cameraRef} style={styles.camera} facing="back" />
+            <CameraGrid />
+          </>
         ) : canAskAgain ? (
           <>
             <Ionicons name="camera-outline" size={72} color={theme.colors.textSecondary} />
@@ -162,15 +255,19 @@ export default function CameraScreen() {
         contentContainerStyle={styles.feedbackContent}
         showsVerticalScrollIndicator={false}
       >
-        {error ? (
+        {error || captureError ? (
           <View style={styles.errorBox}>
             <Ionicons name="cloud-offline" size={18} color={theme.colors.warning} />
-            <Text style={styles.errorText}>{t(error)}</Text>
+            <Text style={styles.errorText}>{t(captureError ?? error!)}</Text>
           </View>
         ) : result ? (
-          <ResultPanel result={result} />
+          <ResultPanel
+            result={result}
+            vehicleId={currentVehicle?.id ?? null}
+            onShowMechanic={() => setBriefOpen(true)}
+          />
         ) : granted ? (
-          <Text style={styles.feedbackHint}>{t('camera.hint')}</Text>
+          <Text style={styles.feedbackHint}>{t('camera.gridHint')}</Text>
         ) : null}
       </ScrollView>
 
@@ -200,11 +297,28 @@ export default function CameraScreen() {
           )}
         </Pressable>
 
+        {!result && selectedTask != null && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityState={{ disabled: loading }}
+            disabled={loading}
+            onPress={handlePickGallery}
+            style={({ pressed }) => [
+              styles.galleryButton,
+              loading && styles.checkDisabled,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Ionicons name="images-outline" size={18} color={theme.colors.accent} />
+            <Text style={styles.galleryText}>{t('camera.pickFromGallery')}</Text>
+          </Pressable>
+        )}
+
         <View style={styles.secondaryRow}>
           <Pressable
             accessibilityRole="button"
             style={({ pressed }) => [styles.secondaryButton, pressed && styles.pressed]}
-            onPress={() => router.back()}
+            onPress={() => goBack(router)}
           >
             <Text style={styles.secondaryText}>{t('common.cancel')}</Text>
           </Pressable>
@@ -212,7 +326,7 @@ export default function CameraScreen() {
             <Pressable
               accessibilityRole="button"
               style={({ pressed }) => [styles.mechanicButton, pressed && styles.pressed]}
-              onPress={() => router.back()}
+              onPress={() => setBriefOpen(true)}
             >
               <Ionicons name="construct" size={18} color={theme.colors.background} />
               <Text style={styles.mechanicText}>{t('common.goToMechanic')}</Text>
@@ -220,6 +334,13 @@ export default function CameraScreen() {
           )}
         </View>
       </View>
+
+      <MechanicBriefSheet
+        visible={briefOpen}
+        vehicle={currentVehicle}
+        diag={briefDiag}
+        onClose={() => setBriefOpen(false)}
+      />
     </View>
   );
 }
@@ -237,6 +358,11 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
     padding: theme.spacing.lg,
   },
+  bannerTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   bannerStep: {
     fontFamily: theme.fonts.heading,
     fontSize: 14,
@@ -244,10 +370,29 @@ const styles = StyleSheet.create({
     color: theme.colors.accent,
     letterSpacing: 1,
   },
-  bannerTitle: {
+  stepChip: {
+    backgroundColor: theme.colors.okSoftBg,
+    borderRadius: theme.radius.pill,
+    paddingVertical: 3,
+    paddingHorizontal: theme.spacing.md,
+  },
+  stepChipText: {
     fontFamily: theme.fonts.body,
-    fontSize: 16,
+    fontSize: 11,
+    fontWeight: '700',
+    color: theme.colors.okSoftText,
+  },
+  bannerTitle: {
+    fontFamily: theme.fonts.heading,
+    fontSize: 20,
+    fontWeight: '700',
     color: theme.colors.textPrimary,
+    marginTop: theme.spacing.xs,
+  },
+  bannerHint: {
+    fontFamily: theme.fonts.body,
+    fontSize: 12,
+    color: theme.colors.textSecondary,
     marginTop: theme.spacing.xs,
   },
   progressTrack: {
@@ -266,7 +411,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: theme.spacing.sm,
-    backgroundColor: theme.colors.warning,
+    backgroundColor: theme.colors.warningBright,
     borderRadius: theme.radius.sm,
     paddingVertical: theme.spacing.sm,
     paddingHorizontal: theme.spacing.md,
@@ -277,7 +422,7 @@ const styles = StyleSheet.create({
     fontFamily: theme.fonts.body,
     fontSize: 12,
     fontWeight: '600',
-    color: theme.colors.background,
+    color: theme.colors.ink,
   },
   cameraArea: {
     flex: 1,
@@ -291,7 +436,11 @@ const styles = StyleSheet.create({
     padding: theme.spacing.xl,
   },
   camera: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   cameraHint: {
     fontFamily: theme.fonts.body,
@@ -409,6 +558,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.md,
     marginTop: theme.spacing.lg,
   },
+  feedbackWrap: {
+    marginTop: theme.spacing.md,
+    paddingTop: theme.spacing.md,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: theme.colors.border,
+  },
+  mechanicBrief: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    marginTop: theme.spacing.md,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.ink,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.md,
+  },
+  mechanicBriefText: {
+    flex: 1,
+    fontFamily: theme.fonts.body,
+    fontSize: 14,
+    fontWeight: '700',
+    color: theme.colors.ink,
+  },
   warningText: {
     flex: 1,
     fontFamily: theme.fonts.body,
@@ -436,6 +609,23 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: theme.colors.background,
+  },
+  galleryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: theme.spacing.sm,
+    minHeight: theme.touchTarget,
+    marginTop: theme.spacing.md,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.accent,
+  },
+  galleryText: {
+    fontFamily: theme.fonts.body,
+    fontSize: 15,
+    fontWeight: '600',
+    color: theme.colors.accent,
   },
   secondaryRow: {
     flexDirection: 'row',

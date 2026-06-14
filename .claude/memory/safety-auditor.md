@@ -30,3 +30,243 @@ sonra güncelle.
 ## Notlar
 - Yeni görev rehberi eklendiğinde: hedge + tetikleyici güvenlik uyarısı + tamirciye-git
   çıkışı + JSON şema atfı zorunlu. LPG bölgesi geçiyorsa müdahale tarifi YASAK.
+
+## Denetim (2026-06-12) — YENİ DOSYA: backend/app/domain/guides.py
+Kapsam: backend/app/domain/guides.py (10 bakım görevi: oil_change, air_filter,
+cabin_filter, battery, spark_plug, coolant, brake_check, tire, wiper, headlight).
+Referans kurallar: domain/safety.py + guides.py modül docstring'i.
+
+Sonuç: KRİTİK 0 · YÜKSEK 0 · ORTA 2 → PASS (bloklama yok).
+
+Doğrulanan güçlü noktalar:
+- brake_check ve coolant gözlem-odaklı; söküm/onarım tarifi YOK.
+- battery rehberi kontrol-odaklı; söküm/elektrot temizliği tamirciye bırakılıyor (step 4).
+- spark_plug içindeki LPG bağlamı yalnızca "dokunma + yetkili servise git"; müdahale tarifi YOK.
+- Tüm görevlerde mechanic_note (vazgeç-tamirciye-git) dataclass default'undan geliyor.
+- Tehlikeli bağlam uyarıları mevcut: kriko altına girme (oil_change s3), sıcak motor/yağ
+  (oil_change s1, spark_plug s1), soğutma basıncı (coolant s1), akü patlayıcı gaz/asit
+  (battery s1/s3), HID yüksek voltaj (headlight s1), halojen cam teması (headlight s4),
+  silecek kolunun cama çarpması (wiper s1), lastik yan duvar balonu (tire s3).
+
+Açık ORTA bulgular (takip):
+1. guides.py:142 cabin_filter — tetikleyici kelime yok, uyarısız; kabul edilebilir ama
+   torpido/elektrik bağlamında "kontak kapalı" vurgusu zaten var. Düşük risk.
+2. guides.py:113 oil_change son adım — yeni yağ doldurma/çalıştırma adımında sıcak yüzey
+   (egzoz manifoldu) hatırlatması yok; opsiyonel pekiştirme.
+   Not: Bunlar bloklayıcı değil; sahibi (a.hakan_@hotmail.com) opsiyonel iyileştirme olarak
+   değerlendirebilir.
+
+## Denetim (2026-06-13) — YENİ ÖZELLİK: Arıza kodu (OBD-II / DTC) açıklama
+Kapsam: backend/prompts/dtc/_base.md, backend/app/domain/safety.py (enforce_dtc_safety),
+backend/app/services/ai/dtc_service.py, backend/app/domain/schemas.py
+(DtcDiagnoseRequest/DtcDiagnoseResponse).
+
+Sonuç: KRİTİK 0 · YÜKSEK 1 · ORTA 3 → PASS (yayından önce 1 zorunlu düzeltme).
+
+Doğrulanan güçlü noktalar:
+- LPG müdahale tarifi YOK; enforce_dtc_safety (safety.py:241-243) LPG'yi yakalayıp
+  LPG_SAFETY_WARNING + tamirciye_git=True ile geçersiz kılıyor. Prompt (_base.md:15) de yasaklıyor.
+- surulebilir_mi is False VEYA aciliyet=yuksek => tamirci + uyarı zorunlu (safety.py:244) gerçekten
+  zorlanıyor; `is False` ile None doğru ayrılıyor (None tamirci tetiklemez, prompt semantiğiyle uyumlu).
+- enforce_dtc_safety dtc_service.py:70'te son katman olarak çağrılıyor; ham model dönmüyor.
+- DtcDiagnoseResponse hem guvenlik_uyarisi hem tamirciye_git_onerisi içeriyor (şema bütünlüğü OK).
+
+Bulgular (takip):
+1. [YÜKSEK — ZORUNLU DÜZELTME] safety.py:28-42 SAFETY_TRIGGER_KEYWORDS — "hararet" ve "yağ basıncı"
+   eksik. Prompt (_base.md:13) ve enforce_dtc_safety docstring'i (safety.py:223) bunları zorunlu
+   uyarı konusu sayıyor ama keyword listesinde yok ("yağ basıncı" sadece generic "basınç" ile kısmen
+   yakalanıyor, "hararet" hiç yakalanmıyor). hararet/yağ basıncı geçen DTC yanıtı guvenlik_uyarisi=null
+   ile geçebilir. Fix: "hararet", "yağ basınc"/"yag basinc", muhtemelen "şarj"/"sarj" ekle + regresyon testi.
+2. [ORTA] safety.py:94-106 _ensure_hedge — sadece DEFINITIVE_PHRASES literallerini değiştiriyor;
+   "arıza şudur"/"sorun budur"/bare "kesin" yakalanmıyor. Hedge zaten varsa kısa devre (satır 104)
+   karışık dilde kesin sözcükleri bırakabilir.
+3. [ORTA] enforce_dtc_safety hedge yumuşatmayı yalnız `tespit`'e uyguluyor; kullanıcıya görünen
+   `baslik` ve `olasi_nedenler` haystack'e giriyor ama _ensure_hedge'den geçmiyor
+   (dashboard'da `anlam` geçiyor — tutarsızlık).
+4. [ORTA/opsiyonel] schemas.py:360-363 DtcDiagnoseRequest.code pattern yok (sadece 2-10 uzunluk);
+   prompt bilinmeyen kodu zarif ele alıyor, güvenlik hatası değil — opsiyonel sıkılaştırma.
+
+Karar: surulebilir_mi=False ve kesin-dil yumuşatma çekirdeği zorlanıyor; tek bloklayıcı, koddaki
+keyword listesinin docstring/prompt'un vaat ettiği hararet/yağ-basıncı uyarısını gerçekten
+zorlamaması (bulgu 1).
+
+## Denetim (2026-06-13) — YENİ ÖZELLİK: Belirti-bazlı serbest teşhis
+Kapsam: backend/prompts/symptom/_base.md, backend/app/domain/safety.py (enforce_symptom_safety),
+backend/app/services/ai/symptom_service.py, backend/app/domain/schemas.py
+(SymptomDiagnoseRequest/Response).
+
+Sonuç: KRİTİK 1 · YÜKSEK 2 · ORTA 2 → BLOCK (yayından önce zorunlu düzeltmeler).
+
+Doğrulanan güçlü noktalar:
+- enforce_symptom_safety servis akışında son katman olarak çağrılıyor (symptom_service.py:60).
+- ariza_sistem=='fren' VEYA aciliyet=yuksek => tamirci + uyarı zorlanıyor (safety.py:286).
+- LPG müdahale tarifi prompt'ta yasak (_base.md:14); kodda LPG_INTERVENTION yakalanırsa
+  LPG_SAFETY_WARNING + tamirci zorlanıyor (safety.py:282).
+- Şema hem guvenlik_uyarisi hem tamirciye_git_onerisi içeriyor (şema bütünlüğü OK).
+- "büyük ihtimalle" hedge prompt'ta + kod backstop'unda (tespit) mevcut.
+
+Bulgular:
+1. [KRİTİK] safety.py:286 — Fren DIŞINDAKİ güvenlik-kritik belirtiler (direksiyon kilitlenmesi,
+   duman/yangın, metalik vuruntu) enforce katmanında zorlanmıyor. Prompt bunları "yuksek aciliyet"
+   olarak işaretlemeye GÜVENİYOR; model orta/dusuk verirse fren-dışı kritik belirti tamirci+uyarı
+   ALMADAN geçer. SAFETY_TRIGGER_KEYWORDS'te "direksiyon", "duman", "yangın", "metalik" YOK.
+2. [YÜKSEK] safety.py:269-291 — haystack guvenlik_uyarisi tetikleyicisi için yalnız tespit+
+   sonraki_adim+context+olasi_nedenler tarıyor; aciliyet tetiklemiyorsa ve keyword yoksa fren-dışı
+   ciddi belirtide uyarı boş kalır. Ayrıca _mentions_safety_topic'te yağ basıncı sadece generic
+   "basınç" ile kısmen yakalanıyor (DTC bulgusuyla aynı kök).
+3. [YÜKSEK] _ensure_hedge yalnız tespit'e uygulanıyor; olasi_nedenler ve sonraki_adim kullanıcıya
+   görünüyor ama hedge/kesin-dil yumuşatmadan geçmiyor (image/sound/dtc ile aynı sınır).
+4. [ORTA] _ensure_hedge "kesin"/"arıza şudur"/"sorun budur" literallerini yakalamıyor (DEFINITIVE_
+   PHRASES eksik) — DTC denetimindeki açık bulgu burada da geçerli.
+5. [ORTA] symptom_service.py:54-58 — ValidationError path'inde token loglanıyor ama güvenlik
+   açısından nötr; not olarak: AIKind.sound + kategori='belirti' kayıt seçimi kasıtlı.
+
+---
+
+## Denetim (2026-06-14) — Katalog genişletme (premium + SUV + Tesla)
+Kapsam: backend/app/domain/catalog.py'ye eklenen ~22 yeni araç (BMW 3/5/X5,
+Mercedes-Benz C/E/A, Audi A3/A4/Q5, Volvo XC60, SUV'lar Tucson/Sportage/Duster/
+Tiguan/Passat/Juke/RAV4/Kuga/Captur/3008 + Tesla Model 3 elektrikli).
+
+Sonuç: KRİTİK 0 · YÜKSEK 0 · ORTA 0 → PASS (blok yok).
+
+Doğrulanan güçlü noktalar:
+- LPG araçları (Duster, Captur): FuelType.lpg yalnızca sınıflandırma; spec'te LPG
+  müdahale/ayar/onarım tarifi YOK. LPG yasağı korunuyor.
+- Tesla Model 3: oil/buji/hava-yağ filtresi alanları doğru şekilde None (EV'de
+  yağ değişimi/buji yok). battery yüksek voltaj GÜVENLİ temsil edilmiş; HV'ye
+  "kendin müdahale" çağrısı yok.
+- Yeni spec'lerde kesin-dil (kesin/%100) yok; parça no'ları "örnek:" yer tutuculu.
+
+İzleme (bulgu DEĞİL): Tesla "yüksek voltaj/HV batarya" ifadesi SAFETY_TRIGGER_
+KEYWORDS'te yok (yalnız "akü" tetikliyor). EV'ye özel rehberlik akışları eklenirse
+"yüksek voltaj"/"yuksek voltaj" anahtarı eklenmeli.
+
+DERS (tekrar): safety-auditor subagent hafızayı bazen backend/.claude/memory/'ye
+yazıyor; kanonik konum .claude/memory/safety-auditor.md (kök) — her denetimden
+sonra yanlış konumu kontrol et ve birleştir.
+
+## Denetim (2026-06-14) — Katalog 2. genişletme (~27 yeni araç)
+Kapsam: backend/app/domain/catalog.py satır 898-1449 ("EK MARKALAR & MODELLER
+(2. genişletme)" → "MOTOSİKLETLER" öncesi). Yeni markalar: Suzuki (Vitara/Swift),
+Mazda (3/CX-5), Seat (Leon/Ibiza), Mitsubishi (Lancer/ASX), Chevrolet (Cruze),
+Mini (Cooper) + mevcut markalara ek modeller (VW Jetta, Renault Fluence/Taliant,
+Fiat Linea, Toyota Yaris, Hyundai i30, Kia Ceed, Ford Fiesta, Opel Corsa,
+Peugeot 208, Citroen C3, Dacia Logan, Nissan Micra, Honda CR-V, BMW 1 Serisi,
+Mercedes GLA, Audi A1).
+
+Sonuç: KRİTİK 0 · YÜKSEK 0 · ORTA 0 → PASS (blok yok).
+
+Doğrulanan güçlü noktalar:
+- LPG araçları (Chevrolet Cruze, Renault Fluence/Taliant, Fiat Linea, Opel Corsa,
+  Dacia Logan): FuelType.lpg YALNIZCA sınıflandırma etiketi; spec içinde LPG
+  sistemine müdahale/ayar/açma/onarım TARİFİ YOK. LPG yasağı korunuyor. (Bu blok
+  saf bildirimsel veri; talimat/komut adımı içermiyor.)
+- Kesin-dil (kesin/%100/kesinlikle) hiçbir yeni spec'te yok.
+- Tehlikeli tamir tarifi yok — alanlar yağ/filtre/buji/akü referans değerleri.
+- Parça no'ları tutarlı şekilde "örnek:" yer tutuculu (bazı bolt size'lar da
+  "örnek: Torx / 13mm" — Peugeot 208/Citroen C3). Modül yorumu (s898-899) tümünün
+  el kitabına karşı doğrulanmasını şart koşuyor.
+
+Değerlendirilen ama bulgu OLMAYAN (kabul edilebilir referans veri):
+- Peugeot 208 (s1288-1307): fuels'da FuelType.elektrik VAR ama oil/buji alanları
+  benzin varyantı için dolu; battery_spec="60Ah (EFB) / e-208 yüksek voltaj".
+  Bu KRİTİK/YÜKSEK DEĞİL — catalog.py saf araç-referans katmanı, kullanıcıya
+  doğrudan talimat üretmiyor. Gerçek güvenlik son katmanı AI yanıtında
+  enforce_image/sound/symptom_safety backstop'u; e-208 kullanıcısı yağ/buji
+  görevi seçerse rehber akışı (guides.py) + AI hedge/uyarı devrede. battery_spec
+  HV'yi açıkça etiketliyor ("yüksek voltaj"), "kendin müdahale et" çağrısı YOK.
+  Tesla Model 3 (önceki denetim) None-alan deseniyle kıyasla 208 melez-katalog
+  satırı; iyileştirme opsiyonel, bloklayıcı değil.
+
+İZLEME (bulgu DEĞİL, önceki denetimle aynı kök):
+- "yüksek voltaj"/"yuksek voltaj" hâlâ SAFETY_TRIGGER_KEYWORDS'te YOK (yalnız
+  "akü" tetikliyor). e-208 / hibrit (Yaris, CR-V, Vitara, Swift) gibi HV içeren
+  araçlara EV/HV-özel rehberlik akışı eklenirse bu anahtar eklenmeli. Katalog
+  genişledikçe HV/hibrit araç sayısı arttı; bu izleme önceliği yükseldi.
+
+## 2026-06-13 — Dashboard (pano) denetiminden taşınan kabul edilmiş istisnalar
+(İlk denetim backend/ cwd'sinde yapıldığı için ayrı konumda kalmıştı; buraya
+birleştirildi. Bu istisnalar gelecekte YENİDEN UYARILMAMALI:)
+- DEFAULT_SAFETY_WARNING / DASHBOARD_RED_WARNING / LPG_SAFETY_WARNING sabitleri
+  tasarım gereği tetikleyici kelime (motor, fren, akü, kesinlikle...) içerir —
+  sabit metinlerin KENDİSİ ihlal olarak işaretlenmez.
+- Dashboard teşhisi AISession'a kind=AIKind.image + kategori='pano_uyari',
+  DTC kind=AIKind.sound + kategori='ariza_kodu', belirti kind=AIKind.sound +
+  kategori='belirti' olarak kasıtlı loglanır (AIKind native-enum riskinden
+  kaçınmak için; güvenlik sorunu değil).
+- Dashboard YÜKSEK bulguları (per-ışık `anlam` hedge, _ensure_hedge kesin-dil
+  yumuşatma) DÜZELTİLDİ (commit a97ab4a).
+
+## Denetim (2026-06-14) — Katalog 3. genişletme (~52 yeni araç, JSON'a taşındı)
+Kapsam: backend/app/domain/catalog_data.json'un son ~52 kaydı (index 80+; toplam
+80→132 araç, marka 25→32). Yeni markalar: BYD, Cupra, Jeep, Land Rover, MG,
+Subaru, Tofaş. Görev odağı: yeni EV'ler, LPG araçları, Tofaş eski TR araçları.
+NOT: Veri artık catalog.py değil JSON dosyasında (catalog_data.json).
+
+Sonuç: KRİTİK 0 · YÜKSEK 0 · ORTA 0 → PASS (blok yok).
+
+Doğrulanan güçlü noktalar:
+- Saf EV'ler (Tesla Model Y s3211, MG 4 s3164, BYD Atto 3 s3188): oil/buji/yağ
+  filtresi/hava filtresi alanları DOĞRU şekilde None. battery_spec yüksek voltajı
+  GÜVENLİ etiketliyor ("ana/Blade batarya yüksek voltaj", "12V yardımcı"); HV'ye
+  "kendin müdahale/aç/onar" çağrısı YOK. Tesla Model 3 deseniyle birebir tutarlı.
+- Melez-katalog EV varyantları (Fiat 500 s2237, Hyundai Kona s2386, Peugeot 2008
+  s2584, Citroen C4 s2636, Volvo XC40 s3260, MG ZS s3139): benzin varyantı için
+  oil/buji dolu + battery_spec'te "... yüksek voltaj" etiketi. Önceki denetimde
+  (e-208) kabul edilmiş desen; KRİTİK/YÜKSEK DEĞİL — JSON saf referans katmanı,
+  kullanıcıya doğrudan talimat üretmiyor; gerçek güvenlik son katmanı AI yanıtında
+  enforce_*_safety backstop'u. "kendin müdahale" çağrısı YOK.
+- LPG araçları (Tofaş Şahin/Doğan, Dacia Sandero/Jogger/Logan, Captur, Duster,
+  Fluence, Taliant, Linea, Opel Corsa, Chevrolet Cruze): "lpg" YALNIZCA fuels
+  sınıflandırma etiketi; hiçbir spec'te LPG sistemine müdahale/ayar/açma/onarım
+  TARİFİ YOK. LPG yasağı korunuyor.
+- Tofaş Şahin/Doğan (s3338/s3363, 1990-2002): spec'ler döneme uygun (15W-40/20W-50,
+  klasik filtre, NGK BPR6ES, 45-55Ah). Tehlikeli/yanıltıcı içerik YOK. cabin_filter
+  doğru şekilde None (o dönem aracında yok).
+- Kesin-dil (kesin/%100/kesinlikle) hiçbir yeni spec'te YOK. Parça no'ları tutarlı
+  "örnek:" yer tutuculu.
+
+İZLEME (bulgu DEĞİL, önceki denetimlerle aynı kök, önceliği artıyor):
+- "yüksek voltaj"/"yuksek voltaj" hâlâ SAFETY_TRIGGER_KEYWORDS'te YOK (yalnız "akü"
+  tetikliyor). Katalog artık 9+ saf/melez HV aracı içeriyor (Tesla x2, MG 4/ZS, BYD,
+  + e-varyantlar). EV/HV-özel rehberlik akışı eklenirse bu anahtar EKLENMELİ.
+
+## Denetim (2026-06-14) — Katalog 4. genişletme (74 yeni: 60 MOTOSİKLET + 14 araba)
+Kapsam: catalog_data.json'a scripts/add_vehicles2.py ile eklenen 74 kayıt
+(toplam motosiklet 72, LPG arabalar Hyundai i10 s4979 / Kia Picanto s5004,
+Yamaha PW50 2T moped s3845). Tetiklenen akış: api/maintenance.py fill_template
+(guides.py:448) → spec değerleri oil_change adımlarına gömülüyor.
+
+Sonuç: KRİTİK 0 · YÜKSEK 1 · ORTA 1 → PASS-with-fix (PW50 yağ rehberi düzeltilmeli).
+
+Doğrulanan güçlü noktalar:
+- Tüm 72 motosiklette cabin_filter_part=None (script zorluyor); cabin_filter görevi
+  zaten _CAR_ONLY (tasks.py:63) → motosiklete teklif edilmiyor. Tutarlı, bulgu yok.
+- Motosiklet oil_drain_location="motor karteri altı tahliye cıvatası" doğru.
+- LPG arabalar (i10, Picanto): "lpg" YALNIZCA fuels sınıflandırma etiketi; spec'te
+  LPG sistemine müdahale/ayar/açma/onarım TARİFİ YOK. LPG yasağı korunuyor.
+- Kesin-dil (kesin/%100/kesinlikle) hiçbir yeni spec'te YOK. Parça no'ları "örnek:"
+  yer tutuculu. JASO MA2 motosiklet yağ spec'i tutarlı (4T motosikletler).
+
+BULGULAR:
+1. [YÜKSEK] Yamaha PW50 (catalog_data.json:3853-3865) — 2 zamanlı moped, oil_spec=
+   "2T yağ (karışım)", oil_capacity_l=0.0, oil_drain_bolt_size="—". oil_change görevi
+   _ALL_COMBUSTION'a uygulanıyor (tasks.py:37-38), motosiklet türü kısıtı YOK → PW50
+   kullanıcısına oil_change rehberi TEKLİF EDİLİR. fill_template (guides.py:456) fallback
+   koşulu `value not in (None, "")` → 0.0 ve "—" "dolu değer" sayılır, fallback'e DÜŞMEZ.
+   Sonuç: rehber "yaklaşık 0.0 L yağ doldur" ve "— lokma anahtarıyla tahliye tıpasını sök"
+   üretir. 2 zamanlı motorda yağ tahliyesi YOKTUR, yağ benzinle karışıma girer. Kullanıcıyı
+   var olmayan bir karter tahliyesi yapmaya / 0.0 L yağ doldurmaya yönlendirir = yanıltıcı
+   ve potansiyel motor hasarı. Fix (biri): (a) 2T araçlarda oil_change'i uygulanamaz say
+   (örn. spec'e is_two_stroke bayrağı veya oil_capacity_l==0 ise 404/ayrı 2T rehberi), VEYA
+   (b) fill_template fallback'ini 0.0/"—" gibi placeholder'ları da fallback'e düşürecek
+   şekilde sıkılaştır + 2T'ye özel "karışım oranı" rehberi ekle. Tek başına spec düzeltmesi
+   yetmez; render mantığı 0.0'ı kelimesi kelimesine basıyor.
+2. [ORTA] Genel render kırılganlığı (guides.py:456) — oil_capacity_l==0.0 ve sentinel
+   string "—" tüm araçlar için fallback'i atlatır. Şu an yalnız PW50 etkili ama gelecekte
+   0.0/"—" girilen her kayıt aynı kusuru yaşar. fill_template'e sayısal 0 ve "—"/"-" gibi
+   yer tutucuları boş sayacak koruma eklenmeli (regresyon testi ile).
+
+Not: Bu denetim subagent cwd'si backend/ olsa da hafıza KÖK .claude/memory/'ye yazıldı;
+backend/.claude/memory OLUŞTURULMADI (talimata uygun).

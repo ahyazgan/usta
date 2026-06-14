@@ -3,6 +3,197 @@
     "name": "Usta",
     "tagline": "Cebindeki usta"
   },
+  "tabs": {
+    "home": "Ana Sayfa",
+    "diagnosis": "Teşhis",
+    "maintenance": "Bakım",
+    "history": "Geçmiş",
+    "settings": "Profil"
+  },
+  "settings": {
+    "title": "Profil",
+    "account": {
+      "title": "Hesap",
+      "free": "Ücretsiz plan",
+      "upgradeDesc": "Sınırsız canlı rehber, teşhis ve fiyat verisi",
+      "premiumActive": "Premium üyelik",
+      "premiumTag": "Aktif"
+    },
+    "prefs": {
+      "title": "Tercihler",
+      "language": "Dil",
+      "notifications": "Bildirimler",
+      "notificationsDesc": "Muayene/sigorta ve bakım hatırlatıcıları"
+    },
+    "privacy": {
+      "title": "Gizlilik & Yasal",
+      "policy": "Gizlilik Politikası",
+      "analytics": "Anonim kullanım analitiği",
+      "analyticsDesc": "Uygulamayı iyileştirmemize yardımcı olur (kişisel veri içermez)"
+    },
+    "actions": {
+      "title": "Hesap İşlemleri",
+      "logout": "Çıkış yap",
+      "delete": "Hesabı sil"
+    },
+    "delete": {
+      "confirmTitle": "Hesabı sil?",
+      "confirmMessage": "Hesabın ve tüm verilerin (araçlar, teşhisler, kayıtlar) kalıcı olarak silinir. Bu işlem geri alınamaz.",
+      "confirm": "Sil"
+    },
+    "about": {
+      "version": "Usta sürüm {{version}}"
+    }
+  },
+  "home": {
+    "greeting": "Merhaba 👋",
+    "welcome": "Garajın",
+    "triage": {
+      "title": "Bugün ne lazım?",
+      "problem": {
+        "title": "Bir sorun var",
+        "desc": "Sesini dinlet veya göster, teşhis edeyim"
+      },
+      "maintenance": {
+        "title": "Bakım yapacağım",
+        "desc": "Adım adım rehberle kendin yap"
+      }
+    },
+    "priceGuide": {
+      "title": "Fiyat Rehberi",
+      "desc": "Bu araç için işler tamirciye ne tutar?"
+    },
+    "tasksTitle": "Yapılacaklar",
+    "tasksEmpty": "Bakım kaydı ekledikçe yapılacaklar burada belirir.",
+    "allMaintenance": "Tümü →",
+    "shareReport": "Usta Raporu'nu paylaş",
+    "invite": "Arkadaşını davet et",
+    "signingIn": "Giriş yapılıyor…",
+    "connectError": "Sunucuya bağlanılamadı. İnternetini kontrol edip tekrar dene.",
+    "savingsTeaser": "Düzenli bakımla araç ömrünü uzat ve sürpriz masraflardan kaçın.",
+    "savings": "Kendin yaptığın {{count}} bakımla yaklaşık ₺{{amount}} tasarruf ettin.",
+    "badge": {
+      "ok": "İyi",
+      "soon": "Yakın",
+      "due": "Acil",
+      "unknown": "—"
+    },
+    "taskMeta": {
+      "ok": "Durum iyi görünüyor",
+      "soon": "Zamanı yaklaşıyor",
+      "due": "Zamanı geldi",
+      "unknown": "Kayıt yok"
+    },
+    "kmModal": {
+      "title": "Kilometreyi güncelle",
+      "placeholder": "Örn: 85200"
+    },
+    "dates": {
+      "title": "Takvim",
+      "muayene": "Muayene",
+      "sigorta": "Sigorta",
+      "mtv": "MTV (Motorlu Taşıt Vergisi)",
+      "mtvHint": "Son ödeme — Ocak/Temmuz sonu",
+      "remaining": "{{days}} gün kaldı",
+      "today": "Bugün!",
+      "overdue": "{{days}} gün geçti"
+    }
+  },
+  "maintenance": {
+    "title": "Bakım",
+    "subtitle": "Aracına uygun bir bakım görevi seç, kamerayla doğru yeri doğrula.",
+    "risk": {
+      "dusuk": "Düşük risk",
+      "orta": "Orta risk",
+      "yuksek": "Yüksek risk"
+    }
+  },
+  "live": {
+    "start": "Canlı Sesli Rehber",
+    "end": "Bitir",
+    "connecting": "Bağlanıyor…",
+    "intro": "Başlat'a bas, kamerayı parçaya tut ve sesle sor — büyük ihtimalle ne olduğunu söyleyeyim.",
+    "cameraHint": "Kamera izni gerekiyor — Başlat'a basınca isteyeceğim.",
+    "audioNotReady": "Ses modülü bu derlemede bağlı değil (dev-build gerekli). Görüntü çalışır, ses sessiz.",
+    "status": {
+      "connecting": "Bağlanıyor",
+      "live": "Canlı",
+      "closed": "Kapalı",
+      "error": "Hata"
+    },
+    "error": {
+      "start": "Canlı oturum başlatılamadı.",
+      "premium": "Aylık ücretsiz canlı süren doldu — premium ile sınırsız."
+    }
+  },
+  "premium": {
+    "title": "Usta Premium",
+    "tagline": "Aracının ustası, sınırsız cebinde.",
+    "active": "Premium aktif 🎉",
+    "free": "Şu an ücretsiz plandasın.",
+    "benefit": {
+      "live": "Sınırsız canlı sesli rehber",
+      "diagnosis": "Sınırsız AI teşhis",
+      "prices": "Tam fiyat verisi + kazıklanma kalkanı",
+      "support": "Öncelikli destek + yeni özellikler"
+    },
+    "priceMonthly": "₺149",
+    "perMonth": "/ ay",
+    "priceYearly": "₺999",
+    "perYear": "/ yıl",
+    "bestValue": "En avantajlı",
+    "cta": "Premium Ol",
+    "comingSoon": "Satın alma lansmanla aktif olacak. Şimdilik önizleme.",
+    "disclaimer": "İstediğin zaman iptal edebilirsin. Fiyatlar mağazada onaylanır.",
+    "refresh": "Durumu yenile"
+  },
+  "prices": {
+    "title": "Fiyat Rehberi",
+    "subtitle": "Bu araç için yaygın işlerin tamirciye tahmini maliyeti. Bir işe dokun, nasıl yapılacağını gör.",
+    "seed": "Türkiye ortalaması",
+    "community": "{{count}} kullanıcının ödediğine göre",
+    "disclaimer": "Tahmini aralıktır; araca, şehre ve arızanın boyutuna göre değişir. Kesin fiyat için teklif al."
+  },
+  "guide": {
+    "estMinutes": "~{{min}} dk",
+    "stepOf": "Adım {{current}} / {{total}}",
+    "toolLabel": "Gerekli:",
+    "torqueLabel": "Tork:",
+    "verifyCta": "Doğru yeri buldun mu? Kamerayı tut, kontrol edeyim.",
+    "estimate": {
+      "title": "Tamirciye yaptırırsan",
+      "seed": "Türkiye ortalaması (tahmini aralık)",
+      "community": "{{count}} kullanıcının ödediğine göre"
+    },
+    "prep": {
+      "title": "Başlamadan önce hazırla",
+      "parts": "Parçalar",
+      "tools": "Aletler",
+      "buy": "Satın Al"
+    },
+    "next": "Yaptım, devam ▸",
+    "finish": "Bitir ve kaydet",
+    "done": {
+      "title": "Eline sağlık! 🔧",
+      "desc": "{{task}} tamamlandı ve bakım geçmişine kaydedildi.",
+      "savings": "+₺{{amount}} cebinde kaldı",
+      "share": "Paylaş",
+      "cta": "Garaja dön"
+    }
+  },
+  "diagnosis": {
+    "title": "Neyin var?",
+    "chatLabel": "Usta diyor ki",
+    "intro": "Hoş geldin! Sesi bana tarif et — ne zaman çıkıyor, neye benziyor? Ben de büyük ihtimalle neyin olduğunu söyleyeyim.",
+    "show": {
+      "title": "Göster",
+      "desc": "Motoru veya parçayı kameraya tut"
+    },
+    "listen": {
+      "title": "Dinlet",
+      "desc": "Garip bir ses mi var? Tarif et"
+    }
+  },
   "garage": {
     "title": "Garajım",
     "loading": "Garajın yükleniyor…",
@@ -32,7 +223,16 @@
       "oil_change": "Yağ Değişimi",
       "battery": "Akü",
       "cabin_filter": "Polen Filtresi",
-      "spark_plug": "Buji Değişimi"
+      "spark_plug": "Buji Değişimi",
+      "brake_check": "Fren Kontrolü",
+      "air_filter": "Hava Filtresi",
+      "coolant": "Soğutma Sıvısı",
+      "tire": "Lastik Kontrolü",
+      "wiper": "Silecek",
+      "headlight": "Far / Ampul",
+      "chain": "Zincir Bakımı",
+      "tire_pressure": "Lastik Basıncı",
+      "clutch_cable": "Debriyaj Teli"
     },
     "cta": "Ustaya Göster"
   },
@@ -61,6 +261,10 @@
       "hibrit": "Hibrit",
       "elektrik": "Elektrik"
     },
+    "type": {
+      "araba": "Araba",
+      "motosiklet": "Motosiklet"
+    },
     "form": {
       "title": "Araç Ekle",
       "make": "Marka",
@@ -69,14 +273,23 @@
       "modelPlaceholder": "Örn: Clio",
       "year": "Yıl",
       "yearPlaceholder": "Örn: 2019",
+      "plate": "Plaka (isteğe bağlı)",
+      "platePlaceholder": "Örn: 34 ABC 123",
       "engineCode": "Motor kodu (isteğe bağlı)",
       "engineCodePlaceholder": "Örn: K9K",
+      "type": "Tür",
       "km": "Kilometre (isteğe bağlı)",
       "kmPlaceholder": "Örn: 138420",
+      "muayene": "Muayene (ist.)",
+      "sigorta": "Sigorta (ist.)",
+      "datePlaceholder": "GG.AA.YYYY",
       "fuel": "Yakıt",
       "save": "Kaydet",
+      "moreDetails": "Detaylar (isteğe bağlı)",
+      "moreDetailsHint": "Plaka, motor kodu, kilometre ve tarihler — sonra da ekleyebilirsin.",
       "specAutoHint": "Bilinen TR araçları için teknik özellikler otomatik doldurulur.",
-      "validation": "Lütfen marka, model, yıl (1950–2100) ve yakıt türünü gir."
+      "validation": "Lütfen marka, model, yıl (1950–2100) ve yakıt türünü gir.",
+      "dateValidation": "Tarihleri GG.AA.YYYY biçiminde gir (örn. 15.03.2027)."
     },
     "error": {
       "network": "Bağlantı yok — internetini kontrol et",
@@ -124,6 +337,11 @@
     },
     "analyze": "Analiz Et",
     "analyzing": "İnceleniyor…",
+    "estimate": {
+      "title": "Tamirciye yaklaşık",
+      "seed": "Türkiye ortalaması (tahmini aralık)",
+      "community": "{{count}} kullanıcının ödediğine göre"
+    },
     "result": {
       "title": "Teşhis",
       "tespit": "Tespit",
@@ -161,6 +379,7 @@
     "reminders": {
       "title": "Hatırlatıcılar",
       "empty": "Henüz hatırlatıcı yok",
+      "emptyHint": "Bakım kaydı ekledikçe km bazlı hatırlatıcılar burada belirir.",
       "remaining": "{{km}} km kaldı",
       "dueAt": "{{km}} km'de",
       "unknownKm": "Bilinmiyor",
@@ -174,14 +393,23 @@
     "logs": {
       "title": "Geçmiş Kayıtlar",
       "empty": "Henüz kayıt yok",
+      "emptyHint": "Bir bakım rehberini tamamla ya da aşağıdan elle kayıt ekle.",
       "kmValue": "{{km}} km",
       "noKm": "Km yok"
+    },
+    "diagnoses": {
+      "title": "Teşhis Geçmişi",
+      "empty": "Henüz AI teşhisi yok",
+      "emptyHint": "Kamerayla doğrulama ya da ses teşhisi yaptıkça burada listelenir.",
+      "mechanic": "Tamirci"
     },
     "addLog": {
       "title": "Kayıt Ekle",
       "taskLabel": "Görev",
       "kmLabel": "Kilometre",
       "kmPlaceholder": "Örn: 138420",
+      "costLabel": "Maliyet (TL, isteğe bağlı)",
+      "costPlaceholder": "Örn: 750",
       "noteLabel": "Not (isteğe bağlı)",
       "notePlaceholder": "Kısa bir not",
       "submit": "Kaydet"
@@ -196,6 +424,8 @@
   "camera": {
     "stepBanner": "Adım {{current}}/{{total}}",
     "stepTitle": "Yağ çubuğunu bul ve seviyeyi kontrol et",
+    "taskLabel": "GÖREV",
+    "guideStep": "Adım {{step}}",
     "safetyStrip": "Dikkat: Motor sıcak olabilir. Aracı sabit zemine al, krikoyla kaldırdıysan takozla destekle.",
     "check": "Kontrol Et",
     "analyzing": "İnceleniyor…",
@@ -204,6 +434,8 @@
     "permissionDenied": "Kamera izni verilmedi. Doğru parçayı doğrulamak için ayarlardan izin ver.",
     "offline": "Çevrimdışısın — bağlantı bekleniyor",
     "hint": "Parçayı çerçeveye ortala ve Kontrol Et'e bas",
+    "gridHint": "Parçayı ızgaranın ortasına hizala",
+    "pickFromGallery": "Galeriden seç",
     "guven": {
       "yuksek": "Yüksek güven",
       "orta": "Orta güven",
@@ -235,9 +467,211 @@
       "noTask": "Önce bir görev seç",
       "noVehicle": "Önce bir araç ekle",
       "generic": "Bir şeyler ters gitti, tekrar dene",
+      "captureFailed": "Fotoğraf çekilemedi, tekrar dene",
+      "galleryDenied": "Galeri izni verilmedi — ayarlardan izin ver",
       "aiUnavailable": "Yapay zekâ servisi şu an kullanılamıyor. Lütfen sonra tekrar dene.",
       "busy": "Servis şu an yoğun. Lütfen biraz sonra tekrar dene."
     }
+  },
+  "dashboard": {
+    "title": "Uyarı Işığı",
+    "safetyStrip": "Aracı sürerken çekme. Güvenli bir yerde dur, kontak açıkken panoyu çek.",
+    "scan": "Panoyu Tara",
+    "retake": "Tekrar Çek",
+    "noLights": "Net bir uyarı ışığı seçemedim. Daha aydınlık ve net bir fotoğraf dene.",
+    "findMechanic": "Tamirci Bul",
+    "urgency": {
+      "dusuk": "Düşük",
+      "orta": "Orta",
+      "yuksek": "Yüksek"
+    },
+    "entry": {
+      "title": "Uyarı ışığı ne demek?",
+      "desc": "Panodaki ışığın fotoğrafını çek, açıklayayım"
+    }
+  },
+  "dtc": {
+    "title": "Arıza Kodu",
+    "intro": "OBD-II cihazından okuduğun arıza kodunu yaz; bu araç için ne anlama geldiğini açıklayayım.",
+    "codeLabel": "Arıza kodu",
+    "codePlaceholder": "Örn. P0300",
+    "noteLabel": "Not (isteğe bağlı)",
+    "notePlaceholder": "Belirti varsa yaz: tekleme, ışık yanıyor…",
+    "disclaimer": "Aynı kod farklı araçlarda farklı nedene işaret edebilir. Bu bir ön bilgidir, kesin teşhis için tamirciye danış.",
+    "explain": "Açıkla",
+    "another": "Başka Kod",
+    "causes": "Olası nedenler",
+    "drivable": {
+      "yes": "🚗 Büyük ihtimalle sürülebilir",
+      "no": "⛔ Sürmeye devam etme",
+      "unknown": "❓ Belirsiz"
+    },
+    "error": {
+      "empty": "Geçerli bir arıza kodu yaz (örn. P0300)"
+    },
+    "entry": {
+      "title": "Arıza kodu ne demek?",
+      "desc": "P0300 gibi bir kodu yaz, açıklayayım"
+    }
+  },
+  "symptom": {
+    "title": "Sorunu Anlat",
+    "intro": "Aracındaki sorunu kendi cümlelerinle yaz; büyük ihtimalle neyle ilgili olduğunu ve ne yapman gerektiğini söyleyeyim.",
+    "placeholder": "Örn: Rölantide motor titriyor, gaz verince düzeliyor.",
+    "examplesTitle": "Hızlı örnekler",
+    "examples": {
+      "idle": "Rölantide titriyor",
+      "brake": "Fren pedalı yumuşadı",
+      "start": "Marş basıyor ama çalışmıyor",
+      "noise": "Gaz verince ses geliyor"
+    },
+    "disclaimer": "Bu bir ön değerlendirmedir, kesin teşhis için tamirciye danış.",
+    "diagnose": "Teşhis Et",
+    "another": "Yeni Sorun",
+    "cost": "Tamirciye tahmini: ₺{{low}}–₺{{high}}",
+    "error": {
+      "empty": "Lütfen sorunu birkaç kelimeyle anlat"
+    },
+    "entry": {
+      "title": "Bir sorunu anlat",
+      "desc": "Yazıyla anlat, teşhis edeyim"
+    }
+  },
+  "fuel": {
+    "title": "Yakıt Takibi",
+    "avgConsumption": "Ort. tüketim",
+    "consumptionValue": "{{value}} L/100",
+    "totalSpent": "Toplam harcama",
+    "entries": "Dolum",
+    "consumptionHint": "Tüketim için en az 2 tam-depo dolumu gerekir.",
+    "addTitle": "Dolum Ekle",
+    "odometer": "Kilometre",
+    "odometerPlaceholder": "Örn: 102500",
+    "liters": "Litre",
+    "litersPlaceholder": "Örn: 42.5",
+    "total": "Tutar (TL, isteğe bağlı)",
+    "totalPlaceholder": "Örn: 1800",
+    "fullTank": "Depo tam dolduruldu",
+    "fullTankDesc": "Tüketim hesabı tam dolumlara göre yapılır",
+    "add": "Kaydet",
+    "historyTitle": "Geçmiş",
+    "empty": "Henüz dolum eklenmedi.",
+    "row": {
+      "liters": "{{liters}} L",
+      "km": "{{km}} km"
+    },
+    "error": {
+      "invalid": "Kilometre ve litre geçerli olmalı"
+    },
+    "entry": {
+      "title": "Yakıt Takibi",
+      "desc": "Tüketim (L/100km) ve masrafını izle"
+    }
+  },
+  "share": {
+    "report": {
+      "title": "🔧 Usta Raporu",
+      "km": "📍 {{km}} km",
+      "maintenance": "✅ {{count}} bakımı kendim yaptım, ~₺{{savings}} tasarruf",
+      "cta": "Cebindeki usta — sen de aracının ustası ol: {{link}}"
+    },
+    "invite": "🔧 Usta'yı dene — araç bakımını adım adım kendin yap, AI ile doğrula, paradan tasarruf et: {{link}}",
+    "achievement": "🔧 {{task}} işini kendim yaptım, ~₺{{savings}} tasarruf — Usta ile!"
+  },
+  "brief": {
+    "cta": "Mekaniğe Göster",
+    "sheetTitle": "Mekaniğe Göster",
+    "sheetHint": "Bu özeti tamirciye gösterebilir ya da paylaşabilirsin.",
+    "share": "Paylaş",
+    "findMechanic": "Tamirci Bul",
+    "title": "🔧 USTA ÖN DEĞERLENDİRME",
+    "vehicle": "Araç",
+    "engine": "Motor",
+    "task": "İşlem",
+    "complaint": "Şikâyet/Bulgu",
+    "system": "İlgili sistem",
+    "soundType": "Ses türü",
+    "confidence": "Güven",
+    "urgency": "Aciliyet",
+    "nextStep": "Öneri",
+    "estimate": "Usta'nın tamirci tahmini",
+    "date": "Tarih",
+    "kindImage": "Görüntü teşhisi",
+    "kindSound": "Ses teşhisi",
+    "disclaimer": "⚠️ Bu bir yapay zekâ ÖN değerlendirmesidir, kesin teşhis değildir. Lütfen kendi kontrolünüzü yapın.",
+    "footer": "— Usta uygulaması"
+  },
+  "mechanics": {
+    "title": "Tamirci Bul",
+    "verified": "Doğrulanmış",
+    "call": "Ara",
+    "whatsapp": "WhatsApp",
+    "directions": "Yol Tarifi",
+    "allCities": "Tüm şehirler",
+    "showAll": "Tüm şehirleri göster",
+    "empty": "Yakında bölgendeki tamirciler burada listelenecek.",
+    "disclaimer": "Tamirciler bağımsızdır; Usta yalnızca yönlendirir, hizmetten sorumlu değildir."
+  },
+  "feedback": {
+    "question": "Bu teşhis doğru çıktı mı?",
+    "thanks": "Teşekkürler — kaydedildi 🙌"
+  },
+  "resolution": {
+    "title": "Bu nasıl sonuçlandı?",
+    "thanks": "Teşekkürler — kaydedildi 🙌",
+    "kendim_cozdum": "Kendim çözdüm",
+    "tamirci_cozdu": "Tamirci çözdü",
+    "sorun_devam": "Sorun devam ediyor",
+    "yanlis_teshis": "Yanlış teşhis",
+    "costPrompt": "Tamirciye ne ödedin? (isteğe bağlı — başkalarına yardımcı olur)",
+    "costPlaceholder": "Örn: 2000",
+    "costSave": "Kaydet",
+    "costSkip": "Atla"
+  },
+  "sistem": {
+    "motor": "Motor",
+    "atesleme": "Ateşleme",
+    "fren": "Fren",
+    "elektrik": "Elektrik",
+    "lastik": "Lastik",
+    "filtre": "Filtre",
+    "suspansiyon": "Süspansiyon",
+    "sanziman": "Şanzıman",
+    "gorus": "Görüş",
+    "diger": "Diğer"
+  },
+  "privacy": {
+    "title": "Gizlilik",
+    "intro": "Verilerini sen yönetirsin. Rıza vermezsen hiçbir analitik gönderilmez. Aşağıdan dilediğin zaman değiştirebilir ya da tüm verini silebilirsin.",
+    "analytics": {
+      "title": "Kullanım analitiği",
+      "desc": "Uygulamayı geliştirmek için anonim ekran/olay verisi. Kapalıyken hiçbir analitik gönderilmez."
+    },
+    "data": {
+      "title": "Anonim katkı",
+      "desc": "Teşhislerin kimliğin olmadan toplu arıza istatistiklerine katkı sağlar (örn. 'şu modelde şu arıza sık')."
+    },
+    "stats": {
+      "title": "Topluluk istatistikleri",
+      "empty": "Henüz yeterli anonim veri yok — kullandıkça birikir.",
+      "count": "{{count}} teşhis",
+      "accuracy": "%{{pct}} doğru"
+    },
+    "delete": {
+      "title": "Verini sil",
+      "desc": "Hesabını ve tüm araç/bakım/teşhis verini kalıcı olarak siler. Geri alınamaz.",
+      "button": "Tüm verimi sil",
+      "confirmTitle": "Emin misin?",
+      "confirmMsg": "Hesabın ve tüm verin kalıcı olarak silinecek. Bu işlem geri alınamaz.",
+      "confirm": "Sil",
+      "errorTitle": "Silinemedi",
+      "errorMsg": "Bir şeyler ters gitti, tekrar dene."
+    }
+  },
+  "notifications": {
+    "title": "Usta hatırlatıyor 🔧",
+    "body": "{{name}} {{label}} tarihi yaklaşıyor: {{date}} ({{days}} gün kaldı).",
+    "mtvBody": "MTV son ödeme tarihi yaklaşıyor: {{date}} ({{days}} gün kaldı)."
   },
   "common": {
     "loading": "Yükleniyor…",

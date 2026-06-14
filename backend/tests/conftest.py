@@ -56,18 +56,73 @@ DEFAULT_SOUND = {
     "tamirciye_git_onerisi": False,
 }
 
+DEFAULT_DASHBOARD = {
+    "tespit": "Büyük ihtimalle sarı motor arıza ışığı yanıyor.",
+    "guven": "orta",
+    "isiklar": [
+        {
+            "isim": "Motor arıza lambası (check engine)",
+            "renk": "sari",
+            "anlam": "Büyük ihtimalle motor yönetiminde bir arıza kodu var.",
+            "aciliyet": "orta",
+            "ne_yapmali": "Yakın zamanda arıza kodunu okut.",
+        }
+    ],
+    "en_yuksek_aciliyet": "orta",
+    "guvenlik_uyarisi": None,
+    "sonraki_adim": "Yakın zamanda tamirciye uğra.",
+    "tamirciye_git_onerisi": True,
+}
+
+
+DEFAULT_DTC = {
+    "tespit": "Büyük ihtimalle P0300, çoklu silindir ateşleme teklemesi demek.",
+    "guven": "orta",
+    "kod": "P0300",
+    "baslik": "Rastgele/çoklu silindir ateşleme teklemesi",
+    "olasi_nedenler": ["Eskimiş buji veya bobin", "Yakıt karışımı sorunu"],
+    "aciliyet": "orta",
+    "surulebilir_mi": False,
+    "sonraki_adim": "Bujileri ve bobinleri kontrol ettir.",
+    "guvenlik_uyarisi": None,
+    "tamirciye_git_onerisi": True,
+}
+
+
+DEFAULT_SYMPTOM = {
+    "tespit": "Büyük ihtimalle rölantide düzensiz çalışma var.",
+    "guven": "orta",
+    "olasi_nedenler": ["Eskimiş buji", "Hava kaçağı"],
+    "ariza_sistem": "atesleme",
+    "aciliyet": "orta",
+    "sonraki_adim": "Bujileri kontrol ettir.",
+    "guvenlik_uyarisi": None,
+    "tamirciye_git_onerisi": True,
+}
+
 
 class FakeClaudeClient:
     def __init__(self) -> None:
         self.image_response = dict(DEFAULT_IMAGE)
         self.sound_response = dict(DEFAULT_SOUND)
+        self.dashboard_response = dict(DEFAULT_DASHBOARD)
+        self.dtc_response = dict(DEFAULT_DTC)
+        self.symptom_response = dict(DEFAULT_SYMPTOM)
         self.tokens_in = 120
         self.tokens_out = 40
         self.calls: list[dict] = []
 
     async def complete_json(self, *, model, system, content, max_tokens=None) -> ClaudeResult:
         self.calls.append({"model": model, "system": system, "content": content})
-        data = self.image_response if isinstance(content, list) else self.sound_response
+        if isinstance(content, list):
+            # Görüntü tabanlı çağrılar; pano prompt'u ile görüntü teşhisini ayır.
+            data = self.dashboard_response if "PANO" in (system or "") else self.image_response
+        elif "ARIZA KODU" in (system or ""):
+            data = self.dtc_response
+        elif "BELİRTİ" in (system or ""):
+            data = self.symptom_response
+        else:
+            data = self.sound_response
         return ClaudeResult(data=dict(data), tokens_in=self.tokens_in, tokens_out=self.tokens_out)
 
 

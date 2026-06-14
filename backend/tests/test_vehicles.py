@@ -19,6 +19,34 @@ async def test_create_and_list_vehicle(client):
 
 
 @pytest.mark.asyncio
+async def test_vehicle_dates_roundtrip(client):
+    """muayene/sigorta tarihleri create + update üzerinden korunur."""
+    headers = await register_and_login(client, "vdate@usta.app")
+    r = await client.post(
+        "/v1/vehicles",
+        json={
+            "make": "Fiat", "model": "Egea", "year": 2019, "fuel_type": "lpg",
+            "muayene_date": "2027-03-15", "sigorta_date": "2026-08-01",
+        },
+        headers=headers,
+    )
+    assert r.status_code == 201
+    body = r.json()
+    assert body["muayene_date"] == "2027-03-15"
+    assert body["sigorta_date"] == "2026-08-01"
+
+    # Güncelleme yalnızca verilen tarihi değiştirir.
+    r = await client.patch(
+        f"/v1/vehicles/{body['id']}",
+        json={"sigorta_date": "2027-08-01"},
+        headers=headers,
+    )
+    assert r.status_code == 200
+    assert r.json()["sigorta_date"] == "2027-08-01"
+    assert r.json()["muayene_date"] == "2027-03-15"  # dokunulmadı
+
+
+@pytest.mark.asyncio
 async def test_create_vehicle_requires_auth_401(client):
     r = await client.post("/v1/vehicles", json={"make": "Fiat", "model": "Egea", "year": 2019, "fuel_type": "lpg"})
     assert r.status_code == 401

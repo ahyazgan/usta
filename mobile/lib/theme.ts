@@ -1,24 +1,46 @@
 /**
- * "Gece Garajı" (Night Garage) design tokens for Usta.
- * Dark theme is the default and only theme.
+ * "Gündüz Servisi" (Daylight Service) design tokens for Usta.
+ * Light theme — cream surfaces, ink-black primary, green for healthy state.
+ * (Mockup-aligned redesign; replaces the former dark "Gece Garajı" theme.)
  */
 
 export const colors = {
-  /** zemin */
-  background: '#16181D',
-  /** yüzey */
-  surface: '#1D2026',
-  border: '#2A2D34',
-  /** vurgu / amber */
-  accent: '#FF8A00',
-  /** ✓ — green ONLY for verification / correct-place state */
-  success: '#22C55E',
-  /** ✗ */
-  danger: '#EF4444',
-  /** uyarı */
-  warning: '#EAB308',
-  textPrimary: '#F2F3F5',
-  textSecondary: '#8B8E96',
+  /** sayfa zemini (krem) */
+  background: '#FAFAF8',
+  /** kart yüzeyi */
+  surface: '#FFFFFF',
+  border: '#EBEBEB',
+  /** birincil eylem / mürekkep — koyu kartlar ve ana butonlar */
+  ink: '#111111',
+  /** vurgu = birincil mürekkep (eski amber yerine) */
+  accent: '#111111',
+  /** olumlu / sağlıklı / ✓ doğrulama */
+  success: '#1D9E75',
+  /** sağlık çubuğu / canlı yeşil */
+  successBright: '#2ECC71',
+  /** ✗ / acil */
+  danger: '#C0392B',
+  dangerBright: '#E24B4A',
+  /** uyarı / yaklaşıyor */
+  warning: '#BA7517',
+  warningBright: '#F59E0B',
+  textPrimary: '#111111',
+  textSecondary: '#888888',
+  /** koyu kart üzerindeki metin */
+  onInk: '#FFFFFF',
+  onInkMuted: 'rgba(255,255,255,0.55)',
+
+  /** durum rozeti / yumuşak zeminler */
+  okSoftBg: '#E8F8F2',
+  okSoftText: '#1D9E75',
+  warnSoftBg: '#FFF3E0',
+  warnSoftText: '#BA7517',
+  urgentSoftBg: '#FEECEC',
+  urgentSoftText: '#C0392B',
+  /** tasarruf bandı */
+  savingsBg: '#F0FBF6',
+  savingsBorder: '#C8EFE0',
+  savingsText: '#0F6E56',
 } as const;
 
 export const fonts = {

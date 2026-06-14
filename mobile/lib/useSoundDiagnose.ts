@@ -5,6 +5,7 @@
  */
 import { useCallback, useMemo, useState } from 'react';
 
+import { capture } from '@/lib/analytics';
 import {
   ApiError,
   createApiClient,
@@ -69,6 +70,7 @@ export function useSoundDiagnose(): UseSoundDiagnose {
           condition,
         });
         setResult(res);
+        void capture('diagnosis_sound', { kategori: res.ses_kategorisi, condition });
       } catch (err) {
         setError(errorKey(err));
       } finally {

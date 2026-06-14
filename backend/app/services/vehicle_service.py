@@ -39,9 +39,13 @@ async def create_vehicle(db: AsyncSession, user_id: int, payload: VehicleCreate)
         make=payload.make,
         model=payload.model,
         year=payload.year,
+        plate=payload.plate,
         fuel_type=payload.fuel_type,
+        vehicle_type=payload.vehicle_type,
         engine_code=payload.engine_code,
         current_km=payload.current_km,
+        muayene_date=payload.muayene_date,
+        sigorta_date=payload.sigorta_date,
     )
     # Spec verilmediyse TR araç parkı kataloğundan otomatik doldurmayı dene.
     spec_in = payload.spec or find_spec(
@@ -50,6 +54,7 @@ async def create_vehicle(db: AsyncSession, user_id: int, payload: VehicleCreate)
         payload.year,
         fuel_type=payload.fuel_type,
         engine_code=payload.engine_code,
+        vehicle_type=payload.vehicle_type,
     )
     if spec_in is not None:
         vehicle.spec = VehicleSpec(**spec_in.model_dump())

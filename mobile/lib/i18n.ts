@@ -16,6 +16,14 @@ i18n.enableFallback = true;
 const deviceLocale = getLocales()[0]?.languageCode ?? 'tr';
 i18n.locale = deviceLocale === 'en' ? 'en' : 'tr';
 
+/** Cihazın varsayılan dili (kullanıcı tercihi yoksa). */
+export const deviceDefaultLocale: 'tr' | 'en' = deviceLocale === 'en' ? 'en' : 'tr';
+
+/** Aktif dili değiştir (ayarlardan). Re-render için store + key-remount kullanılır. */
+export function applyLocale(locale: 'tr' | 'en'): void {
+  i18n.locale = locale;
+}
+
 export type TranslateOptions = Record<string, unknown>;
 
 export function t(key: string, opts?: TranslateOptions): string {

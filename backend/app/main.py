@@ -12,7 +12,23 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
 
-from .api import ai, auth, maintenance, tasks, vehicles
+from .api import (
+    account,
+    admin,
+    ai,
+    auth,
+    billing,
+    catalog,
+    estimates,
+    fuel,
+    live,
+    maintenance,
+    mechanics,
+    parts,
+    stats,
+    tasks,
+    vehicles,
+)
 from .config import get_settings
 from .database import SessionLocal, create_all
 from .domain.ai_errors import AIError
@@ -86,7 +102,17 @@ async def health() -> HealthResponse:
 
 
 app.include_router(auth.router)
+app.include_router(account.router)
+app.include_router(catalog.router)
 app.include_router(vehicles.router)
 app.include_router(tasks.router)
 app.include_router(maintenance.router)
+app.include_router(fuel.router)
+app.include_router(estimates.router)
 app.include_router(ai.router)
+app.include_router(live.router)
+app.include_router(parts.router)
+app.include_router(billing.router)
+app.include_router(admin.router)
+app.include_router(mechanics.router)
+app.include_router(stats.router)

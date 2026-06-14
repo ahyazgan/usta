@@ -2,10 +2,55 @@
 
 import pytest
 
-from app.domain.catalog import find_spec
+from app.domain.catalog import CATALOG, _parse_entry, find_spec
 from app.domain.enums import FuelType, VehicleType
 
 from .conftest import register_and_login
+
+
+def test_catalog_loads_from_json():
+    """Katalog JSON'dan yüklendi ve dolu (boş = veri dosyası okunamadı demek)."""
+    assert len(CATALOG) > 50
+    makes = {e.make for e in CATALOG}
+    assert {"BMW", "Renault", "Tesla", "Toyota"} <= makes
+
+
+def test_parse_entry_valid():
+    entry = _parse_entry(
+        {
+            "make": "Test",
+            "model": "X",
+            "year_min": 2010,
+            "year_max": 2020,
+            "vehicle_type": "araba",
+            "fuels": ["benzin", "lpg"],
+            "engine_codes": ["ABC"],
+            "spec": {"oil_spec": "5W-30"},
+        }
+    )
+    assert entry.make == "Test"
+    assert FuelType.lpg in entry.fuels
+    assert entry.spec.oil_spec == "5W-30"
+    assert entry.vehicle_type == VehicleType.araba
+
+
+def test_parse_entry_invalid_raises():
+    """Bozuk kayıt (eksik zorunlu alan / geçersiz enum) hata fırlatır → yükleyici
+    bunu yakalayıp o kaydı atlar, katalog çökmez."""
+    import pytest as _pytest
+
+    with _pytest.raises((KeyError, ValueError, TypeError)):
+        _parse_entry({"make": "Eksik"})  # year_min/model yok
+    with _pytest.raises((KeyError, ValueError, TypeError)):
+        _parse_entry(
+            {
+                "make": "Kötü",
+                "model": "Y",
+                "year_min": 2010,
+                "year_max": 2020,
+                "fuels": ["uçak"],  # geçersiz FuelType
+            }
+        )
 
 
 def test_find_spec_known_diesel_clio():

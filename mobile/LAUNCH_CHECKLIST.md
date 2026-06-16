@@ -40,16 +40,21 @@ eas build -p ios --profile preview     # gerektiğinde
 - **Apple Developer** hesabı gerekir ($99/yıl). EAS kimlik bilgilerini ister.
 - Camera/Microphone izin metinleri zaten app.json'da → Info.plist'e otomatik geçer.
 
-## 4) Mağaza yayını için kalanlar (SENİN sağlayacakların)
+## 4) Mağaza yayını için kalanlar
 | Gerek | Durum |
 |---|---|
 | Google Play geliştirici hesabı ($25 tek sefer) | senin |
 | Apple Developer ($99/yıl, iOS için) | senin |
-| **Hosted gizlilik politikası URL'i** (mağaza zorunlu) | gerekli — /privacy'yi bir web sayfasına da koy |
-| Mağaza görselleri (ekran görüntüleri, feature grafik) | gerekli |
-| Mağaza açıklaması (TR + EN) | gerekli |
-| App Store gizlilik etiketi (veri beyanı) | KVKK altyapımız kolaylaştırır |
+| **Hosted gizlilik politikası URL'i** (mağaza zorunlu) | ✅ **https://usta-backend.onrender.com/privacy** (backend `/privacy` route'u + uygulama içi "tam politikayı oku" linki) |
+| **Kullanım Şartları / EULA URL'i** (App Store bekler) | ✅ **https://usta-backend.onrender.com/terms** (backend `/terms` route'u + Ayarlar'da link; sorumluluk reddi + LPG + abonelik şartları) |
+| Mağaza açıklaması (TR + EN) | ✅ hazır → [STORE_LISTING.md](STORE_LISTING.md) |
+| App Store gizlilik etiketi + Play Veri Güvenliği beyanı | ✅ doldurulmuş → [STORE_LISTING.md](STORE_LISTING.md) |
+| Mağaza görselleri (ekran görüntüleri, feature grafik) | gerekli — APK'yı telefonda çalıştır + çek (kontrol listesi STORE_LISTING.md §7) |
 | Teşhis sorumluluk reddi ("kesin tavsiye değil") | ✅ uygulamada var (Apple lehine) |
+
+> Not: Gizlilik politikasındaki iletişim e-postası şu an `privacy@usta.app`
+> yer tutucusu — gönderimden önce geçerli bir adresle güncelle
+> ([privacy.html](../backend/app/static/privacy.html)).
 
 ## 5) Mağaza gönderimi (hazır olunca)
 ```bash

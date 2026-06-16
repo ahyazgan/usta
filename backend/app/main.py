@@ -5,11 +5,12 @@ from __future__ import annotations
 import time
 import uuid
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 import structlog
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from sqlalchemy import text
 
 from .api import (
@@ -99,6 +100,21 @@ async def health() -> HealthResponse:
     except Exception:  # pragma: no cover
         db_status = "down"
     return HealthResponse(status="ok", database=db_status)
+
+
+_STATIC_DIR = Path(__file__).resolve().parent / "static"
+
+
+@app.get("/privacy", include_in_schema=False)
+async def privacy_policy() -> FileResponse:
+    """Herkese açık gizlilik politikası (mağaza zorunlu URL'i)."""
+    return FileResponse(_STATIC_DIR / "privacy.html", media_type="text/html")
+
+
+@app.get("/terms", include_in_schema=False)
+async def terms_of_use() -> FileResponse:
+    """Herkese açık Kullanım Şartları / EULA (mağaza için)."""
+    return FileResponse(_STATIC_DIR / "terms.html", media_type="text/html")
 
 
 app.include_router(auth.router)

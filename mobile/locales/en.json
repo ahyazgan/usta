@@ -29,7 +29,8 @@
       "title": "Privacy & Legal",
       "policy": "Privacy Policy",
       "analytics": "Anonymous usage analytics",
-      "analyticsDesc": "Helps us improve the app (no personal data)"
+      "analyticsDesc": "Helps us improve the app (no personal data)",
+      "terms": "Terms of Use"
     },
     "actions": {
       "title": "Account Actions",
@@ -661,6 +662,10 @@
       "confirm": "Delete",
       "errorTitle": "Couldn't delete",
       "errorMsg": "Something went wrong, try again."
+    },
+    "policy": {
+      "title": "Legal",
+      "link": "Read the full privacy policy"
     }
   },
   "notifications": {

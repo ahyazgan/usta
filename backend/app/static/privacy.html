@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="index, follow" />
+<title>Usta — Gizlilik Politikası</title>
+<style>
+  :root {
+    --bg: #16181D; --surface: #1D2026; --border: #2A2D34;
+    --amber: #FF8A00; --text: #F2F3F5; --muted: #8B8E96;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, "Segoe UI", Roboto, Inter, system-ui, sans-serif;
+    line-height: 1.65; font-size: 16px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 32px 20px 80px; }
+  header { border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 28px; }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--amber); }
+  .brand h1 { font-size: 20px; margin: 0; letter-spacing: 0.5px; text-transform: uppercase; }
+  h2 { font-size: 19px; margin: 34px 0 10px; color: var(--text); }
+  h3 { font-size: 16px; margin: 22px 0 6px; color: var(--amber); }
+  p, li { color: var(--text); }
+  .muted { color: var(--muted); font-size: 14px; }
+  a { color: var(--amber); }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14.5px; }
+  th, td { text-align: left; padding: 9px 10px; border: 1px solid var(--border); vertical-align: top; }
+  th { background: var(--surface); color: var(--muted); font-weight: 600; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; margin: 16px 0; }
+  ul { padding-left: 22px; }
+  code { background: var(--surface); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; font-size: 13.5px; }
+  .lang-switch { font-size: 13px; }
+  footer { margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><span class="dot"></span><h1>Usta</h1></div>
+    <p class="muted" style="margin:10px 0 0;">Gizlilik Politikası &nbsp;·&nbsp; Son güncelleme: 16 Haziran 2026 &nbsp;·&nbsp; <a class="lang-switch" href="#english">English</a></p>
+  </header>
+
+  <p>Usta ("uygulama", "biz"), araç sahiplerine yapay zekâ destekli bakım rehberliği
+  sunan bir mobil uygulamadır. Bu politika, hangi kişisel verileri işlediğimizi, neden
+  ve nasıl işlediğimizi ve 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) ile
+  ilgili mevzuat kapsamındaki haklarınızı açıklar.</p>
+
+  <div class="card">
+    <strong>Özet:</strong> Verini sen yönetirsin. Açık rıza vermediğin sürece davranış
+    analitiği ve anonim küme katkısı <em>kapalıdır</em>. Teşhis için çektiğin fotoğraf ve
+    ses kayıtları yalnızca o an işlenir, <strong>sunucularımızda saklanmaz</strong>.
+    Hesabını ve tüm verini uygulama içinden tek dokunuşla kalıcı silebilirsin.
+  </div>
+
+  <h2>1. Veri Sorumlusu</h2>
+  <p>Veri sorumlusu Usta uygulamasını işleten taraftır. İletişim:
+  <a href="mailto:privacy@usta.app">privacy@usta.app</a>.
+  <span class="muted">(Yayın öncesi geçerli bir iletişim e-postası ile güncellenecektir.)</span></p>
+
+  <h2>2. İşlediğimiz Veriler</h2>
+
+  <h3>2.1 Hesap verileri</h3>
+  <table>
+    <tr><th>Veri</th><th>Amaç</th><th>Hukuki sebep</th></tr>
+    <tr><td>E-posta adresi</td><td>Hesap oluşturma, giriş, kurtarma</td><td>Sözleşmenin ifası</td></tr>
+    <tr><td>Şifre (geri döndürülemez şekilde <em>hash</em>'lenir; düz metin tutulmaz)</td><td>Kimlik doğrulama</td><td>Sözleşmenin ifası</td></tr>
+    <tr><td>Abonelik düzeyi (ücretsiz/premium)</td><td>Özellik erişimi, faturalama</td><td>Sözleşmenin ifası</td></tr>
+    <tr><td>Rıza tercihleri ve tarihi</td><td>Tercihlerine saygı, ispat yükümlülüğü</td><td>Açık rıza / hukuki yükümlülük</td></tr>
+  </table>
+
+  <h3>2.2 Araç ve bakım verileri</h3>
+  <table>
+    <tr><th>Veri</th><th>Amaç</th></tr>
+    <tr><td>Marka, model, yıl, yakıt türü, araç türü, motor kodu, güncel km</td><td>Araca özel teşhis ve rehberlik</td></tr>
+    <tr><td>Plaka <span class="muted">(opsiyonel)</span></td><td>Aracını ayırt etmen için; zorunlu değildir</td></tr>
+    <tr><td>Muayene ve sigorta tarihleri <span class="muted">(opsiyonel)</span></td><td>Takvim bazlı hatırlatıcılar</td></tr>
+    <tr><td>Bakım kayıtları, yakıt dolumları, beyan ettiğin maliyetler</td><td>Geçmiş takibi, tüketim ve maliyet endeksi</td></tr>
+  </table>
+
+  <h3>2.3 Yapay zekâ teşhis verileri</h3>
+  <p>Kamera fotoğrafı, gösterge paneli görüntüsü ve motor sesi <strong>tarifin</strong>,
+  teşhis üretmek için işlenir. Görüntü ve ses içeriği işlemden sonra <strong>kalıcı
+  olarak saklanmaz</strong>; yalnızca metin halindeki teşhis özeti (ör. tespit, güven
+  düzeyi, kategori), token kullanımı (maliyet denetimi) ve — verdiysen — geri bildirimin
+  kaydedilir. Teşhisler hiçbir zaman kesin tıbbi/teknik tavsiye değildir; "büyük ihtimalle"
+  dilinde, tamirciye yönlendirme çıkışıyla sunulur.</p>
+
+  <h3>2.4 Davranış ve kullanım verileri <span class="muted">(yalnızca açık rıza ile)</span></h3>
+  <ul>
+    <li><strong>Kullanım analitiği:</strong> Uygulamayı geliştirmek için anonim ekran/olay
+    verisi. Rıza kapalıyken hiçbir analitik gönderilmez.</li>
+    <li><strong>Anonim küme katkısı:</strong> Teşhislerin, kimliğin olmadan toplu arıza
+    istatistiklerine (ör. "şu modelde şu arıza sık") katkı sağlar.</li>
+    <li><strong>Yönlendirme sinyalleri:</strong> Bir tamirciyi araman/WhatsApp veya yol
+    tarifi açman, ya da bir parçanın satın-al bağlantısına dokunman kaydedilir
+    (hizmet eşleştirme ve iş modeli için).</li>
+  </ul>
+
+  <h2>3. Verilerin Aktarımı</h2>
+  <p>Verilerini satmıyoruz. Sınırlı veriyi yalnızca hizmeti sağlamak için aşağıdaki
+  hizmet sağlayıcılarla paylaşırız:</p>
+  <table>
+    <tr><th>Sağlayıcı</th><th>Paylaşılan veri</th><th>Amaç</th></tr>
+    <tr><td>Anthropic (Claude API)</td><td>Teşhis için fotoğraf/ses tarifi + araç bilgisi</td><td>Yapay zekâ teşhis üretimi</td></tr>
+    <tr><td>Bulut altyapı sağlayıcısı (sunucu barındırma)</td><td>Yukarıdaki hesap/araç verileri</td><td>Uygulamanın çalışması</td></tr>
+    <tr><td>Ödeme/uygulama mağazası sağlayıcısı</td><td>Abonelik işlemi bilgileri</td><td>Premium faturalama</td></tr>
+  </table>
+  <p class="muted">Bu sağlayıcılar yurt dışında sunucu işletebilir; aktarım KVKK md. 9
+  kapsamında, hizmetin ifası ve açık rızan çerçevesinde yapılır.</p>
+
+  <h2>4. Saklama Süresi</h2>
+  <ul>
+    <li>Hesap, araç ve bakım verileri: hesabın aktif olduğu sürece.</li>
+    <li>Teşhis görüntüsü/ses içeriği: <strong>saklanmaz</strong> (anlık işlenir).</li>
+    <li>Hesabını sildiğinde tüm kişisel verin <strong>kalıcı ve geri alınamaz</strong>
+    şekilde silinir (ilişkili araç/bakım/teşhis kayıtları dâhil — cascade silme).</li>
+  </ul>
+
+  <h2>5. Haklarınız (KVKK md. 11)</h2>
+  <p>Kişisel verilerinizle ilgili şu haklara sahipsiniz: işlenip işlenmediğini öğrenme,
+  bilgi talep etme, amacına uygun kullanılıp kullanılmadığını öğrenme, düzeltilmesini /
+  silinmesini isteme, rızanızı geri çekme ve işlemeye itiraz etme.</p>
+  <ul>
+    <li><strong>Silme:</strong> Uygulama → Ayarlar → Gizlilik → "Tüm verimi sil".</li>
+    <li><strong>Rıza geri çekme:</strong> Aynı ekrandaki analitik/veri anahtarları.</li>
+    <li><strong>Başvuru:</strong> <a href="mailto:privacy@usta.app">privacy@usta.app</a></li>
+  </ul>
+
+  <h2>6. Güvenlik</h2>
+  <p>Şifreler hash'lenir, yenileme token'ları yalnızca hash olarak saklanır, trafik HTTPS
+  ile şifrelenir ve sunucu güvenlik başlıkları (HSTS, nosniff, frame-deny) uygulanır.
+  Hiçbir yöntem %100 güvenli olamasa da verinizi makul teknik ve idari tedbirlerle koruruz.</p>
+
+  <h2>7. Çocukların Gizliliği</h2>
+  <p>Usta 18 yaş altı kullanıcılara yönelik değildir ve bilerek bu yaş grubundan veri
+  toplamaz.</p>
+
+  <h2>8. Değişiklikler</h2>
+  <p>Bu politikayı zaman zaman güncelleyebiliriz. Önemli değişikliklerde uygulama
+  içinden bilgilendirme yaparız. Bu sayfanın üst kısmındaki tarih son sürümü gösterir.</p>
+
+  <hr style="border:none;border-top:1px solid var(--border);margin:40px 0;" />
+
+  <h2 id="english">English Summary</h2>
+  <p>Usta is an AI-assisted car-maintenance guidance app. We process your account
+  (email, hashed password, subscription, consent preferences), vehicle and maintenance
+  data to provide vehicle-specific diagnostics and guidance. Diagnostic photos and engine-sound
+  descriptions are processed transiently and <strong>not stored</strong>; only a text summary
+  of each diagnosis is kept. Behavioral analytics and anonymous aggregate contribution are
+  <strong>off by default</strong> and only enabled with your explicit consent. We share limited
+  data with Anthropic (Claude API) for diagnosis, our hosting provider, and the app-store/payment
+  provider for billing — we never sell your data. You can permanently delete your account and all
+  data from <em>Settings → Privacy → Delete all my data</em>, and withdraw consent at any time.
+  For requests, contact <a href="mailto:privacy@usta.app">privacy@usta.app</a>. Diagnoses are
+  guidance only ("most likely…"), never definitive advice, and always include a path to a
+  professional mechanic.</p>
+
+  <footer>
+    <p class="muted">© 2026 Usta. Bu sayfa uygulama mağazalarının zorunlu kıldığı kamuya
+    açık gizlilik politikası URL'idir.</p>
+  </footer>
+</div>
+</body>
+</html>

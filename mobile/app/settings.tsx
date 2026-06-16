@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
+  Linking,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -14,7 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BottomTabBar } from '@/components/BottomTabBar';
-import { createApiClient, type Subscription } from '@/lib/api';
+import { API_BASE_URL, createApiClient, type Subscription } from '@/lib/api';
 import { t } from '@/lib/i18n';
 import type { AppLocale } from '@/lib/prefs';
 import { useUstaStore } from '@/lib/store';
@@ -197,6 +198,12 @@ export default function SettingsScreen() {
             icon="shield-checkmark-outline"
             label={t('settings.privacy.policy')}
             onPress={() => router.push('/privacy')}
+          />
+          <View style={styles.divider} />
+          <Row
+            icon="document-text-outline"
+            label={t('settings.privacy.terms')}
+            onPress={() => void Linking.openURL(`${API_BASE_URL}/terms`)}
           />
           <View style={styles.divider} />
           <Row

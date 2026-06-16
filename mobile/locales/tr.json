@@ -29,7 +29,8 @@
       "title": "Gizlilik & Yasal",
       "policy": "Gizlilik Politikası",
       "analytics": "Anonim kullanım analitiği",
-      "analyticsDesc": "Uygulamayı iyileştirmemize yardımcı olur (kişisel veri içermez)"
+      "analyticsDesc": "Uygulamayı iyileştirmemize yardımcı olur (kişisel veri içermez)",
+      "terms": "Kullanım Şartları"
     },
     "actions": {
       "title": "Hesap İşlemleri",
@@ -661,6 +662,10 @@
       "confirm": "Sil",
       "errorTitle": "Silinemedi",
       "errorMsg": "Bir şeyler ters gitti, tekrar dene."
+    },
+    "policy": {
+      "title": "Yasal",
+      "link": "Tam gizlilik politikasını oku"
     }
   },
   "notifications": {

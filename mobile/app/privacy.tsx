@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Linking,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -13,7 +14,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { createApiClient, type SystemStat } from '@/lib/api';
+import { API_BASE_URL, createApiClient, type SystemStat } from '@/lib/api';
 import { clearTokens } from '@/lib/auth';
 import { ensureDemoSession } from '@/lib/demoSession';
 import { t } from '@/lib/i18n';
@@ -212,6 +213,18 @@ export default function PrivacyScreen() {
             </View>
           )}
 
+          {/* Tam yasal metin — mağaza zorunlu, herkese açık URL */}
+          <Text style={styles.sectionTitle}>{t('privacy.policy.title')}</Text>
+          <Pressable
+            accessibilityRole="link"
+            onPress={() => void Linking.openURL(`${API_BASE_URL}/privacy`)}
+            style={({ pressed }) => [styles.policyLink, pressed && styles.pressed]}
+          >
+            <Ionicons name="document-text-outline" size={18} color={theme.colors.ink} />
+            <Text style={styles.policyLinkText}>{t('privacy.policy.link')}</Text>
+            <Ionicons name="open-outline" size={16} color={theme.colors.textSecondary} />
+          </Pressable>
+
           {/* Silme/unutulma hakkı */}
           <Text style={styles.sectionTitle}>{t('privacy.delete.title')}</Text>
           <Text style={styles.deleteDesc}>{t('privacy.delete.desc')}</Text>
@@ -273,6 +286,25 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.border,
     padding: theme.spacing.lg,
+  },
+  policyLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.lg,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+    minHeight: 56,
+  },
+  policyLinkText: {
+    flex: 1,
+    fontFamily: theme.fonts.body,
+    fontSize: 15,
+    fontWeight: '600',
+    color: theme.colors.ink,
   },
   toggleRow: {
     flexDirection: 'row',

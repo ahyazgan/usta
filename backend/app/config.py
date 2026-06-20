@@ -63,9 +63,19 @@ class Settings(BaseSettings):
     # Tek oturum sert üst sınırı (saniye) — kaçak maliyeti engeller.
     live_session_max_seconds: int = 600
 
+    # Geliştirme web origin'leri (Expo web): prod'da da bunlara izin verilir ki
+    # localhost'tan web uygulaması canlı backend'e bağlanabilsin.
+    dev_cors_origins: list[str] = [
+        "http://localhost:8081",
+        "http://localhost:8082",
+        "http://localhost:19006",
+    ]
+
     @property
     def cors_origins(self) -> list[str]:
-        return ["*"] if self.debug else [self.prod_cors_origin]
+        if self.debug:
+            return ["*"]
+        return [self.prod_cors_origin, *self.dev_cors_origins]
 
     @property
     def sqlalchemy_url(self) -> str:
